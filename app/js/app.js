@@ -193,10 +193,12 @@ MOUNT.username = el => {
     const v = inp.value.trim().toLowerCase(); inp.value = v;
     const ok = /^[a-z0-9._]{3,15}$/.test(v);
     b.disabled = !ok;
-    h.textContent = !v ? '3 to 15 letters, numbers, dots or underscores.' : ok ? `@${v} is free.` : 'Use 3 to 15 letters, numbers, dots or underscores.';
+    const mine = S.user && S.loggedOut && v === S.user.handle;
+    h.textContent = !v ? '3 to 15 letters, numbers, dots or underscores.' : mine ? `Welcome back, @${v}. Continue to pick up where you left off.` : ok ? `@${v} is free.` : 'Use 3 to 15 letters, numbers, dots or underscores.';
     h.className = 'hint ' + (!v ? '' : ok ? 'good' : 'bad');
   };
   inp.addEventListener('input', check);
+  if (S.user && S.loggedOut) { inp.value = S.user.handle; check(); }
   el.addEventListener('click', e => { const s = e.target.closest('[data-act="sugg"]'); if (s) { inp.value = s.dataset.v; check(); } });
   setTimeout(() => inp.focus(), 450);
 };
@@ -209,6 +211,16 @@ SCREENS.welcome = () => `<div class="onb">
     <div><span class="ic">${ic('stamp', 18)}</span>Every quiz you finish stamps your passport. Keep a streak for badges.</div>
   </div>
   <button class="btn ink" data-act="to-look">Make your look</button>
+</div>`;
+
+// --- welcome back (shown whenever a saved visitor opens the app)
+SCREENS.back = () => `<div class="onb back-onb">
+  <img class="facade" src="assets/facade.svg" alt="The Knowseum building">
+  <span class="backav pop"><img src="${avatarSrc()}" alt="Your avatar"></span>
+  <h1 class="brand rise" style="text-align:center">Welcome back, <em>@${esc(S.user.handle)}</em></h1>
+  <p class="sub" style="text-align:center">${ic('flame', 16, '#d6544b', 2)} ${S.streak}-day streak · ${stampCount()} stamp${stampCount() === 1 ? '' : 's'} · ${S.badges.length} badge${S.badges.length === 1 ? '' : 's'}</p>
+  <button class="btn ink" data-act="continue-back">Continue</button>
+  <button class="btn line" data-act="logout">Not you? Log out</button>
 </div>`;
 
 // --- make your look
@@ -928,13 +940,19 @@ SCREENS.profile = () => `<div class="prof"><div class="bigav pop"><img src="${av
   <div class="menu rise"><button data-act="edit-look">${ic('pencil', 18)} Edit my look<small>›</small></button>
     <button data-act="next-day">${ic('flame', 18)} Simulate tomorrow<small>+1 streak day</small></button>
     <button data-act="week">${ic('flame', 18)} Simulate a week<small>+7 days</small></button>
+    <button data-act="logout">${ic('user', 18)} Log out<small>›</small></button>
     <button class="danger" data-act="reset">${ic('close', 18)} Reset my progress</button></div>
   <p class="ascii" style="text-align:center;margin:18px 0 10px">*.  demo build · progress saves on this browser only  .*</p>`;
 
 // ------------------------------------------------------------------ actions
 const ACT = {
   google: () => { pending.email = ''; go('username'); },
-  'handle-ok': () => { pending.handle = current.querySelector('#handle').value.trim().toLowerCase(); go('welcome'); },
+  'handle-ok': () => { pending.handle = current.querySelector('#handle').value.trim().toLowerCase();
+    if (S.user && S.loggedOut) {
+      if (pending.handle === S.user.handle) { S.loggedOut = false; save(); go('lobby', {}, 'fade'); toast(`${tick(18, '#e7cf6a', 3)} Welcome back, @${esc(S.user.handle)}`); return; }
+      S = fresh(); save();
+    }
+    go('welcome'); },
   'to-look': () => { lookDraft = null; lookTab = 'Hair'; go('look'); },
   girl: el => { const girl = el.dataset.v === '1'; if (girl === lookDraft.girl) return; lookDraft.girl = girl; lookDraft.hair = girl ? 'buns' : 'curly';
     if (!OUTFITS[girl ? 'g' : 'b'].some(o => o[0] === lookDraft.outfit)) lookDraft.outfit = 'hoodie'; rerenderLook(); },
@@ -1035,6 +1053,10 @@ const ACT = {
   reset: () => openSheet(`<h2 style="margin:6px 0 4px">Reset everything?</h2><p style="color:var(--body);margin:0 0 18px">This clears your look, stamps, badges and scores on this browser.</p>
     <div style="display:grid;gap:10px"><button class="btn ink" style="background:var(--red)" data-act="reset-yes">Reset progress</button><button class="btn line" data-act="close-sheet">Cancel</button></div>`),
   'reset-yes': () => { S = fresh(); save(); go('signin', {}, 'fade'); },
+  'continue-back': () => { go('lobby', {}, 'fade'); const nb = checkBadges(); if (nb.length) setTimeout(() => showBadges(nb), 700); },
+  logout: () => openSheet(`<h2 style="margin:6px 0 4px">Log out?</h2><p style="color:var(--body);margin:0 0 18px">Your progress stays saved on this device. Sign in again with <b>@${esc(S.user.handle)}</b> to pick up where you left off. A different username starts a fresh museum visit.</p>
+    <div style="display:grid;gap:10px"><button class="btn ink" data-act="logout-yes">Log out</button><button class="btn line" data-act="close-sheet">Cancel</button></div>`),
+  'logout-yes': () => { S.loggedOut = true; save(); closeSheet(); go('signin', {}, 'fade'); },
 };
 function addDays(n) { S.streak += n; save(); const nb = checkBadges(); go('profile', {}, 'none'); toast(`${ic('flame', 16, '#e7cf6a', 2)} ${S.streak}-day streak`); if (nb.length) setTimeout(() => showBadges(nb, () => go('profile', {}, 'none')), 500); }
 let storyK = 'singapore';
@@ -1048,5 +1070,5 @@ device.addEventListener('click', e => {
 });
 
 // ------------------------------------------------------------------ boot
-go(S.user ? 'lobby' : 'signin', {}, 'fade');
+go(S.user && !S.loggedOut ? 'back' : 'signin', {}, 'fade');
 })();
