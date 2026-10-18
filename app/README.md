@@ -4,30 +4,7 @@ An interactive mobile web app for a gamified news museum built for young readers
 
 The app is plain HTML, CSS and JavaScript, with no frameworks and no build step.
 
-## Play it online
-
-Once GitHub Pages is on (see below), the app lives at **https://altnisthon.github.io/Knowseum/app/**. Open it on your phone and add it to your home screen if you like.
-
-### Turn on GitHub Pages (one time, repo owner only)
-
-1. On GitHub, open the repo → **Settings** → **Pages**.
-2. Under **Build and deployment**, set **Source** to *Deploy from a branch*.
-3. Pick branch **main** and folder **/ (root)**, then **Save**.
-4. Wait a minute or two. The link above starts working, and every push to `main` updates it.
-
-## Work on it together
-
-1. **Add your friend:** repo → **Settings** → **Collaborators** → **Add people** → enter her GitHub username. She accepts the email invite.
-2. **Get the code:** she clicks the green **Code** button → **Open with GitHub Desktop** (easiest), or runs `git clone https://github.com/altnisthon/Knowseum.git`.
-3. **Make a change on a branch:** create a branch (e.g. `new-quiz-questions`), edit files in `app/`, commit, and push.
-4. **Open a pull request** on GitHub so the other person can look before it goes into `main`.
-5. **Before starting work each time, pull** the latest `main` so you don't edit old code.
-
-Tip: if you both edit the same file at the same time, GitHub will ask you to pick which lines to keep (a "merge conflict"). Splitting work by file helps: for example one person edits `js/stories.js`, the other edits `js/data.js`.
-
-You can also edit a single file straight on github.com: open the file → pencil icon → **Commit changes**.
-
-## Run it on your computer
+## Run it
 
 **Easiest:** double-click `index.html`. It opens in your browser, and every screen works from a local file.
 
@@ -47,7 +24,7 @@ On a computer it shows inside a phone frame. On a phone it fills the screen.
 | Sign in → Username → Welcome | Email or Google (mock), pick an `@handle` with live checking |
 | Make your look | Girl/boy toggle, shuffle and colour buttons, and four tabs: **Hair** (6 styles + 6 colours), **Outfit** (6 outfits + 6 colours), **Accessories** (6 to start, wear up to 2, plus 6 earned in the museum), **Secret** (9 items unlocked by your streak and quiz count) |
 | Lobby | The isometric museum fills the screen. Hold your character and drag it to a doorway to walk in (or tap the floor or a door). Wings drawer at the bottom opens the full list |
-| Wing room | Each wing's isometric room. Tap the Newsworthy wall to walk up to it. Furnish the room by finishing quizzes there (couch, coffee table, trophy, then 3 more). World, Environment and Culture rooms have a topic quiz until their story arrives |
+| Wing room | Each wing's isometric room. Tap the Newsworthy wall to walk up to it. Furnish the room by finishing quizzes there (couch, coffee table, trophy, then 3 more). World, Environment and Culture rooms show their painting; their wall has the headline, a link to the article, "coming soon" activities and a one-question warm-up quiz |
 | Newsworthy Wall | Gilded painting, headline plaque, three activity cards with completion ticks |
 | Newsworthy Wall | Swipe the gilded frames (or use the arrows). Frame 1 is this week's story; the others are "coming soon" placeholders for the demo |
 | Step into the story | 14 interactive frames per article: swipe the panel, tap to reveal, hold for the F1 lights-out start, drag the race replay, toggle comparisons, run a scan, read the incident log, and a 3-question checkpoint quiz. Continue lights up once you've done each frame's thing |

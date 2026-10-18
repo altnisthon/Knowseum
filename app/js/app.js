@@ -309,7 +309,7 @@ SCREENS.lobby = () => {
         <div class="stat"><b>${S.quizzesDone}</b><span>quizzes done</span></div></div>
       <div class="wrows">${KN.wings.map(w => {
         const art = ART[w.key];
-        const sub = art ? art.headline : `Topic quiz: ${W_.rooms[w.key].short}`;
+        const sub = art ? art.headline : WALL_ONLY[w.key].headline;
         const prog = art ? `<span class="pips">${[0, 1, 2, 3, 4].map(i => `<i class="${i < actsDone(w.key) ? 'on' : ''}"></i>`).join('')}</span>` : `<span class="tq ${S.topic[w.key] ? 'done' : ''}">${S.topic[w.key] ? 'Done' : 'Quiz'}</span>`;
         return `<button class="wrow" data-act="enter-wing" data-v="${w.key}" style="--c:${w.color};--t:${w.tint}"><span class="sw2"><i></i></span><span class="tx"><b>${w.name} Wing</b><small>${esc(sub)}</small></span>${prog}${ic('chev', 18, '#7d7972', 2)}</button>`;
       }).join('')}</div></div></div></div></div>`;
@@ -398,20 +398,20 @@ SCREENS.room = ({ k }) => {
   const w = KN.wings.find(x => x.key === k), R = W_.rooms[k], art = ART[k];
   const lvl = art ? furnLevel(k) : 0, st = R[String(lvl)];
   const runs = wingRuns(k), placed = R.furn.filter(f => runs >= f[3]).length;
-  const topic = !art;
+  const topic = !art, only = WALL_ONLY[k];
   const tipShown = !S.tipHidden[k];
   const prizes = art ? LEVELS.map(l => art.rewards[l]).filter(r => r.where === 'room item' && S.arts[k].items.includes(r.item)) : [];
   return `<div style="--c:${w.color};--t:${w.tint}">${topbar(`${w.name} Wing`, topic ? 'Room 1 of 1 · not furnished yet' : `Room 1 of 1 · ${placed ? placed + ' furnishing' + (placed > 1 ? 's' : '') : 'not furnished yet'}`, 'to-lobby', `<span class="round" style="background:#f4eccb;overflow:hidden;padding:0"><img src="${avatarSrc(null, false, true)}" alt="" style="width:40px;height:40px"></span>`)}
   <div class="iso room" id="roomart"><img src="assets/rooms/room-${k}-${lvl}.webp" alt="The ${w.name} Wing room${lvl ? ', furnished' : ''}">
-    <button class="hot" data-act="room-wall" data-v="${k}" style="${lp(...st.wall, 390, 330)}"><span class="hring"></span><span class="dl on">${topic ? 'Topic quiz' : 'Newsworthy wall'}</span></button>
+    <button class="hot" data-act="room-wall" data-v="${k}" style="${lp(...st.wall, 390, 330)}"><span class="hring"></span><span class="dl on">Newsworthy wall</span></button>
     ${lvl >= 3 ? `<span class="hot static" style="${lp(...st.trophy, 390, 330)}"><span class="dl">${art ? 'Trophy' : ''}</span></span>` : ''}
     <span class="walker" id="rwalker" style="${lp(...st.me, 390, 330)};${walkerW(st.k)}"><img src="${avatarSrc(null, true)}" alt="You"></span></div>
   ${tipShown && !placed ? `<div class="tipcard rise"><div class="h"><span class="ic">${ic('spark', 18, '#1c1b19', 1.9)}</span><b>Make this room yours</b><button data-act="hide-tip" data-v="${k}" aria-label="Close tip">${ic('close', 14, '#fff', 2.2)}</button></div>
-    <p>${topic ? `This wing's story isn't on the wall yet. Warm up with the topic quiz and come back when the article lands.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
+    <p>${topic ? `This wing's story is on the Newsworthy wall. Its activities land soon, and there's a warm-up topic quiz there meanwhile.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
-  <button class="wallcard rise" data-act="room-wall" data-v="${k}"><span class="thumb">${topic ? `<span class="qthumb">?<small>TOPIC QUIZ</small></span>` : `<img src="assets/paintings/${art.painting}.webp" alt="">`}</span>
-    <span class="tx"><span class="label">Newsworthy wall</span><b>${topic ? `Topic quiz: ${R.short}` : '3 frames to explore'}</b><span class="mini">${ic(topic ? 'play' : 'chev', 14, '#fff', 2.2, topic ? '#fff' : 'none')} ${topic ? (S.topic[k] ? 'Play again' : 'Take the quiz') : 'View wall'}</span></span></button>
-  ${topic ? `<p class="ascii" style="text-align:center;margin:18px 0 30px">*. the full story lands on this wall soon .*</p>` : `
+  <button class="wallcard rise" data-act="room-wall" data-v="${k}"><span class="thumb"><img src="assets/paintings/${(art || only).painting}.webp" alt=""></span>
+    <span class="tx"><span class="label">Newsworthy wall</span><b>${topic ? esc(only.headline) : '3 frames to explore'}</b><span class="mini">${ic('chev', 14, '#fff', 2.2)} View wall</span></span></button>
+  ${topic ? `<p class="ascii" style="text-align:center;margin:18px 0 30px">*. room furnishings arrive with this wing's quizzes .*</p>` : `
   <div class="furnish rise"><div class="fh"><b>Furnish your room</b><span>${placed} of ${R.furn.length}</span></div>
     <div class="fbar"><span>${runs} of 12 quizzes done in this wing</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
     <div class="lgrid">${R.furn.map(([kind, name, , q], i) => { const got = runs >= q, isNew = got && q === runs;
@@ -437,10 +437,27 @@ function topicQuiz(k) {
 }
 
 // --- newsworthy wall
+// wings whose story is on the wall but whose activities aren't built yet (headline + painting only)
+const WALL_ONLY = {
+  environment: { headline: '\u2018Why would I want to harm myself?\u2019: Some delivery riders look to cut hours as haze worsens', painting: 'haze', topic: 'Haze and delivery riders', src: 'The Straits Times', date: '15 Oct 2026', url: 'https://sg.news.yahoo.com/why-want-harm-myself-delivery-092020108.html' },
+  culture: { headline: 'Chinamaxxing? Boiling apples won\u2019t make you Chinese', painting: 'chinamaxxing', topic: 'Chinamaxxing', src: 'The Straits Times', date: '1 Mar 2026', url: 'https://www.pressreader.com/singapore/the-straits-times/20260301/281844355118509' },
+  world: { headline: 'Central Ukrainian region hit by vast drone attack, killing three', painting: 'ukraine', topic: 'Drone attack in Ukraine', src: 'Reuters \u00b7 The Straits Times', date: '15 Oct 2026', url: 'https://www.straitstimes.com/world/europe/central-ukrainian-region-hit-by-vast-drone-attack-killing-three' },
+};
+const ARTICLE_URL = { politics: 'https://sg.news.yahoo.com/govts-must-incentivise-private-sector-115433630.html', singapore: 'https://www.redhot.sg/mercedes-kimi-antonelli-within-touching-distance-of-maiden-f1-title-after-finishing-3rd-at-s-pore-gp-726764.html', tech: 'https://sg.news.yahoo.com/anthropic-signs-mou-singapore-evaluate-083000721.html' };
+const wallArt = k => ART[k] || (() => { const w = KN.wings.find(x => x.key === k), o = WALL_ONLY[k]; return { ...o, color: w.color, tint: w.tint, wingName: w.name + ' Wing', only: true }; })();
 const WALL_PH = [{ img: 'blur1', t: 'A new story lands on this wall next week' }, { img: 'blur2', t: 'Another headline is on its way' }, { img: null, t: 'More stories from this wing, coming soon' }];
 let wallIdx = 0;
 function wallInfo(k, i) {
-  const a = ART[k], st = S.arts[k], lvDone = LEVELS.filter(l => st.best[l] !== null).length, N = WALL_PH.length + 1;
+  const a = wallArt(k), N = WALL_PH.length + 1;
+  if (i === 0 && a.only) {
+    const R = W_.rooms[k], done = S.topic[k];
+    return `<div class="plaque rise"><div class="label">${a.wingName} · Frame 1 of ${N}</div><h2>${esc(a.headline)}</h2>
+    <div class="row"><span>${a.src} · ${a.date}</span><button data-act="read-article" data-url="${a.url}">${ic('book', 15)} Read article</button></div></div>
+  <div class="acts-h"><span class="label" style="color:var(--ink)">Activities for this story land soon</span><span class="ascii" style="color:${a.color}">[---]</span></div>
+  <div class="acts locked">${['Step into the story', 'Perspectives', 'Quiz'].map((n, j) => `<button class="act ph rise" data-act="wall-soon" data-v="this" style="animation-delay:${j * .05}s"><span class="lk">${ic('lock', 18, '#9d988f', 2)}</span><b>${n}</b><small>Coming soon</small></button>`).join('')}</div>
+  <button class="tqcard rise" data-act="topic-open" data-v="${k}"><span class="q">?</span><span class="tx"><span class="label">Warm-up · topic quiz</span><b>${esc(R.quiz[0])}</b><small>${done ? (done.ok ? 'Done · you got it right' : 'Done · try again any time') : '1 question · counts toward your quiz badges'}</small></span>${ic('chev', 18, '#1c1b19', 2.2)}</button>`;
+  }
+  const st = S.arts[k] || { best: {} }, lvDone = a.only ? 0 : LEVELS.filter(l => st.best[l] !== null).length;
   if (i > 0) {
     const ph = WALL_PH[i - 1];
     return `<div class="plaque ph rise"><div class="label">${a.wingName} · Frame ${i + 1} of ${N} · coming soon</div><h2>${esc(ph.t)}</h2>
@@ -449,7 +466,7 @@ function wallInfo(k, i) {
     <div class="acts locked">${['Step into the story', 'Perspectives', 'Quiz'].map((n, j) => `<button class="act ph rise" data-act="wall-soon" style="animation-delay:${j * .05}s"><span class="lk">${ic('lock', 18, '#9d988f', 2)}</span><b>${n}</b><small>Soon</small></button>`).join('')}</div>`;
   }
   return `<div class="plaque rise"><div class="label">${a.wingName} · Frame 1 of ${N}</div><h2>${esc(a.headline)}</h2>
-    <div class="row"><span>The Straits Times · ${a.date}</span><button data-act="read-article">${ic('book', 15)} Read article</button></div></div>
+    <div class="row"><span>The Straits Times · ${a.date}</span><button data-act="read-article" data-url="${ARTICLE_URL[k] || ''}">${ic('book', 15)} Read article</button></div></div>
   <div class="acts-h"><span class="label" style="color:var(--ink)">Pick an activity · any order</span><span class="ascii" style="color:${a.color}">[${'#'.repeat([st.story, st.persp, lvDone === 3].filter(Boolean).length)}${'-'.repeat(3 - [st.story, st.persp, lvDone === 3].filter(Boolean).length)}]</span></div>
   <div class="acts">
     <button class="act story rise" data-act="story" data-v="${k}"><span class="play">${ic('play', 18, '#fff', 2, '#fff')}</span><b>Step into the story</b><small>14 frames</small>${st.story ? `<span class="tick-badge">${tick(16, '#fff', 3)}</span>` : ''}</button>
@@ -458,7 +475,7 @@ function wallInfo(k, i) {
   </div>`;
 }
 SCREENS.wall = ({ k }) => {
-  const a = ART[k];
+  const a = wallArt(k);
   const showTip = !S.seenTip;
   const other = ['politics', 'kimi', 'tech'].find(p => p !== a.painting);
   const slides = [{ img: a.painting }, ...WALL_PH.map(p => ({ img: p.img || other, ph: true }))];
@@ -487,7 +504,7 @@ MOUNT.wall = (el, { k }) => {
       wallIdx = best;
       [...tr.children].forEach((s, i) => s.classList.toggle('on', i === best));
       el.querySelectorAll('#walldots i').forEach((d, i) => d.classList.toggle('on', i === best));
-      el.querySelector('#wallsub').textContent = `${ART[k].wingName} · ${best + 1} of ${N}`;
+      el.querySelector('#wallsub').textContent = `${wallArt(k).wingName} · ${best + 1} of ${N}`;
       el.querySelector('#wallinfo').innerHTML = wallInfo(k, best);
       const t = el.querySelector('#newtip'); if (t && best) { S.seenTip = true; save(); t.remove(); }
     }
@@ -829,7 +846,7 @@ function mapSVG(L) {
     const n = 7, dots = Array.from({ length: n }, (_, i) => `<circle cx="${x + 26 + i * ((w - 52) / (n - 1))}" cy="${y + 24}" r="7" fill="${i < Math.round(st / 5 * n) ? wg.color : '#fff'}" stroke="${wg.color}" stroke-width="2.4"/>`).join('');
     return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${wg.tint}" stroke="${wg.color}" stroke-width="3.4"/>${dots}
       <text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" font-size="${wg.name.length > 12 ? 27 : 33}" font-weight="800" fill="#1c1b19">${esc(wg.name.replace('Singapore ', 'SG '))}</text>
-      <text x="${x + w / 2}" y="${y + h / 2 + 38}" text-anchor="middle" font-size="22" fill="#5d5950">${open ? '7 stations' : 'Topic quiz'}</text>
+      <text x="${x + w / 2}" y="${y + h / 2 + 38}" text-anchor="middle" font-size="22" fill="#5d5950">${open ? '7 stations' : 'On the wall'}</text>
       <path d="M${x + w / 2 - 40} ${y + h - 30} q40 -40 80 -10" fill="none" stroke="${wg.color}" stroke-width="2.2" stroke-dasharray="5 6" opacity=".6"/></g>`;
   };
   const cx = L.m + L.cw + L.gap / 2, cx2 = L.m + 2 * L.cw + 1.5 * L.gap, ry1 = L.top + L.rh + L.gap / 2, ry2 = L.top + 2 * L.rh + 1.5 * L.gap;
@@ -950,16 +967,18 @@ const ACT = {
   'coach-x': el => tipDone(el.dataset.v),
   'drag-help': el => { const k = el.dataset.v; S.tips[k] = false; save(); go(k, {}, 'none'); },
   'room-wall': el => { const k = el.dataset.v, st = W_.rooms[k][String(ART[k] ? furnLevel(k) : 0)];
-    walkTo('rwalker', st.wall[0] - 6, st.wall[1] + 44, 390, 330, () => { if (ART[k]) go('wall', { k }); else { go('room', { k }, 'none'); topicQuiz(k); } }); },
+    walkTo('rwalker', st.wall[0] - 6, st.wall[1] + 44, 390, 330, () => go('wall', { k })); },
   'hide-tip': el => { S.tipHidden[el.dataset.v] = true; save(); const t = current.querySelector('.tipcard'); if (t) { t.style.animation = 'fadeOut .25s both'; setTimeout(() => t.remove(), 250); } },
   'topic-ans': el => { const k = el.dataset.k, i = +el.dataset.v, R = W_.rooms[k], ok = i === R.quiz[2];
     const box = device.querySelector('#topts'); box.classList.add('locked');
     [...box.children].forEach((b, j) => { if (j === R.quiz[2]) { b.classList.add('right'); b.querySelector('.mark').innerHTML = tick(24); } else if (j === i) { b.classList.add('wrong'); b.querySelector('.mark').innerHTML = cross(22); } else b.classList.add('dim'); });
     const first = !S.topic[k]; S.topic[k] = { ok }; if (first) S.quizzesDone++; const nb = checkBadges(); save();
     device.querySelector('#tfeed').innerHTML = `<div class="rise" style="margin-top:16px"><b style="font-size:20px;color:${ok ? 'var(--green-d)' : 'var(--red)'}">${ok ? 'Correct!' : 'Not quite.'}</b>
-      <p style="color:var(--body);margin:6px 0 14px">${first ? 'That counts as a quiz toward your badges. ' : ''}The full ${R.short} story arrives on this wall soon.</p>
+      <p style="color:var(--body);margin:6px 0 14px">${first ? 'That counts as a quiz toward your badges. ' : ''}Read the full article from the plaque on the wall.</p>
       <button class="btn ink" data-act="topic-done" data-v="${k}" data-nb="${nb.map(b => b.key).join(',')}">Done</button></div>`; },
-  'topic-done': el => { const nb = (el.dataset.nb || '').split(',').filter(Boolean).map(k => ALLB.find(b => b.key === k)); closeSheet(); go('room', { k: el.dataset.v }, 'none'); if (nb.length) setTimeout(() => showBadges(nb), 350); },
+  'topic-open': el => topicQuiz(el.dataset.v),
+  'topic-done': el => { const nb = (el.dataset.nb || '').split(',').filter(Boolean).map(k => ALLB.find(b => b.key === k)); closeSheet();
+    if (currentName === 'wall') { const i = current.querySelector('#wallinfo'); if (i) i.innerHTML = wallInfo(el.dataset.v, 0); } else go('room', { k: el.dataset.v }, 'none'); if (nb.length) setTimeout(() => showBadges(nb), 350); },
   'to-room': el => go('room', { k: el.dataset.v }, 'back'),
   'locked-wing': el => toast(`${ic('lock', 16, '#fff')} The ${el.dataset.v} Wing opens soon.`),
   'to-lobby': () => go('lobby', {}, 'back'),
@@ -969,8 +988,8 @@ const ACT = {
   'hall-tab': el => { hallTab = +el.dataset.v; const sc = current.scrollTop; current.innerHTML = SCREENS.hall(); current.scrollTop = sc; },
   'to-hall': () => go('hall'),
   'wall-go': el => { const tr = current.querySelector('#wtrack'); if (!tr) return; const w = tr.children[0].offsetWidth + 16; const n = Math.max(0, Math.min(tr.children.length - 1, wallIdx + +el.dataset.v)); tr.scrollTo({ left: n * w, behavior: 'smooth' }); },
-  'wall-soon': () => toast(`${ic('lock', 16, '#fff')} This frame opens when its story lands. It's a placeholder for the demo.`),
-  'read-article': () => toast(`${ic('book', 16, '#fff')} This would open the Straits Times article.`),
+  'wall-soon': el => el.dataset.v === 'this' ? toast(`${ic('lock', 16, '#fff')} Step into the story, Perspectives and Quiz for this article land soon.`) : toast(`${ic('lock', 16, '#fff')} This frame opens when its story lands. It's a placeholder for the demo.`),
+  'read-article': el => { const u = el.dataset.url; if (u) window.open(u, '_blank', 'noopener'); else toast(`${ic('book', 16, '#fff')} This would open the Straits Times article.`); },
   story: el => { S.seenTip = true; save(); go('story', { k: el.dataset.v }, 'up'); },
   'story-close': () => go('wall', { k: curK() }, 'fade'),
   persp: el => { S.seenTip = true; save(); go('persp', { k: el.dataset.v }); },
