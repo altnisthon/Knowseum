@@ -942,3 +942,6 @@ img { max-width: 100%; display: block; }
 .tqcard .q { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--acc); display: grid; place-items: center; font: 800 26px var(--sans); }
 .tqcard .tx { flex: 1; display: flex; flex-direction: column; gap: 2px; } .tqcard .tx b { font-size: 13.5px; line-height: 1.3; } .tqcard .tx small { font-size: 11.5px; color: var(--mute); }
 .acts.locked { padding-bottom: 14px; }
+.back-onb .facade { width: 150px; margin-bottom: -6px; }
+.backav { display: block; width: 104px; height: 104px; margin: 0 auto 4px; border-radius: 50%; overflow: hidden; background: var(--paper); border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--line), 0 8px 20px rgba(0,0,0,.08); }
+.backav img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; transform: scale(1.2); transform-origin: 50% 20%; }
