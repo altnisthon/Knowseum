@@ -937,3 +937,8 @@ img { max-width: 100%; display: block; }
 .hrow .val { font: 800 14px var(--mono); } .hrow .val small { font-size: 10px; color: var(--mute); font-weight: 500; }
 .hrow.mine { background: #fffbea; border: 2px solid var(--ink); } .hrow.pinned { margin-top: 10px; position: sticky; bottom: 24px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
 .hnote { display: flex; gap: 8px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--ink); color: #fff; font-size: 13px; line-height: 1.4; }
+.tqcard { display: flex; align-items: center; gap: 12px; width: calc(100% - 32px); margin: 0 16px 24px; padding: 12px 14px; border-radius: 18px; background: #fff; border: 1.4px solid var(--ink); text-align: left; position: relative; z-index: 2; box-shadow: 3px 3px 0 var(--ink); transition: transform .15s; }
+.tqcard:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.tqcard .q { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--acc); display: grid; place-items: center; font: 800 26px var(--sans); }
+.tqcard .tx { flex: 1; display: flex; flex-direction: column; gap: 2px; } .tqcard .tx b { font-size: 13.5px; line-height: 1.3; } .tqcard .tx small { font-size: 11.5px; color: var(--mute); }
+.acts.locked { padding-bottom: 14px; }
