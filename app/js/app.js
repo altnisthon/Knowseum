@@ -51,9 +51,16 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 
 // ------------------------------------------------------------------ badges
 const ALLB = [...KN.badges.streak.map(b => ({ ...b, kind: 'streak' })), ...KN.badges.quiz.map(b => ({ ...b, kind: 'quiz' })),
-  ...OPEN.map(k => ({ key: ART[k].badgeArt, name: ART[k].bonus.badge, sub: ART[k].name, kind: 'article', art: k }))];
+  ...OPEN.map(k => ({ key: ART[k].badgeArt, name: ART[k].bonus.badge, sub: ART[k].name, kind: 'article', art: k })),
+  ...[['mini-01', 'First Move', 1], ['mini-03', 'Curious Cat', 3], ['mini-06', 'Wing Walker', 6], ['mini-09', 'Brainstorm', 9], ['mini-12', 'Grand Tour', 12]]
+    .map(([key, name, at]) => ({ key, name, at, sub: at === 1 ? '1st mini game' : `${at} mini games`, kind: 'mini' }))];
+const MINI_BLURB = { 'mini-01': 'Your first mini game. Your ticket into the museum\u2019s back rooms.', 'mini-03': 'Three mini games. Curiosity looks good on you.',
+  'mini-06': 'Six mini games. You\u2019ve walked the wings.', 'mini-09': 'Nine mini games. Your brain is a lightbulb.', 'mini-12': 'All twelve mini games. The grand tour, complete.' };
+Object.assign(KN.badgeBlurbs, MINI_BLURB);
+const miniCount = () => Object.values(S.mini || {}).reduce((n, w) => n + Object.keys(w).length, 0);
+const MINI_TOTAL = 12;
 const BK = kind => ALLB.filter(b => b.kind === kind);
-const isEarned = b => b.kind === 'streak' ? S.streak >= b.at : b.kind === 'quiz' ? (b.at === null ? S.perfectHard : S.quizzesDone >= b.at) : S.arts[b.art].bonus;
+const isEarned = b => b.kind === 'streak' ? S.streak >= b.at : b.kind === 'quiz' ? (b.at === null ? S.perfectHard : S.quizzesDone >= b.at) : b.kind === 'mini' ? miniCount() >= b.at : S.arts[b.art].bonus;
 function checkBadges() {
   const fresh = ALLB.filter(b => isEarned(b) && !S.badges.includes(b.key));
   fresh.forEach(b => S.badges.push(b.key));
@@ -463,7 +470,9 @@ MOUNT.mini = (el, { k, g }) => KNMiniGame.mount(el, {
   vetting: () => openSheet(vetSheet()),
   done: (score, total) => { S.mini[k] = S.mini[k] || {}; const r = S.mini[k][g]; const first = !r;
     if (!r || score > r.best) S.mini[k][g] = { best: score, total }; save();
-    if (first) setTimeout(() => toast(`${tick(18, '#e7cf6a', 3)} ${KNMiniGame.META[g].name} done in the ${wingNm(k)} Wing`), 400); },
+    const nb = checkBadges();
+    if (nb.length) setTimeout(() => showBadges(nb), 900);
+    else if (first) setTimeout(() => toast(`${tick(18, '#e7cf6a', 3)} ${KNMiniGame.META[g].name} done in the ${wingNm(k)} Wing`), 400); },
 });
 const wingNm = k => KN.wings.find(x => x.key === k).name;
 function topicQuiz(k) {
@@ -800,7 +809,8 @@ SCREENS.passport = () => {
   <button class="strip paper rise" data-act="to-stamps" style="width:calc(100% - 32px)">${show.length ? show.map((s, i) => `<img src="assets/stamps/${s}.webp" alt="" style="transform:rotate(${[-8, 6, -3][i]}deg)">`).join('') : '<span class="empty">Finish any quiz level to get your first stamp.</span>'}</button>
   <div class="sec-h"><h3>Badges<small>${S.badges.length} earned</small></h3><button data-act="to-badges">See all ${ic('chev', 14, '#1c1b19', 2.2)}</button></div>
   ${row(`${S.streak} day streak`, BK('streak'), S.streak, 'flame')}${row(`${S.quizzesDone} quizzes done`, BK('quiz'), S.quizzesDone, 'book')}
-  ${row(`${OPEN.filter(k => S.arts[k].bonus).length} of 3 articles complete`, ALLB.filter(b => b.kind === 'article'), 0, 'spark')}`;
+  ${row(`${OPEN.filter(k => S.arts[k].bonus).length} of 3 articles complete`, ALLB.filter(b => b.kind === 'article'), 0, 'spark')}
+  ${row(`${miniCount()} of ${MINI_TOTAL} mini games played`, BK('mini'), miniCount(), 'map')}`;
 };
 let stampWing = 'singapore', newStamp = null;
 SCREENS.stamps = () => {
@@ -837,13 +847,14 @@ SCREENS.badges = () => {
     ${p !== null && p !== undefined ? `<svg class="ringp" viewBox="0 0 88 88"><circle cx="44" cy="44" r="41" fill="none" stroke="#e4dfd4" stroke-width="4"/><circle cx="44" cy="44" r="41" fill="none" stroke="#d8bd5a" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 41 * p} 999" transform="rotate(-90 44 44)"/></svg>` : !isEarned(b) ? `<span class="lk">${ic('lock', 13, '#7d7972', 1.8)}</span>` : ''}</span>
     <b>${b.name}</b><small>${b.sub}</small></button>`;
   const arts = ALLB.filter(b => b.kind === 'article'), nArt = arts.filter(isEarned).length;
-  return `${topbar('Badges', `${S.badges.length} of 13 earned`, 'to-passport')}
+  return `${topbar('Badges', `${S.badges.length} of ${ALLB.length} earned`, 'to-passport')}
   ${card('Streak milestones', 'flame', `${S.streak} day streak`, BK('streak'), S.streak, 'day')}
   ${card('Quiz milestones', 'book', `${S.quizzesDone} quizzes done`, BK('quiz'), S.quizzesDone, 'quiz')}
   <div class="bcard paper rise"><div class="h">${ic('spark', 20)}<b>Article badges</b><span>${nArt} of 3 earned</span></div>
     <div class="prog"><i data-w="${nArt / 3 * 100}"></i></div><div class="ascii" style="color:var(--body)">finish all 3 levels + Perspectives</div>
     <div class="bgrid">${arts.map(b => tile(b, null)).join('')}</div></div>
-  <div class="pad" style="margin-bottom:20px"><div style="border:1.4px dashed var(--line);border-radius:14px;padding:13px 16px;display:flex;justify-content:space-between;color:var(--mute);font-weight:700;font-size:13.5px">Mini game milestones<span class="mono" style="font-size:11px">coming soon</span></div></div>`;
+  ${card('Mini game milestones', 'map', `${miniCount()} of ${MINI_TOTAL} played`, BK('mini'), miniCount(), 'game')}
+  <div style="height:20px"></div>`;
 };
 MOUNT.badges = el => setTimeout(() => el.querySelectorAll('.prog i').forEach(i => { i.style.width = i.dataset.w + '%'; }), 120);
 function badgeDetail(key) {
@@ -851,6 +862,7 @@ function badgeDetail(key) {
   let how = '';
   if (b.kind === 'streak') how = got ? `Earned with a ${b.at}-day streak.` : `Keep a ${b.at}-day streak. You're on ${S.streak}.`;
   else if (b.kind === 'quiz') how = b.at === null ? (got ? 'Full marks on a Dam hard sia quiz.' : 'Score 5/5 on any Dam hard sia quiz.') : got ? `Earned after ${b.at} quiz${b.at > 1 ? 'zes' : ''}.` : `Finish ${b.at} quizzes. You've done ${S.quizzesDone}. Every level you finish counts, retries too.`;
+  else if (b.kind === 'mini') how = got ? `Earned after playing ${b.at} mini game${b.at > 1 ? 's' : ''}.` : `Play ${b.at} different mini game${b.at > 1 ? 's' : ''}. You've played ${miniCount()} of ${MINI_TOTAL}. Find them in each wing's room.`;
   else how = got ? `You finished every level and Perspectives in ${ART[b.art].name}.` : `Finish all 3 quiz levels and Perspectives in the ${ART[b.art].wingName}.`;
   openSheet(`<img src="assets/badges/${got ? '' : 'locked-'}${b.key}.webp" alt="" class="pop" style="width:180px;margin:0 auto">
     <h2 style="text-align:center;margin:10px 0 2px">${b.name}</h2><p style="text-align:center;color:var(--body);margin:0 0 6px;font-weight:600">${b.sub}</p>
