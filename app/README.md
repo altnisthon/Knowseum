@@ -33,6 +33,7 @@ On a computer it shows inside a phone frame. On a phone it fills the screen.
 | Results → Rewards → Bonus | Counting score, travel-stamp reveal, unlocked items, article badge after finishing everything |
 | Badge unlocked | Animated Van Gogh night sky when a streak or quiz milestone is reached |
 | Mini games | Two per wing, in each wing room. Every wing has **Fact or Cap** (swipe true/false). Plus: World **GeoGuessr** (drop a pin, get a fun fact), Tech **Jargon Match**, Singapore and Culture **Wikirace**, SG Politics **Who Am I?**, Environment **Earth Quests**. All content is an AI draft for the demo, badged "pending newsroom check", with a sheet explaining how a Tier 1 newsroom vets it |
+| Mini game badges | Five Van Gogh badges for mini games played: First Move (1), Curious Cat (3), Wing Walker (6), Brainstorm (9), Grand Tour (all 12). They unlock with the night-sky animation and show on the Badges page and passport |
 | Passport | Points, latest stamps, all badges; a stamp page per wing; tap stamps and badges for details |
 | Map | Full-screen museum floor plan. Hold your character and drag it into a room (or tap a spot, or use the arrow keys), then tap Enter. Includes the Lobby and the Hall of Fame |
 | Hall of Fame | Leaderboards for quiz points, streak and stamps, with a podium. Other players are made up for the demo |
