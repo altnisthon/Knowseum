@@ -32,6 +32,7 @@ On a computer it shows inside a phone frame. On a phone it fills the screen.
 | Quiz | Pick Easy la / Not bad leh / Dam hard sia; 5 questions each with green/red feedback, shake and explanations |
 | Results → Rewards → Bonus | Counting score, travel-stamp reveal, unlocked items, article badge after finishing everything |
 | Badge unlocked | Animated Van Gogh night sky when a streak or quiz milestone is reached |
+| Mini games | Two per wing, in each wing room. Every wing has **Fact or Cap** (swipe true/false). Plus: World **GeoGuessr** (drop a pin, get a fun fact), Tech **Jargon Match**, Singapore and Culture **Wikirace**, SG Politics **Who Am I?**, Environment **Earth Quests**. All content is an AI draft for the demo, badged "pending newsroom check", with a sheet explaining how a Tier 1 newsroom vets it |
 | Passport | Points, latest stamps, all badges; a stamp page per wing; tap stamps and badges for details |
 | Map | Full-screen museum floor plan. Hold your character and drag it into a room (or tap a spot, or use the arrow keys), then tap Enter. Includes the Lobby and the Hall of Fame |
 | Hall of Fame | Leaderboards for quiz points, streak and stamps, with a podium. Other players are made up for the demo |
@@ -49,12 +50,15 @@ js/world.js       lobby + room layout (door, wall and avatar positions), furnitu
 js/avatar.js      draws the avatar from your look (hair, colours, outfit, accessories)
 js/stories.js     content for the interactive story frames (facts from the articles)
 js/story.js       story engine: draws each frame and runs its interaction
+js/minigames-data.js  content for the 12 mini games (edit here; every item is an AI draft for the demo)
+js/minigames.js   mini game engine
 js/app.js         screens, navigation, game logic, animations
 assets/
   paintings/      wing paintings
   stamps/         9 travel stamps (Higgsfield)
   badges/         Van Gogh streak, quiz and article badges (Higgsfield), plus greyed locked copies
   lobby.webp      isometric museum lobby
+  worldmap.svg    world map for GeoGuessr (Natural Earth via world-atlas)
   rooms/          each wing room, empty to fully furnished
   map.svg, facade.svg
 ```
