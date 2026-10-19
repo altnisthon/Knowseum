@@ -32,12 +32,12 @@ const device = document.getElementById('device');
 // ------------------------------------------------------------------ state
 const KEY = 'knowseum-state-v1';
 const fresh = () => ({
-  user: null, streak: 1, quizzesDone: 0, perfectHard: false, badges: [], seenTip: false, equipped: [], topic: {}, tipHidden: {}, seenSecrets: [], tips: {},
+  user: null, streak: 1, quizzesDone: 0, perfectHard: false, badges: [], seenTip: false, equipped: [], topic: {}, tipHidden: {}, seenSecrets: [], tips: {}, mini: {},
   arts: Object.fromEntries(OPEN.map(k => [k, { runs: 0, seenLevel: 0, story: false, persp: false, best: { easy: null, mid: null, hard: null }, stamps: {}, items: [], bonus: false }])),
 });
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch (e) { S = fresh(); }
-S.topic = S.topic || {}; S.tips = S.tips || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
+S.topic = S.topic || {}; S.tips = S.tips || {}; S.mini = S.mini || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
 if (S.user && !S.user.look) S.user.look = { ...DEFAULT_LOOK, girl: S.user.girl !== false };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const today = () => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -423,6 +423,7 @@ SCREENS.room = ({ k }) => {
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
   <button class="wallcard rise" data-act="room-wall" data-v="${k}"><span class="thumb"><img src="assets/paintings/${(art || only).painting}.webp" alt=""></span>
     <span class="tx"><span class="label">Newsworthy wall</span><b>${topic ? esc(only.headline) : '3 frames to explore'}</b><span class="mini">${ic('chev', 14, '#fff', 2.2)} View wall</span></span></button>
+  ${miniSection(k)}
   ${topic ? `<p class="ascii" style="text-align:center;margin:18px 0 30px">*. room furnishings arrive with this wing's quizzes .*</p>` : `
   <div class="furnish rise"><div class="fh"><b>Furnish your room</b><span>${placed} of ${R.furn.length}</span></div>
     <div class="fbar"><span>${runs} of 12 quizzes done in this wing</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
@@ -440,6 +441,31 @@ MOUNT.room = (el, { k }) => {
     a.seenLevel = lvl; save();
   }
 };
+function miniSection(k) {
+  const G = KNMiniGame.GAMES[k]; if (!G) return '';
+  return `<div class="minis rise"><div class="fh"><b>Mini games</b><span>Background + general knowledge</span></div>
+    <div class="minigrid">${G.map((g, i) => { const m = KNMiniGame.META[g], r = (S.mini[k] || {})[g];
+      return `<button class="minicard ${i ? 'alt' : ''}" data-act="mini-open" data-v="${k}" data-g="${g}"><span class="mi">${KNMiniGame.icon(m.ico, 24)}</span><b>${m.name}</b><small>${m.sub}</small>
+        ${r ? `<span class="best">${tick(12, '#fff', 3)} Best ${r.best}/${r.total}</span>` : '<span class="best new">Play</span>'}</button>`; }).join('')}</div>
+    <button class="vetlink" data-act="vetting">${ic('spark', 14, '#8a7a52', 2)} AI-drafted for the demo. How the newsroom checks it</button></div>`;
+}
+function vetSheet() {
+  const V = KN_MINI.vetting;
+  return `<div class="ascii" style="margin-bottom:6px">HOW MINI GAME CONTENT GOES LIVE</div><h2 style="margin:0 0 6px;font-size:21px">Checked by a Tier 1 newsroom first</h2>
+    <p style="color:var(--body);margin:0 0 14px;font-size:14px">The facts, clues and explainers in these games are background knowledge, not news. Here's how each card gets from draft to live.</p>
+    <ol class="vetsteps">${V.steps.map(([h, p], i) => `<li><span>${i + 1}</span><div><b>${h}</b><p>${p}</p></div></li>`).join('')}</ol>
+    <div class="vetstatus"><span class="vbadge static"><i></i>${V.badge}</span><span class="arr">→</span><span class="vbadge static ok"><i></i>Verified by the newsroom</span></div>
+    <p style="color:var(--mute);font-size:12.5px;margin:12px 0 16px">In this prototype every card is still an AI draft, so each one shows the grey badge. In the live app only verified cards appear.</p>
+    <button class="btn ink" data-act="close-sheet">Got it</button>`;
+}
+SCREENS.mini = ({ k, g }) => { const w = KN.wings.find(x => x.key === k); return KNMiniGame.render(k, g, { color: w.color, tint: w.tint, wing: w.name + ' Wing' }); };
+MOUNT.mini = (el, { k, g }) => KNMiniGame.mount(el, {
+  vetting: () => openSheet(vetSheet()),
+  done: (score, total) => { S.mini[k] = S.mini[k] || {}; const r = S.mini[k][g]; const first = !r;
+    if (!r || score > r.best) S.mini[k][g] = { best: score, total }; save();
+    if (first) setTimeout(() => toast(`${tick(18, '#e7cf6a', 3)} ${KNMiniGame.META[g].name} done in the ${wingNm(k)} Wing`), 400); },
+});
+const wingNm = k => KN.wings.find(x => x.key === k).name;
 function topicQuiz(k) {
   const R = W_.rooms[k], [q, opts, ans] = R.quiz;
   openSheet(`<div class="ascii" style="margin-bottom:6px;color:${KN.wings.find(w => w.key === k).color}">TOPIC QUIZ · ${esc(R.short.toUpperCase())}</div>
@@ -995,6 +1021,9 @@ const ACT = {
       <p style="color:var(--body);margin:6px 0 14px">${first ? 'That counts as a quiz toward your badges. ' : ''}Read the full article from the plaque on the wall.</p>
       <button class="btn ink" data-act="topic-done" data-v="${k}" data-nb="${nb.map(b => b.key).join(',')}">Done</button></div>`; },
   'topic-open': el => topicQuiz(el.dataset.v),
+  'mini-open': el => go('mini', { k: el.dataset.v, g: el.dataset.g }),
+  'mini-close': el => go('room', { k: el.dataset.v }, 'back'),
+  vetting: () => openSheet(vetSheet()),
   'topic-done': el => { const nb = (el.dataset.nb || '').split(',').filter(Boolean).map(k => ALLB.find(b => b.key === k)); closeSheet();
     if (currentName === 'wall') { const i = current.querySelector('#wallinfo'); if (i) i.innerHTML = wallInfo(el.dataset.v, 0); } else go('room', { k: el.dataset.v }, 'none'); if (nb.length) setTimeout(() => showBadges(nb), 350); },
   'to-room': el => go('room', { k: el.dataset.v }, 'back'),
