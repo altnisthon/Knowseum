@@ -399,7 +399,7 @@ img { max-width: 100%; display: block; }
 /* ---------- map ---------- */
 .mapwrap { position: relative; margin: 6px 16px 0; touch-action: none; }
 .mapwrap .mapimg { width: 100%; border-radius: 16px; display: block; }
-.me { position: absolute; width: 32px; transform: translate(-50%, -92%); transition: left .08s linear, top .08s linear; pointer-events: none; z-index: 2; }
+.me { position: absolute; width: 46px; transform: translate(-50%, -92%); transition: left .08s linear, top .08s linear; pointer-events: none; z-index: 2; }
 .me img { width: 100%; filter: drop-shadow(0 4px 3px rgba(0,0,0,.25)); }
 .me::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: -2px; height: 8px; border-radius: 50%; background: rgba(0,0,0,.18); z-index: -1; }
 .roomhit { position: absolute; border-radius: 6px; }
@@ -493,7 +493,7 @@ img { max-width: 100%; display: block; }
 .walker { position: absolute; transform: translate(-50%, -97%); z-index: 2; pointer-events: none; transition: left .75s var(--ease), top .75s var(--ease), opacity .2s; }
 .walker img { width: 100%; filter: drop-shadow(0 3px 2px rgba(0,0,0,.25)); }
 .walker::after { content: ''; position: absolute; left: 14%; right: 14%; bottom: 0; height: 9%; border-radius: 50%; background: rgba(0,0,0,.16); z-index: -1; }
-.walker.walking img { animation: bob .25s ease-in-out infinite; }
+.walker.walking .cf { animation: bob .25s ease-in-out infinite; }
 @keyframes bob { 50% { transform: translateY(-3px) rotate(2deg); } }
 .walker.gone { opacity: 0; }
 .hot { position: absolute; transform: translate(-50%, -50%); z-index: 3; display: grid; place-items: center; }
@@ -555,8 +555,19 @@ img { max-width: 100%; display: block; }
 .walker.grab::before, .me.grab::before { content: ''; position: absolute; inset: -14px -16px -6px; }
 .walker img, .me img { transition: transform .2s var(--spring); pointer-events: none; }
 .walker.held, .me.held { cursor: grabbing; z-index: 6; }
-.walker.held img, .me.held img { transform: translateY(-8px) scale(1.12) rotate(-3deg); filter: drop-shadow(0 10px 6px rgba(0,0,0,.25)); }
-.walker.grab:not(.held):not(.walking) img, .me.grab:not(.held) img { animation: idle 2.4s ease-in-out infinite; }
+/* pick-up: the sprout swaps to its arms-up pose and dangles from your finger; it squashes when you let go */
+.walker .cj, .me .cj { position: absolute; left: 0; top: 0; opacity: 0; transform-origin: 50% 30%; }
+.walker .cf, .me .cf { transform-origin: 50% 100%; }
+.walker.held .cf, .me.held .cf, .walker.hop .cf, .me.hop .cf { opacity: 0; }
+.walker.held .cj, .me.held .cj { opacity: 1; filter: drop-shadow(0 12px 6px rgba(0,0,0,.22)); animation: pickup .22s var(--spring) both, dangle .9s .22s ease-in-out infinite; }
+.walker.held::after, .me.held::after { transform: scale(.55); opacity: .55; transition: transform .2s, opacity .2s; }
+.walker.landed .cf, .me.landed .cf { animation: land .42s var(--spring); }
+.walker.hop .cj, .me.hop .cj { opacity: 1; animation: hopin .38s ease-out forwards; }
+@keyframes pickup { from { transform: translateY(0) scale(1); } to { transform: translateY(-12px) scale(1.1) rotate(-4deg); } }
+@keyframes dangle { 0%, 100% { transform: translateY(-12px) scale(1.1) rotate(-4deg); } 50% { transform: translateY(-15px) scale(1.1) rotate(4deg); } }
+@keyframes land { 0% { transform: scale(1.12, .84); } 55% { transform: scale(.95, 1.06); } 100% { transform: none; } }
+@keyframes hopin { 0% { transform: none; } 45% { transform: translateY(-26%) scale(1.04); } 100% { transform: translateY(-10%) scale(.82); } }
+.walker.grab:not(.held):not(.walking):not(.landed) .cf, .me.grab:not(.held):not(.landed) .cf { animation: idle 2.4s ease-in-out infinite; }
 @keyframes idle { 50% { transform: translateY(-2px); } }
 
 /* coach tooltip that points at the character */
@@ -914,7 +925,7 @@ img { max-width: 100%; display: block; }
 #roomhits { position: absolute; inset: 0; pointer-events: none; }
 .roomhit.near { box-shadow: 0 0 0 4px var(--acc-d), 0 0 0 9px rgba(216,189,90,.3); border-radius: 6px; }
 .enterbar.float { position: absolute; left: 16px; right: 16px; bottom: 22px; margin: 0; min-height: 0; z-index: 9; }
-.mapwrap.full .me { width: 34px; }
+.mapwrap.full .me { width: 50px; }
 
 /* ---------- hall of fame ---------- */
 .hall { padding: 4px 16px 0; }
