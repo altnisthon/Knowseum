@@ -8,12 +8,9 @@ const ART = KN.articles;
 const LV = Object.fromEntries(KN.levels.map(l => [l.key, l]));
 const LEVELS = ['easy', 'mid', 'hard'];
 const OPEN = ['singapore', 'politics', 'tech'];
-const HAIR = { g: ['long', 'bob', 'ponytail', 'buns', 'hijab', 'curlylong'], b: ['short', 'side', 'wavy', 'curly', 'buzz', 'cap'] };
-const HAIR_NAMES = { long: 'Long', bob: 'Bob', ponytail: 'Ponytail', buns: 'Buns', hijab: 'Hijab', curlylong: 'Curls', short: 'Short', side: 'Side part', wavy: 'Wavy', curly: 'Curly', buzz: 'Buzz', cap: 'Cap' };
-const HAIR_COL = ['#1c1b19', '#5a3b2a', '#a8723c', '#e2c06e', '#b5403a', '#9fb2d6'];
 const CLOTH_COL = ['#d8bd5a', '#7fb3a8', '#b5403a', '#5b76b0', '#d79aac', '#3a3834'];
-const OUTFITS = { g: [['hoodie', 'Hoodie'], ['tee', 'Tee'], ['dress', 'Dress'], ['uniform', 'School uniform'], ['kurung', 'Baju kurung'], ['jacket', 'Denim jacket']],
-  b: [['hoodie', 'Hoodie'], ['tee', 'Tee'], ['uniform', 'School uniform'], ['jersey', 'Jersey'], ['melayu', 'Baju Melayu'], ['jacket', 'Denim jacket']] };
+// one sprout, no gender: every outfit is open to everyone
+const OUTFITS = [['hoodie', 'Hoodie'], ['tee', 'Tee'], ['dress', 'Dress'], ['uniform', 'School uniform'], ['kurung', 'Baju kurung'], ['melayu', 'Baju Melayu'], ['jersey', 'Jersey'], ['jacket', 'Denim jacket']];
 const ACCS = [['headphones', 'Headphones'], ['cat', 'Cat buddy'], ['camera', 'Camera'], ['backpack', 'Backpack'], ['bucket', 'Bucket hat'], ['bubbletea', 'Bubble tea']];
 const SECRETS = [
   { key: 'presspass', name: 'Press pass', streak: 1, how: 'Start a streak' }, { key: 'notebook', name: 'Notebook', streak: 3, how: '3-day streak' },
@@ -38,13 +35,15 @@ const fresh = () => ({
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch (e) { S = fresh(); }
 S.topic = S.topic || {}; S.tips = S.tips || {}; S.mini = S.mini || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
-if (S.user && !S.user.look) S.user.look = { ...DEFAULT_LOOK, girl: S.user.girl !== false };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const today = () => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const points = () => OPEN.reduce((t, k) => t + LEVELS.reduce((u, l) => u + (S.arts[k].best[l] || 0) * LV[l].mult, 0), 0);
 const stampCount = () => OPEN.reduce((t, k) => t + Object.keys(S.arts[k].stamps).length, 0);
 const actsDone = k => { const a = S.arts[k]; return [a.story, a.persp, ...LEVELS.map(l => a.best[l] !== null)].filter(Boolean).length; };
-const DEFAULT_LOOK = { girl: true, hair: 'buns', hairCol: '#1c1b19', outfit: 'tee', outfitCol: '#d8bd5a', acc: ['headphones'] };
+const DEFAULT_LOOK = { outfit: 'tee', outfitCol: '#d8bd5a', acc: ['headphones'] };
+// older saves had girl/boy + hair; the sprout keeps only outfit, colour and accessories
+const cleanLook = l => ({ outfit: OUTFITS.some(o => o[0] === (l && l.outfit)) ? l.outfit : 'tee', outfitCol: (l && l.outfitCol) || DEFAULT_LOOK.outfitCol, acc: ((l && l.acc) || []).filter(a => KNAvatar.ACC[a]) });
+if (S.user) { S.user.look = S.user.look ? cleanLook(S.user.look) : { ...DEFAULT_LOOK }; delete S.user.girl; }
 const curLook = () => (S.user && S.user.look) || DEFAULT_LOOK;
 const avatarSrc = (look, legs, head) => KNAvatar.uri(look || curLook(), { legs: !!legs, bust: !head });
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -232,7 +231,7 @@ SCREENS.back = () => `<div class="onb back-onb">
 
 // --- make your look
 // --- make your look (Hair / Outfit / Accessories / Secret, as in the Figma frames)
-let lookDraft = null, lookTab = 'Hair';
+let lookDraft = null, lookTab = 'Outfit';
 const doodle = (kind, locked) => `<svg viewBox="0 0 100 100" aria-hidden="true">${(locked ? window.KN_DOODLE_LOCKED : window.KN_DOODLE)[kind] || ''}</svg>`;
 function lookTile({ act, v, name, sub, state = 'on', art, seed = 0 }) {
   // state: on | sel | locked | progress | mystery
@@ -250,14 +249,11 @@ function secretState(it) {
 function earnedHave(e) { return e.bonus ? S.arts[e.art].bonus : S.arts[e.art].items.includes(e.item); }
 SCREENS.look = ({ edit } = {}) => {
   lookDraft = lookDraft || JSON.parse(JSON.stringify(curLook()));
-  const d = lookDraft, g = d.girl ? 'g' : 'b';
-  const tabs = ['Hair', 'Outfit', 'Accessories', 'Secret'];
+  const d = lookDraft;
+  const tabs = ['Outfit', 'Accessories', 'Secret'];
   let body = '';
-  if (lookTab === 'Hair') {
-    body = `<div class="lgrid">${HAIR[g].map((h, i) => lookTile({ act: 'hair', v: h, name: HAIR_NAMES[h], state: d.hair === h ? 'sel' : 'on', seed: i, art: `<img src="${KNAvatar.uri({ ...d, hair: h, acc: [] }, { bust: false })}" alt="">` })).join('')}</div>
-      <div class="colrow"><span class="label">Colour</span>${HAIR_COL.map(c => `<button class="sw ${d.hairCol === c ? 'on' : ''}" style="background:${c}" data-act="haircol" data-v="${c}" aria-label="Hair colour ${c}"></button>`).join('')}</div>`;
-  } else if (lookTab === 'Outfit') {
-    body = `<div class="lgrid">${OUTFITS[g].map(([k, n], i) => lookTile({ act: 'outfit', v: k, name: n, state: d.outfit === k ? 'sel' : 'on', seed: i, art: doodle(k) })).join('')}</div>
+  if (lookTab === 'Outfit') {
+    body = `<div class="lgrid">${OUTFITS.map(([k, n], i) => lookTile({ act: 'outfit', v: k, name: n, state: d.outfit === k ? 'sel' : 'on', seed: i, art: `<img class="ofit" src="${KNAvatar.uri({ outfit: k, outfitCol: d.outfitCol, acc: [] }, { view: 'outfit' })}" alt="">` })).join('')}</div>
       <div class="colrow"><span class="label">Colour</span>${CLOTH_COL.map(c => `<button class="sw ${d.outfitCol === c ? 'on' : ''}" style="background:${c}" data-act="clothcol" data-v="${c}" aria-label="Outfit colour ${c}"></button>`).join('')}</div>`;
   } else if (lookTab === 'Accessories') {
     body = `<div class="lgrid">${ACCS.map(([k, n], i) => lookTile({ act: 'acc', v: k, name: n, state: d.acc.includes(k) ? 'sel' : 'on', seed: i, art: doodle(k) })).join('')}</div>
@@ -278,9 +274,7 @@ SCREENS.look = ({ edit } = {}) => {
       <p class="lnote" style="text-align:center">Keep your streak going to unlock more.</p>`;
   }
   return `${topbar('Make your look', edit ? '' : 'Step 2 of 2', edit ? 'back-look' : '', `<button class="savepill" data-act="look-save">Save</button>`)}
-  <div class="seg2" role="tablist"><span class="knob" style="transform:translateX(${d.girl ? 0 : '100%'})"></span>
-    <button data-act="girl" data-v="1" role="tab" aria-selected="${d.girl}">Girl</button><button data-act="girl" data-v="0" role="tab" aria-selected="${!d.girl}">Boy</button></div>
-  <div class="look-stage"><img id="lookimg" src="${KNAvatar.uri(d)}" alt="Your avatar preview">
+  <div class="look-stage"><img id="lookimg" src="${KNAvatar.uri(d, { legs: true })}" alt="Your avatar preview">
     <button class="round white lsh" data-act="look-shuffle" aria-label="Shuffle look">${ic('shuffle', 20)}</button>
     <button class="round white lpal" data-act="look-palette" aria-label="Next colour">${ic('palette', 20)}</button>${sparkles([[26, 24, 14, '#e7cf6a'], [330, 50, 11, '#fff', .5]])}</div>
   <div class="ltabs" role="tablist">${tabs.map(t => `<button class="${t === lookTab ? 'on' : ''}" data-act="look-tab" data-v="${t}" role="tab" aria-selected="${t === lookTab}">${t}${t === 'Secret' ? ' ' + ic('lock', 12, 'currentColor', 2) : ''}</button>`).join('')}</div>
@@ -303,7 +297,9 @@ function toggleAcc(key) {
 const DOOR_SIDE = { world: 'L', singapore: 'R', culture: 'R', tech: 'L', environment: 'U', politics: 'U' };
 const DOOR_NAME = { singapore: 'Singapore', politics: 'SG Politics', tech: 'Tech', world: 'World', environment: 'Environment', culture: 'Culture' };
 const lp = (x, y, w = 390, h = 300) => `left:${x / w * 100}%;top:${y / h * 100}%`;
-const walkerW = (k, w = 390) => `width:${110 * k / w * 100}%`;
+const walkerW = (k, w = 390) => `width:${150 * k / w * 100}%`;
+// the sprout standing (front) plus its arms-up pose, which shows while you hold it or it hops through a door
+const charImgs = (alt = '') => `<img class="cf" src="${avatarSrc(null, true)}" alt="${alt}" draggable="false"><img class="cj" src="${KNAvatar.uri(curLook(), { legs: true, pose: 'jump' })}" alt="" draggable="false">`;
 SCREENS.lobby = () => {
   const L = W_.lobby;
   const wingsDone = KN.wings.filter(w => ART[w.key] ? actsDone(w.key) === 5 : S.topic[w.key]).length;
@@ -315,7 +311,7 @@ SCREENS.lobby = () => {
     <button class="chip" data-tab="passport" style="background:var(--grey)">${ic('stamp', 15)} ${stampCount()}</button></div>
   <div class="museum" id="museum"><div class="stagein" id="lobbyart"><img src="assets/lobby.webp" alt="The museum lobby with six arched doorways, one for each wing" draggable="false">
     ${L.doors.map(d => `<button class="door ${DOOR_SIDE[d.key]}" aria-label="Enter the ${DOOR_NAME[d.key]} Wing" data-act="enter-wing" data-v="${d.key}" style="${lp(d.x, d.y)};--c:${KN.wings.find(w => w.key === d.key).color}"><span class="dotp"></span><span class="dl">${DOOR_NAME[d.key]}</span></button>`).join('')}
-    <span class="walker grab" id="walker" style="${lp(...lobbyPx())};${walkerW(L.k * 1.25)}" role="img" aria-label="You. Hold and drag to move"><img src="${avatarSrc(null, true)}" alt="" draggable="false"></span>
+    <span class="walker grab" id="walker" style="${lp(...lobbyPx())};${walkerW(L.k * 1.25)}" role="img" aria-label="You. Hold and drag to move">${charImgs()}</span>
     ${coach('lobby', 'Hold your character and drag it to a doorway to enter a wing')}</div>
     <button class="round white helpbtn" data-act="drag-help" data-v="lobby" aria-label="How to move">?</button></div>
   <div class="wingdrawer ${wingsOpen ? 'open' : ''}" id="wingdrawer">
@@ -362,7 +358,8 @@ function dragChar(walker, box, { onMove, onDrop, onTap }) {
     // keep the character's middle under the finger, so the feet sit just below it
     onMove((e.clientX - r.left) / r.width, (e.clientY + wr.height * .42 - r.top) / r.height);
   });
-  const up = e => { if (!held) return; held = false; walker.classList.remove('held'); box.classList.remove('dragging'); if (moved) onDrop(); else onTap && onTap(); walker._justDragged = Date.now(); };
+  const up = e => { if (!held) return; held = false; walker.classList.remove('held'); box.classList.remove('dragging');
+    walker.classList.remove('landed'); void walker.offsetWidth; walker.classList.add('landed'); setTimeout(() => walker.classList.remove('landed'), 420); if (moved) onDrop(); else onTap && onTap(); walker._justDragged = Date.now(); };
   walker.addEventListener('pointerup', up); walker.addEventListener('pointercancel', up);
   walker.addEventListener('click', e => e.stopPropagation());
 }
@@ -407,7 +404,7 @@ function walkTo(elId, x, y, w, h, then) {
   const wk = current.querySelector('#' + elId);
   if (!wk) { then(); return; }
   wk.classList.add('walking'); wk.style.left = x / w * 100 + '%'; wk.style.top = y / h * 100 + '%';
-  setTimeout(() => { wk.classList.add('gone'); setTimeout(then, 220); }, 760);
+  setTimeout(() => { wk.classList.remove('walking'); wk.classList.add('hop'); setTimeout(() => { wk.classList.add('gone'); setTimeout(then, 200); }, 380); }, 760);
 }
 
 // --- wing room (isometric) — before and after furnishing
@@ -424,7 +421,7 @@ SCREENS.room = ({ k }) => {
   <div class="iso room" id="roomart"><img src="assets/rooms/room-${k}-${lvl}.webp" alt="The ${w.name} Wing room${lvl ? ', furnished' : ''}">
     <button class="hot" data-act="room-wall" data-v="${k}" style="${lp(...st.wall, 390, 330)}"><span class="hring"></span><span class="dl on">Newsworthy wall</span></button>
     ${lvl >= 3 ? `<span class="hot static" style="${lp(...st.trophy, 390, 330)}"><span class="dl">${art ? 'Trophy' : ''}</span></span>` : ''}
-    <span class="walker" id="rwalker" style="${lp(...st.me, 390, 330)};${walkerW(st.k)}"><img src="${avatarSrc(null, true)}" alt="You"></span></div>
+    <span class="walker" id="rwalker" style="${lp(...st.me, 390, 330)};${walkerW(st.k)}">${charImgs('You')}</span></div>
   ${tipShown && !placed ? `<div class="tipcard rise"><div class="h"><span class="ic">${ic('spark', 18, '#1c1b19', 1.9)}</span><b>Make this room yours</b><button data-act="hide-tip" data-v="${k}" aria-label="Close tip">${ic('close', 14, '#fff', 2.2)}</button></div>
     <p>${topic ? `This wing's story is on the Newsworthy wall. Its activities land soon, and there's a warm-up topic quiz there meanwhile.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
@@ -916,7 +913,7 @@ function mapSVG(L) {
 SCREENS.map = () => `<div class="mapv"><div class="maphead"><div style="flex:1"><h1 class="h1">Museum map</h1><p>Hold your character and drag it into a room.</p></div>
     <button class="round white helpbtn static" data-act="drag-help" data-v="map" aria-label="How to move">?</button></div>
   <div class="mapwrap full" id="mapwrap"><div id="mapsvg" class="mapsvg"></div><div id="roomhits"></div>
-    <span class="me grab" id="me" role="img" aria-label="You. Hold and drag to move"><img src="${avatarSrc(null, true)}" alt="" draggable="false"></span>
+    <span class="me grab" id="me" role="img" aria-label="You. Hold and drag to move">${charImgs()}</span>
     ${coach('map', 'Hold your character and drag it into a room')}</div>
   <div class="enterbar float" id="enterbar"></div></div>`;
 MOUNT.map = el => {
@@ -952,7 +949,7 @@ const HALL = [['newsy.nadia', 84, 41, 9], ['quizwiz.kai', 81, 30, 9], ['headline
 const HALL_TABS = [['Quiz points', 1, 'pts'], ['Streak', 2, 'days'], ['Stamps', 3, 'stamps']];
 let hallTab = 0;
 const seedLook = (s) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; const r = n => { h = (Math.imul(h, 1103515245) + 12345) >>> 0; return (h >>> 16) % n; };
-  const girl = !!r(2), g = girl ? 'g' : 'b'; return { girl, hair: HAIR[g][r(6)], hairCol: HAIR_COL[r(6)], outfit: OUTFITS[g][r(6)][0], outfitCol: CLOTH_COL[r(6)], acc: r(3) ? [ACCS[r(6)][0]] : [] }; };
+  return { outfit: OUTFITS[r(OUTFITS.length)][0], outfitCol: CLOTH_COL[r(6)], acc: r(3) ? [ACCS[r(6)][0]] : [] }; };
 SCREENS.hall = () => {
   const [tn, ci, unit] = HALL_TABS[hallTab];
   const mine = [points(), S.streak, stampCount()][ci - 1];
@@ -991,26 +988,21 @@ const ACT = {
       S = fresh(); save();
     }
     go('welcome'); },
-  'to-look': () => { lookDraft = null; lookTab = 'Hair'; go('look'); },
-  girl: el => { const girl = el.dataset.v === '1'; if (girl === lookDraft.girl) return; lookDraft.girl = girl; lookDraft.hair = girl ? 'buns' : 'curly';
-    if (!OUTFITS[girl ? 'g' : 'b'].some(o => o[0] === lookDraft.outfit)) lookDraft.outfit = 'hoodie'; rerenderLook(); },
-  hair: el => { lookDraft.hair = el.dataset.v; rerenderLook(); },
-  haircol: el => { lookDraft.hairCol = el.dataset.v; rerenderLook(); },
+  'to-look': () => { lookDraft = null; lookTab = 'Outfit'; go('look'); },
   outfit: el => { lookDraft.outfit = el.dataset.v; rerenderLook(); },
   clothcol: el => { lookDraft.outfitCol = el.dataset.v; rerenderLook(); },
   acc: el => { toggleAcc(el.dataset.v); rerenderLook(); },
   'secret-locked': el => { const s = SECRETS.find(x => x.key === el.dataset.v); toast(`${ic('lock', 16, '#fff')} ${s.mystery ? 'A mystery item.' : s.name + ':'} ${s.how} to unlock.`); },
   'earned-locked': el => { const e = EARNED.find(x => x.key === el.dataset.v); toast(`${ic('lock', 16, '#fff')} ${e.name}: ${e.how} to unlock.`); },
   'look-tab': el => { lookTab = el.dataset.v; rerenderLook(false); },
-  'look-shuffle': () => { const g = lookDraft.girl ? 'g' : 'b', pick = a => a[Math.floor(Math.random() * a.length)];
-    Object.assign(lookDraft, { hair: pick(HAIR[g]), hairCol: pick(HAIR_COL), outfit: pick(OUTFITS[g])[0], outfitCol: pick(CLOTH_COL), acc: Math.random() < .7 ? [pick(ACCS)[0]] : [] }); rerenderLook(); },
-  'look-palette': () => { if (lookTab === 'Hair') lookDraft.hairCol = HAIR_COL[(HAIR_COL.indexOf(lookDraft.hairCol) + 1) % HAIR_COL.length];
-    else lookDraft.outfitCol = CLOTH_COL[(CLOTH_COL.indexOf(lookDraft.outfitCol) + 1) % CLOTH_COL.length]; rerenderLook(); },
+  'look-shuffle': () => { const pick = a => a[Math.floor(Math.random() * a.length)];
+    Object.assign(lookDraft, { outfit: pick(OUTFITS)[0], outfitCol: pick(CLOTH_COL), acc: Math.random() < .7 ? [pick(ACCS)[0]] : [] }); rerenderLook(); },
+  'look-palette': () => { lookDraft.outfitCol = CLOTH_COL[(CLOTH_COL.indexOf(lookDraft.outfitCol) + 1) % CLOTH_COL.length]; rerenderLook(); },
   'back-look': () => { lookDraft = null; go('profile', {}, 'back'); },
   'look-save': () => {
     const first = !S.user;
     if (first) { S.user = { email: pending.email, handle: pending.handle || 'visitor', since: today() }; }
-    S.user.look = lookDraft; S.user.girl = lookDraft.girl; lookDraft = null; save();
+    S.user.look = cleanLook(lookDraft); lookDraft = null; save();
     if (first) { go('lobby', {}, 'fade'); const nb = checkBadges(); if (nb.length) setTimeout(() => showBadges(nb), 700); }
     else { go('profile', {}, 'back'); toast(`${tick(18, '#e7cf6a', 3)} Look saved`); }
   },
@@ -1089,7 +1081,7 @@ const ACT = {
   'stamp-detail': el => stampDetail(el.dataset.v),
   'retry-from-stamp': el => { Q = { k: el.dataset.k, lv: el.dataset.v, i: 0, marks: [], pts: 0 }; go('question', {}, 'up'); },
   'badge-detail': el => badgeDetail(el.dataset.v),
-  'edit-look': () => { lookDraft = null; lookTab = 'Hair'; go('look', { edit: true }); },
+  'edit-look': () => { lookDraft = null; lookTab = 'Outfit'; go('look', { edit: true }); },
   'next-day': () => addDays(1), week: () => addDays(7),
   reset: () => openSheet(`<h2 style="margin:6px 0 4px">Reset everything?</h2><p style="color:var(--body);margin:0 0 18px">This clears your look, stamps, badges and scores on this browser.</p>
     <div style="display:grid;gap:10px"><button class="btn ink" style="background:var(--red)" data-act="reset-yes">Reset progress</button><button class="btn line" data-act="close-sheet">Cancel</button></div>`),

@@ -22,7 +22,7 @@ On a computer it shows inside a phone frame. On a phone it fills the screen.
 | Screen | What you can do |
 |---|---|
 | Sign in → Username → Welcome | Email or Google (mock), pick an `@handle` with live checking |
-| Make your look | Girl/boy toggle, shuffle and colour buttons, and four tabs: **Hair** (6 styles + 6 colours), **Outfit** (6 outfits + 6 colours), **Accessories** (6 to start, wear up to 2, plus 6 earned in the museum), **Secret** (9 items unlocked by your streak and quiz count) |
+| Make your look | One sprout character for everyone (no gender, no hair). Shuffle and colour buttons, and three tabs: **Outfit** (8 outfits + 6 colours), **Accessories** (6 to start, wear up to 2, plus 6 earned in the museum), **Secret** (9 items unlocked by your streak and quiz count) |
 | Lobby | The isometric museum fills the screen. Hold your character and drag it to a doorway to walk in (or tap the floor or a door). Wings drawer at the bottom opens the full list |
 | Wing room | Each wing's isometric room. Tap the Newsworthy wall to walk up to it. Furnish the room by finishing quizzes there (couch, coffee table, trophy, then 3 more). World, Environment and Culture rooms show their painting; their wall has the headline, a link to the article, "coming soon" activities and a one-question warm-up quiz |
 | Newsworthy Wall | Gilded painting, headline plaque, three activity cards with completion ticks |
@@ -48,7 +48,8 @@ index.html        page shell
 css/app.css       all styles and animations
 js/data.js        article content: threads, 45 quiz questions, rewards, badges
 js/world.js       lobby + room layout (door, wall and avatar positions), furniture and accessory doodles
-js/avatar.js      draws the avatar from your look (hair, colours, outfit, accessories)
+js/avatar.js      draws the sprout avatar from your look (outfit, colour, accessories); 'front' and arms-up 'jump' poses
+js/char-sprites.js the sprout sprite layers (body, shading, necklace, sprout), embedded as base64
 js/stories.js     content for the interactive story frames (facts from the articles)
 js/story.js       story engine: draws each frame and runs its interaction
 js/minigames-data.js  content for the 12 mini games (edit here; every item is an AI draft for the demo)
