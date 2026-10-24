@@ -237,9 +237,9 @@ window.KN_MINI = {
     rounds: [
       { name: 'Is this AI?', note: 'Photos', items: [
         { kind: 'img', src: 'assets/realfake/ai-merlion.webp', ans: 'ai', tell: 'It never snows in Singapore. When a scene breaks real-world rules, be suspicious.' },
-        { kind: 'img', src: 'assets/realfake/real-1.jpg', ans: 'real', tell: '' },
+        { kind: 'img', src: 'assets/realfake/real-1.webp', ans: 'real', tell: 'Real photo of Lau Pa Sat at night. Look at the messy, specific details: readable shop signs, people caught mid-step, lights that aren’t perfectly even.' },
         { kind: 'img', src: 'assets/realfake/ai-hawker.webp', ans: 'ai', tell: 'Hard one! The signs are readable, so look for other clues: everything is a bit too tidy and evenly lit. When a photo looks perfect, ask who posted it first.' },
-        { kind: 'img', src: 'assets/realfake/real-2.jpg', ans: 'real', tell: '' },
+        { kind: 'img', src: 'assets/realfake/real-2.webp', ans: 'real', tell: 'Real photo of a Singapore park playground. Everyone is doing something different, and every shadow falls the same way.' },
       ] },
       { name: 'Real or fake news?', note: 'Headlines', items: [
         { kind: 'news', head: 'Anthropic to work with Singapore to evaluate AI models for safety and security', src: 'The Straits Times · 14 Oct 2026', ans: 'real', tell: 'It’s from a trusted outlet, with a date, and other outlets reported it too.' },
@@ -251,7 +251,7 @@ window.KN_MINI = {
         { kind: 'img', src: 'assets/realfake/ai-voiddeck.webp', ans: 'ai', tell: 'Zoom into the notice board: the posters are blurry blobs with no words you can read. Real notices are full of tiny, readable text.' },
         { kind: 'news', head: 'Govts must incentivise private sector to hire fresh grads amid declining entry-level roles: President', src: 'The Straits Times · 12 Oct 2026', ans: 'real', tell: 'Long, careful headlines that name who said it are typical of real reporting.' },
         { kind: 'news', head: 'Singapore to fine drivers who use Waze in tunnels from 1 January', src: 'Shared on a group chat', ans: 'fake', tell: 'It sounds official and boring, which is why it spreads. Check gov.sg or a news site before you forward it.' },
-        { kind: 'img', src: 'assets/realfake/real-3.jpg', ans: 'real', tell: '' },
+        { kind: 'img', src: 'assets/realfake/real-3.webp', ans: 'real', tell: 'A real photo from the MRT’s early years. Old photos can look strange, but an archive tells you exactly where they came from.', credit: 'Ministry of Information and the Arts Collection, courtesy of National Archives of Singapore' },
         { kind: 'img', src: 'assets/realfake/ai-mrt.webp', ans: 'ai', tell: 'Very convincing, even the station code is right. When the picture can’t tell you, the source can: who took it, and does a trusted outlet stand behind it?' },
       ] },
     ],

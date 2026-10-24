@@ -1131,3 +1131,5 @@ img { max-width: 100%; display: block; }
 .rf-res .verdict { align-self: flex-start; display: inline-flex; gap: 6px; align-items: center; padding: 5px 11px; border-radius: 12px; color: #fff; font-weight: 800; font-size: 13px; background: var(--green); } .rf-res.no .verdict { background: var(--red); }
 .rf-res > b { font: 800 18px var(--sans); letter-spacing: .02em; } .rf-res p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--body); }
 .rf-res .tip { background: #fdf6dc; border-radius: 12px; padding: 10px 12px; } .rf-res .tip .k { color: #9a7b16; } .rf-res .tip p { margin-top: 3px; color: var(--ink); }
+
+.rf-credit { display: block; font-size: 11px; color: #8a867e; margin: 6px 0 2px; line-height: 1.35; }

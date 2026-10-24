@@ -446,7 +446,7 @@
       const tip = it.tell || RF.R().realTip;
       body().querySelector('#rfres').innerHTML = `<div class="rf-res rise ${ok ? 'ok' : 'no'}"><span class="verdict">${ok ? tick(16) : cross(16)} ${v === null ? 'Time’s up!' : ok ? 'Correct' : 'Not quite'}</span><b>${label}</b>
         ${ok ? (it.tell ? `<p>${esc(it.tell)}</p>` : '') : `<div class="tip"><span class="k">Tip</span><p>${esc(tip)}</p></div>`}
-        <button class="btn ink" data-mx="rf-next">Next</button></div>`;
+        ${it.credit ? `<small class="rf-credit">Photo: ${esc(it.credit)}</small>` : ''}<button class="btn ink" data-mx="rf-next">Next</button></div>`;
       setTimeout(() => body().querySelector('.rf-res')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 150);
     },
   };

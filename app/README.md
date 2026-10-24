@@ -61,7 +61,7 @@ assets/
   lobby.webp      isometric museum lobby
   worldmap.svg    world map for GeoGuessr (Natural Earth via world-atlas)
   rooms/          each wing room, empty to fully furnished
-  realfake/       AI images for Real or Fake? (real photos: real-1.jpg, real-2.jpg, real-3.jpg)
+  realfake/       AI images for Real or Fake? and real photos (real-1 Lau Pa Sat, real-2 park playground, real-3 early MRT, National Archives of Singapore)
   map.svg, facade.svg
 ```
 
