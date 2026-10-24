@@ -1,4 +1,6 @@
 /* Knowseum · mini game content (2 per wing).
+   Fact or Cap (every wing) · GeoGuessr (World) · Wikirace (Singapore, Culture)
+   Guess Who (SG Politics) · Hole-some Recycling (Environment) · Real or Fake? (Tech)
    DEMO NOTE: every item below was drafted by AI for the prototype. In the live product each item
    carries a status (ai-draft -> in-review -> verified) and only verified items are shown.
    Edit freely: each game is plain data. */
@@ -95,28 +97,6 @@ window.KN_MINI = {
       fact: 'Nairobi National Park sits right next to the city, so wildlife lives minutes from downtown.' },
   ],
 
-  // ------------------------------------------------------------------ Tech: Jargon Match
-  jargon: [
-    ['MOU', 'A written agreement that sets out plans two sides want to work on together'],
-    ['IPO', 'When a private company first sells shares to the public'],
-    ['AI agent', 'An AI that can carry out multi-step tasks with little human help'],
-    ['Red-teaming', 'Testing a system by deliberately trying to make it fail'],
-    ['Hallucination', 'When an AI states something false as if it were true'],
-    ['Sovereign wealth fund', 'A fund that invests money on behalf of a country'],
-    ['Model evaluation', 'Testing an AI model to measure what it can do and how safe it is'],
-    ['Cyberincident', 'A security breach or attack on computer systems or data'],
-  ],
-
-  // ------------------------------------------------------------------ SG Politics: Who Am I
-  whoami: [
-    { clue: 'I’m the Prime Minister, and I’m also the Minister for Finance. I took over as PM in May 2024.', opts: ['Lawrence Wong', 'Gan Kim Yong', 'Lee Hsien Loong'], a: 0, kind: 'Minister' },
-    { clue: 'I’m the Minister for Digital Development and Information. My ministry signed the AI safety deal with Anthropic.', opts: ['Grace Fu', 'Josephine Teo', 'Ong Ye Kung'], a: 1, kind: 'Minister' },
-    { clue: 'I’m the Minister for Education. Schools, polys, ITE and universities are my patch.', opts: ['Chan Chun Sing', 'Edwin Tong', 'Desmond Lee'], a: 2, kind: 'Minister' },
-    { clue: 'I give Singaporeans credit to spend on approved training courses, so you can keep learning after you start work.', opts: ['SkillsFuture Credit', 'GST Voucher', 'Baby Bonus'], a: 0, kind: 'Policy' },
-    { clue: 'Part of your pay, plus a top-up from your employer, goes into me. I help with housing, healthcare and retirement.', opts: ['MediShield Life', 'CPF', 'SkillsFuture Credit'], a: 1, kind: 'Policy' },
-    { clue: 'I’m Singapore’s head of state, chosen by citizens in an election. I spoke about fresh grads and AI in Bangkok.', opts: ['The Prime Minister', 'The Speaker of Parliament', 'The President'], a: 2, kind: 'Office' },
-  ],
-
   // ------------------------------------------------------------------ Wikirace (Singapore + Culture)
   // page text: [[Link]] makes a clickable link to another page in the same set
   wiki: {
@@ -155,23 +135,126 @@ window.KN_MINI = {
     },
   },
 
-  // ------------------------------------------------------------------ Environment: Earth quests
-  quests: [
-    { key: 'beach', title: 'Clean the beach', kind: 'tap',
-      intro: 'Tap the rubbish to pick it up. Leave the shells and the crab alone!',
-      items: [['bottle', 'Plastic bottle', 1], ['bag', 'Plastic bag', 1], ['straw', 'Straw', 1], ['can', 'Drink can', 1], ['wrapper', 'Snack wrapper', 1], ['shell', 'Shell', 0], ['crab', 'Crab', 0], ['shell2', 'Shell', 0]],
-      impact: 'Plastic doesn’t rot away. It breaks into tiny microplastics that fish and seabirds swallow. Every piece you pick up is one that never reaches the sea.' },
-    { key: 'byo', title: 'Bring your own', kind: 'choose',
-      intro: 'You’re buying chicken rice to go. What do you pack it in?',
-      opts: [['Styrofoam box', 0, 'Used once, then thrown away.'], ['Plastic bag + box', 0, 'Two bits of trash in one meal.'], ['Your own reusable tub', 1, 'Wash it, use it again tomorrow.']],
-      impact: 'Singapore’s only landfill, on Pulau Semakau, is expected to fill up by around 2035. Reusing containers means less waste to burn and bury.' },
-    { key: 'sort', title: 'Sort it right', kind: 'sort',
-      intro: 'Which items go in the blue recycling bin? Tap to send each one to Recycle or Trash.',
-      items: [['Clean paper', 1], ['Rinsed plastic bottle', 1], ['Drink can', 1], ['Greasy pizza box', 0], ['Used tissue', 0], ['Food scraps', 0]],
-      impact: 'Food and grease can spoil a whole bin of recyclables. Rinse it, then recycle it.' },
-    { key: 'power', title: 'Switch it off', kind: 'tap',
-      intro: 'Nobody’s home. Tap everything that’s been left on.',
-      items: [['fan', 'Fan', 1], ['light', 'Lights', 1], ['tv', 'TV', 1], ['aircon', 'Aircon', 1], ['fridge', 'Fridge (leave it!)', 0]],
-      impact: 'Most of Singapore’s electricity comes from burning natural gas, so saving power cuts carbon emissions.' },
-  ],
+  // ------------------------------------------------------------------ SG Politics: Guess Who
+  // 4 rounds, 5 cards each. Answers alternate party (2 PAP, 2 WP) and each round mixes both parties,
+  // so neither side gets more turns as the answer. Facts checked Oct 2026 against PMO cabinet pages
+  // (after the 27 Jul 2026 reshuffle), Workers' Party candidate pages and GE2025 results.
+  guesswho: {
+    checked: 'Checked against PMO cabinet pages, Workers’ Party profiles and GE2025 results (Oct 2026).',
+    people: {
+      'Josephine Teo': 'PAP', 'Grace Fu': 'PAP', 'Desmond Lee': 'PAP', 'Chan Chun Sing': 'PAP', 'Jeffrey Siow': 'PAP',
+      'Chee Hong Tat': 'PAP', 'Edwin Tong': 'PAP', 'Indranee Rajah': 'PAP', 'Sim Ann': 'PAP', 'Ong Ye Kung': 'PAP',
+      'Sylvia Lim': 'WP', 'He Ting Ru': 'WP', 'Dennis Tan': 'WP', 'Jamus Lim': 'WP', 'Gerald Giam': 'WP',
+      'Pritam Singh': 'WP', 'Louis Chua': 'WP', 'Fadli Fawzi': 'WP', 'Kenneth Tiong': 'WP', 'Abdul Muhaimin': 'WP',
+    },
+    rounds: [
+      { answer: 'Josephine Teo', cards: ['Josephine Teo', 'Grace Fu', 'Desmond Lee', 'He Ting Ru', 'Sylvia Lim'],
+        facts: [
+          ['I’m a woman.', ['Desmond Lee']],
+          ['I first entered Parliament in 2006.', ['He Ting Ru']],
+          ['I’m a PAP minister.', ['Sylvia Lim']],
+          ['I was Minister for Manpower from 2018 to 2021.', ['Grace Fu']],
+          ['Today my ministry looks after digital development, AI and media.', []],
+        ],
+        role: 'Minister for Digital Development and Information · MP for Jalan Besar GRC',
+        didyou: 'She spent eight years at the Ministry of Home Affairs and was its first woman political office holder.' },
+      { answer: 'Dennis Tan', cards: ['Dennis Tan', 'Jamus Lim', 'Gerald Giam', 'Chee Hong Tat', 'Edwin Tong'],
+        facts: [
+          ['I’m a Workers’ Party MP.', ['Chee Hong Tat', 'Edwin Tong']],
+          ['I first sat in Parliament as a Non-Constituency MP.', ['Jamus Lim']],
+          ['I’m a lawyer.', ['Gerald Giam']],
+          ['I won Hougang SMC in 2020, and again in 2025.', []],
+          ['My speciality is shipping and maritime law.', []],
+        ],
+        role: 'Workers’ Party MP for Hougang SMC',
+        didyou: 'He narrowly lost Fengshan SMC in 2015, then served as a Non-Constituency MP until he won Hougang in 2020.' },
+      { answer: 'Desmond Lee', cards: ['Desmond Lee', 'Chan Chun Sing', 'Jeffrey Siow', 'Pritam Singh', 'Louis Chua'],
+        facts: [
+          ['I first became an MP in 2011.', ['Jeffrey Siow', 'Louis Chua']],
+          ['I’m a minister.', ['Pritam Singh']],
+          ['I trained as a lawyer.', ['Chan Chun Sing']],
+          ['Before politics, I was a prosecutor at the Attorney-General’s Chambers.', []],
+          ['Today I’m Minister for Education: schools, polys, ITE and universities.', []],
+        ],
+        role: 'Minister for Education · MP for West Coast-Jurong West GRC',
+        didyou: 'Before Education, he was Minister for National Development, the ministry in charge of housing and land use.' },
+      { answer: 'Sylvia Lim', cards: ['Sylvia Lim', 'He Ting Ru', 'Jamus Lim', 'Indranee Rajah', 'Sim Ann'],
+        facts: [
+          ['I’m a woman.', ['Jamus Lim']],
+          ['I’m a Workers’ Party MP.', ['Indranee Rajah', 'Sim Ann']],
+          ['I first entered Parliament in 2006, as a Non-Constituency MP.', ['He Ting Ru']],
+          ['I’ve been the Workers’ Party chair since 2003.', []],
+          ['I spent 12 years as a lecturer at Temasek Polytechnic.', []],
+        ],
+        role: 'Workers’ Party chair · MP for Aljunied GRC',
+        didyou: 'She started her career as a police officer before becoming a lawyer.' },
+    ],
+  },
+
+  // ------------------------------------------------------------------ Environment: Hole-some Recycling
+  // Items: [key, label, size(px), kind] kind: 'rec' recyclable · 'bottle' deposit bottle (+1 coin)
+  // 'dirty' looks recyclable but is contaminated · 'trash' general waste · 'ewaste' e-waste
+  // 'crushed' crushed bottle (still recyclable, no deposit) · 'full' bottle with drink inside
+  hole: {
+    items: {
+      bottle: ['Empty bottle', 26, 'bottle'], can: ['Drink can', 24, 'bottle'], paper: ['Clean paper', 26, 'rec'],
+      box: ['Cardboard box', 46, 'rec'], jar: ['Glass jar', 28, 'rec'], carton: ['Rinsed carton', 30, 'rec'], mag: ['Old magazine', 34, 'rec'],
+      tissue: ['Used tissue', 20, 'trash'], peel: ['Banana peel', 26, 'trash'], foam: ['Styrofoam box', 40, 'trash'],
+      cutlery: ['Plastic cutlery', 24, 'trash'], cup: ['Stained coffee cup', 28, 'dirty'], pizza: ['Greasy pizza box', 48, 'dirty'],
+      tub: ['Oily takeaway tub', 30, 'dirty'], dbottle: ['Unrinsed bottle', 26, 'dirty'],
+      battery: ['Battery', 18, 'ewaste'], phone: ['Old phone', 24, 'ewaste'], bank: ['Powerbank', 26, 'ewaste'], toy: ['Soft toy', 36, 'trash'],
+      crushed: ['Crushed bottle', 22, 'crushed'], full: ['Half-full bottle', 26, 'full'],
+    },
+    // dirty items count as recyclable in wave 1 (rule not taught yet) and as contamination from wave 2
+    waves: [
+      { name: 'Blue bin basics', time: 40, goal: 90, spawn: ['bottle', 'can', 'paper', 'box', 'jar', 'mag', 'tissue', 'peel', 'foam'],
+        rule: 'Swallow what goes in the blue bin. Food, tissue and styrofoam shrink your hole.',
+        learn: 'About 40% of what goes into recycling bins in Singapore can’t be recycled because it’s contaminated.' },
+      { name: 'Rinse it first', time: 40, goal: 130, spawn: ['bottle', 'can', 'paper', 'box', 'carton', 'cup', 'pizza', 'tub', 'dbottle', 'tissue', 'cutlery'],
+        rule: 'New rule: dirty items now cost you. Stained cups, greasy pizza boxes and unrinsed bottles are contamination.',
+        learn: 'Food and grease can spoil a whole bin of clean recyclables. Empty it, rinse it, then recycle it.' },
+      { name: 'Not for the blue bin', time: 40, goal: 160, spawn: ['bottle', 'can', 'paper', 'box', 'jar', 'carton', 'battery', 'phone', 'bank', 'toy', 'cup', 'foam'],
+        rule: 'New rule: batteries, phones and powerbanks are e-waste. They go to e-waste points, never the blue bin.',
+        learn: 'E-waste like batteries and powerbanks can catch fire in recycling trucks. Drop them at an e-waste collection point.' },
+      { name: 'Empty and uncrushed', time: 40, goal: 180, spawn: ['bottle', 'can', 'crushed', 'full', 'paper', 'box', 'mag', 'tub', 'dbottle', 'battery', 'peel'],
+        rule: 'New rule: half-full bottles are a mess. Crushed bottles still recycle, but they earn no 10¢ deposit.',
+        learn: 'Since 1 April 2026, drinks with the deposit mark cost 10¢ more. Return them empty and uncrushed to a reverse vending machine to get it back.' },
+      { name: 'Rush hour', time: 45, goal: 220, fast: true, spawn: ['bottle', 'can', 'crushed', 'full', 'paper', 'box', 'jar', 'carton', 'mag', 'cup', 'pizza', 'tub', 'dbottle', 'battery', 'phone', 'bank', 'toy', 'tissue', 'peel', 'foam', 'cutlery'],
+        rule: 'Everything at once, and it keeps coming. Every rule still counts.',
+        learn: 'Not sure about an item? NEA’s recycling guide and its Bloobin chatbot tell you which bin it goes in.' },
+    ],
+    perks: [
+      { key: 'wash', name: 'Auto Wash', cost: 4, uses: 5, after: 1, desc: 'Tap to rinse every dirty item near your hole, so it becomes recyclable. 5 washes.' },
+      { key: 'nty', name: 'No Thank You', cost: 6, uses: 3, after: 2, desc: 'Switches on by itself. Your hole snaps shut on trash, even if you drive right over it. Blocks 3 mistakes.' },
+      { key: 'frog', name: 'Captain Green', cost: 8, uses: 2, after: 3, desc: 'A frog sidekick grabs nearby recyclables with its tongue for 10 seconds. 2 uses.' },
+    ],
+  },
+
+  // ------------------------------------------------------------------ Tech: Real or Fake?
+  // kind 'img': ans 'real' | 'ai'. kind 'news': ans 'real' | 'fake'. Real headlines are exact headlines of
+  // articles used in the Knowseum wings. Fake headlines are made up for this game and labelled as such.
+  realfake: {
+    rounds: [
+      { name: 'Is this AI?', note: 'Photos', items: [
+        { kind: 'img', src: 'assets/realfake/ai-merlion.webp', ans: 'ai', tell: 'It never snows in Singapore. When a scene breaks real-world rules, be suspicious.' },
+        { kind: 'img', src: 'assets/realfake/real-1.jpg', ans: 'real', tell: '' },
+        { kind: 'img', src: 'assets/realfake/ai-hawker.webp', ans: 'ai', tell: 'Hard one! The signs are readable, so look for other clues: everything is a bit too tidy and evenly lit. When a photo looks perfect, ask who posted it first.' },
+        { kind: 'img', src: 'assets/realfake/real-2.jpg', ans: 'real', tell: '' },
+      ] },
+      { name: 'Real or fake news?', note: 'Headlines', items: [
+        { kind: 'news', head: 'Anthropic to work with Singapore to evaluate AI models for safety and security', src: 'The Straits Times · 14 Oct 2026', ans: 'real', tell: 'It’s from a trusted outlet, with a date, and other outlets reported it too.' },
+        { kind: 'news', head: 'BREAKING: MOE to replace O-Level exams with AI chatbot interviews from next year!!', src: 'Forwarded many times', ans: 'fake', tell: 'ALL CAPS, “BREAKING” and !!! are made to rush you. A big policy change like this would be on moe.gov.sg first.' },
+        { kind: 'news', head: 'Central Ukrainian region hit by vast drone attack, killing three', src: 'Reuters · 15 Oct 2026', ans: 'real', tell: 'A news agency, a date and plain, specific wording are good signs.' },
+        { kind: 'news', head: 'Doctors confirm boiling apples every morning cures haze cough in 3 days', src: 'healthtips-sg.blog', ans: 'fake', tell: 'Miracle cures with exact promises are a classic fake. Which doctors? The post never says.' },
+      ] },
+      { name: 'Mixed and tricky', note: 'No easy tells', items: [
+        { kind: 'img', src: 'assets/realfake/ai-voiddeck.webp', ans: 'ai', tell: 'Zoom into the notice board: the posters are blurry blobs with no words you can read. Real notices are full of tiny, readable text.' },
+        { kind: 'news', head: 'Govts must incentivise private sector to hire fresh grads amid declining entry-level roles: President', src: 'The Straits Times · 12 Oct 2026', ans: 'real', tell: 'Long, careful headlines that name who said it are typical of real reporting.' },
+        { kind: 'news', head: 'Singapore to fine drivers who use Waze in tunnels from 1 January', src: 'Shared on a group chat', ans: 'fake', tell: 'It sounds official and boring, which is why it spreads. Check gov.sg or a news site before you forward it.' },
+        { kind: 'img', src: 'assets/realfake/real-3.jpg', ans: 'real', tell: '' },
+        { kind: 'img', src: 'assets/realfake/ai-mrt.webp', ans: 'ai', tell: 'Very convincing, even the station code is right. When the picture can’t tell you, the source can: who took it, and does a trusted outlet stand behind it?' },
+      ] },
+    ],
+    realTip: 'This one was a real photo. Real photos have messy, specific details: readable signs, natural shadows, people doing different things.',
+  },
 };

@@ -32,7 +32,7 @@ On a computer it shows inside a phone frame. On a phone it fills the screen.
 | Quiz | Pick Easy la / Not bad leh / Dam hard sia; 5 questions each with green/red feedback, shake and explanations |
 | Results → Rewards → Bonus | Counting score, travel-stamp reveal, unlocked items, article badge after finishing everything |
 | Badge unlocked | Animated Van Gogh night sky when a streak or quiz milestone is reached |
-| Mini games | Two per wing, in each wing room. Every wing has **Fact or Cap** (swipe true/false). Plus: World **GeoGuessr** (drop a pin, get a fun fact), Tech **Jargon Match**, Singapore and Culture **Wikirace**, SG Politics **Who Am I?**, Environment **Earth Quests**. All content is an AI draft for the demo, badged "pending newsroom check", with a sheet explaining how a Tier 1 newsroom vets it |
+| Mini games | Two per wing, in each wing room. Every wing has **Fact or Cap** (swipe true/false). Plus: World **GeoGuessr** (read a clue, drop a pin, get a fun fact), Singapore and Culture **Wikirace** (reach the target page by links only), SG Politics **Guess Who** (5 MP cards, facts drip in one by one, 4 rounds with 2 PAP and 2 WP answers, Read more toggle with a Did you know), Environment **Hole-some Recycling** (recyclables grow your hole, trash shrinks it; 5 waves with stricter rules; empty bottles earn 10¢ for the Auto Wash, No Thank You and Captain Green perks), Tech **Real or Fake?** (AI image vs real photo, then real vs fake headlines, then both mixed against the clock, with a tip when you miss). All content is an AI draft for the demo, badged "pending newsroom check", with a sheet explaining how a Tier 1 newsroom vets it |
 | Mini game badges | Five Van Gogh badges for mini games played: First Move (1), Curious Cat (3), Wing Walker (6), Brainstorm (9), Grand Tour (all 12). They unlock with the night-sky animation and show on the Badges page and passport |
 | Passport | Points, latest stamps, all badges; a stamp page per wing; tap stamps and badges for details |
 | Map | Full-screen museum floor plan. Hold your character and drag it into a room (or tap a spot, or use the arrow keys), then tap Enter. Includes the Lobby and the Hall of Fame |
@@ -61,6 +61,7 @@ assets/
   lobby.webp      isometric museum lobby
   worldmap.svg    world map for GeoGuessr (Natural Earth via world-atlas)
   rooms/          each wing room, empty to fully furnished
+  realfake/       AI images for Real or Fake? (real photos: real-1.jpg, real-2.jpg, real-3.jpg)
   map.svg, facade.svg
 ```
 
