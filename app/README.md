@@ -22,9 +22,9 @@ On a computer it shows inside a phone frame. On a phone it fills the screen.
 | Screen | What you can do |
 |---|---|
 | Sign in → Username → Welcome | Email or Google (mock), pick an `@handle` with live checking |
-| Make your look | Girl/boy toggle, shuffle and colour buttons, and four tabs: **Hair** (6 styles + 6 colours), **Outfit** (6 outfits + 6 colours), **Accessories** (6 to start, wear up to 2, plus 6 earned in the museum), **Secret** (9 items unlocked by your streak and quiz count) |
-| Lobby | The isometric museum fills the screen. Hold your character and drag it to a doorway to walk in (or tap the floor or a door). Wings drawer at the bottom opens the full list |
-| Wing room | Each wing's isometric room. Tap the Newsworthy wall to walk up to it. Furnish the room by finishing quizzes there (couch, coffee table, trophy, then 3 more). World, Environment and Culture rooms show their painting; their wall has the headline, a link to the article, "coming soon" activities and a one-question warm-up quiz |
+| Make your look | Choose one of three 3D cats (**Ragdoll**, **Ginger**, **Siamese**) and shuffle. Four tabs: **Cat**, **Outfit** (8: hoodie, school uniform, fusion ethnic baju, Knowledge jersey, tee, dress, denim jacket, baju kurung), **Accessories** (6 to start, wear up to 2 with one thing on your head at a time, plus 6 earned in the museum), **Secret** (9 items unlocked by your streak and quiz count) |
+| Lobby | The isometric museum fills the screen. Hold your character and drag it to a doorway to walk in (or tap the floor or a door). Wings drawer at the bottom opens the full list. Each doorway has the wing's name on the sign above it and a curtain with stickers for that wing. Your cat turns sideways when it walks and jumps when you pick it up |
+| Wing room | Each wing's 3D room in its own colours, with the wing's painting on the wall. Tap the Newsworthy wall to walk up to it. Furnish the room by finishing quizzes there: sofa (1), side stool (2), trophy (3), then for Singapore, SG Politics and Tech an armchair (5), plant (7), mushroom lamp (9) and a wing special at 12 (racing sim seat, lectern, robot buddy). Sofa, armchair and lamp take the wing's colour. World, Environment and Culture show their painting; their wall has the headline, a link to the article, "coming soon" activities and a one-question warm-up quiz |
 | Newsworthy Wall | Gilded painting, headline plaque, three activity cards with completion ticks |
 | Newsworthy Wall | Swipe the gilded frames (or use the arrows). Frame 1 is this week's story; the others are "coming soon" placeholders for the demo |
 | Step into the story | 14 interactive frames per article: swipe the panel, tap to reveal, hold for the F1 lights-out start, drag the race replay, toggle comparisons, run a scan, read the incident log, and a 3-question checkpoint quiz. Continue lights up once you've done each frame's thing |
@@ -81,3 +81,11 @@ Every fact in the stories, threads and quizzes comes from three Straits Times re
 - "Anthropic to work with Singapore to evaluate AI models for safety and security", Sarah Koh, 14 Oct 2026
 
 This is a prototype for a COMM121 class project. Sign-in is pretend and nothing is sent anywhere.
+
+## The cats and 3D assets
+
+- `assets/cats/<cat>-<outfit>-<pose>.webp`: 3 cats x 8 outfits x 3 poses (front, side, jump), made on Higgsfield (Nano Banana 2.1) from the reference sheets and cut out. `js/cats-data.js` holds each sprite's size and where its head is, so accessories line up.
+- `assets/acc/`: the 3D accessories layered on the cat. Secret and earned items keep their doodle art.
+- `assets/furn/`: 3D furniture. `sofa`, `chair` and `lamp` also come in a tinted copy per wing (`sofa-singapore.webp` and so on).
+- `assets/rooms3d/room-<wing>.webp`: the empty 3D room per wing with its painting set into the frame. Furniture positions are in `FPOS` in `js/app.js` (390 x 330 room).
+- `js/avatar.js`: builds the cat as layered `<img>` tags (`KNAvatar.html(look, { mode: 'full' | 'bust' | 'walk' })`), so it works from a local file too.

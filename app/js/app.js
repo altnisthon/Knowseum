@@ -8,12 +8,7 @@ const ART = KN.articles;
 const LV = Object.fromEntries(KN.levels.map(l => [l.key, l]));
 const LEVELS = ['easy', 'mid', 'hard'];
 const OPEN = ['singapore', 'politics', 'tech'];
-const HAIR = { g: ['long', 'bob', 'ponytail', 'buns', 'hijab', 'curlylong'], b: ['short', 'side', 'wavy', 'curly', 'buzz', 'cap'] };
-const HAIR_NAMES = { long: 'Long', bob: 'Bob', ponytail: 'Ponytail', buns: 'Buns', hijab: 'Hijab', curlylong: 'Curls', short: 'Short', side: 'Side part', wavy: 'Wavy', curly: 'Curly', buzz: 'Buzz', cap: 'Cap' };
-const HAIR_COL = ['#1c1b19', '#5a3b2a', '#a8723c', '#e2c06e', '#b5403a', '#9fb2d6'];
-const CLOTH_COL = ['#d8bd5a', '#7fb3a8', '#b5403a', '#5b76b0', '#d79aac', '#3a3834'];
-const OUTFITS = { g: [['hoodie', 'Hoodie'], ['tee', 'Tee'], ['dress', 'Dress'], ['uniform', 'School uniform'], ['kurung', 'Baju kurung'], ['jacket', 'Denim jacket']],
-  b: [['hoodie', 'Hoodie'], ['tee', 'Tee'], ['uniform', 'School uniform'], ['jersey', 'Jersey'], ['melayu', 'Baju Melayu'], ['jacket', 'Denim jacket']] };
+const OUTFITS = KNAvatar.OUTFITS, CATS = KNAvatar.CATS;
 const ACCS = [['headphones', 'Headphones'], ['cat', 'Cat buddy'], ['camera', 'Camera'], ['backpack', 'Backpack'], ['bucket', 'Bucket hat'], ['bubbletea', 'Bubble tea']];
 const SECRETS = [
   { key: 'presspass', name: 'Press pass', streak: 1, how: 'Start a streak' }, { key: 'notebook', name: 'Notebook', streak: 3, how: '3-day streak' },
@@ -38,15 +33,17 @@ const fresh = () => ({
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch (e) { S = fresh(); }
 S.topic = S.topic || {}; S.tips = S.tips || {}; S.mini = S.mini || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
-if (S.user && !S.user.look) S.user.look = { ...DEFAULT_LOOK, girl: S.user.girl !== false };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const today = () => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const points = () => OPEN.reduce((t, k) => t + LEVELS.reduce((u, l) => u + (S.arts[k].best[l] || 0) * LV[l].mult, 0), 0);
 const stampCount = () => OPEN.reduce((t, k) => t + Object.keys(S.arts[k].stamps).length, 0);
 const actsDone = k => { const a = S.arts[k]; return [a.story, a.persp, ...LEVELS.map(l => a.best[l] !== null)].filter(Boolean).length; };
-const DEFAULT_LOOK = { girl: true, hair: 'buns', hairCol: '#1c1b19', outfit: 'tee', outfitCol: '#d8bd5a', acc: ['headphones'] };
+const DEFAULT_LOOK = { cat: 'ragdoll', outfit: 'hoodie', acc: ['headphones'] };
+// older saves had a girl/boy doodle (hair, colours); move them onto a cat, keeping outfit and accessories where they still exist
+if (S.user) S.user.look = KNAvatar.clean(S.user.look || DEFAULT_LOOK);
 const curLook = () => (S.user && S.user.look) || DEFAULT_LOOK;
-const avatarSrc = (look, legs, head) => KNAvatar.uri(look || curLook(), { legs: !!legs, bust: !head });
+// avatar markup: 'bust' for round photos, 'full' for the whole cat, 'walk' for characters that move around
+const avatar = (look, mode = 'bust') => KNAvatar.html(look || curLook(), { mode });
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // ------------------------------------------------------------------ badges
@@ -223,16 +220,15 @@ SCREENS.welcome = () => `<div class="onb">
 // --- welcome back (shown whenever a saved visitor opens the app)
 SCREENS.back = () => `<div class="onb back-onb">
   <img class="facade" src="assets/facade.svg" alt="The Knowseum building">
-  <span class="backav pop"><img src="${avatarSrc()}" alt="Your avatar"></span>
+  <span class="backav pop" role="img" aria-label="Your avatar">${avatar()}</span>
   <h1 class="brand rise" style="text-align:center">Welcome back, <em>@${esc(S.user.handle)}</em></h1>
   <p class="sub" style="text-align:center">${ic('flame', 16, '#d6544b', 2)} ${S.streak}-day streak · ${stampCount()} stamp${stampCount() === 1 ? '' : 's'} · ${S.badges.length} badge${S.badges.length === 1 ? '' : 's'}</p>
   <button class="btn ink" data-act="continue-back">Continue</button>
   <button class="btn line" data-act="logout">Not you? Log out</button>
 </div>`;
 
-// --- make your look
-// --- make your look (Hair / Outfit / Accessories / Secret, as in the Figma frames)
-let lookDraft = null, lookTab = 'Hair';
+// --- make your look (Cat / Outfit / Accessories / Secret)
+let lookDraft = null, lookTab = 'Cat';
 const doodle = (kind, locked) => `<svg viewBox="0 0 100 100" aria-hidden="true">${(locked ? window.KN_DOODLE_LOCKED : window.KN_DOODLE)[kind] || ''}</svg>`;
 function lookTile({ act, v, name, sub, state = 'on', art, seed = 0 }) {
   // state: on | sel | locked | progress | mystery
@@ -250,21 +246,21 @@ function secretState(it) {
 function earnedHave(e) { return e.bonus ? S.arts[e.art].bonus : S.arts[e.art].items.includes(e.item); }
 SCREENS.look = ({ edit } = {}) => {
   lookDraft = lookDraft || JSON.parse(JSON.stringify(curLook()));
-  const d = lookDraft, g = d.girl ? 'g' : 'b';
-  const tabs = ['Hair', 'Outfit', 'Accessories', 'Secret'];
+  const d = lookDraft = KNAvatar.clean(lookDraft);
+  const tabs = ['Cat', 'Outfit', 'Accessories', 'Secret'];
+  const catArt = l => KNAvatar.html(l, { mode: 'full' });
   let body = '';
-  if (lookTab === 'Hair') {
-    body = `<div class="lgrid">${HAIR[g].map((h, i) => lookTile({ act: 'hair', v: h, name: HAIR_NAMES[h], state: d.hair === h ? 'sel' : 'on', seed: i, art: `<img src="${KNAvatar.uri({ ...d, hair: h, acc: [] }, { bust: false })}" alt="">` })).join('')}</div>
-      <div class="colrow"><span class="label">Colour</span>${HAIR_COL.map(c => `<button class="sw ${d.hairCol === c ? 'on' : ''}" style="background:${c}" data-act="haircol" data-v="${c}" aria-label="Hair colour ${c}"></button>`).join('')}</div>`;
+  if (lookTab === 'Cat') {
+    body = `<div class="lgrid">${CATS.map(([k, n], i) => lookTile({ act: 'cat', v: k, name: n, state: d.cat === k ? 'sel' : 'on', seed: i, art: catArt({ ...d, cat: k, acc: [] }) })).join('')}</div>
+      <p class="lnote">Pick your cat. Your outfit and accessories stay on.</p>`;
   } else if (lookTab === 'Outfit') {
-    body = `<div class="lgrid">${OUTFITS[g].map(([k, n], i) => lookTile({ act: 'outfit', v: k, name: n, state: d.outfit === k ? 'sel' : 'on', seed: i, art: doodle(k) })).join('')}</div>
-      <div class="colrow"><span class="label">Colour</span>${CLOTH_COL.map(c => `<button class="sw ${d.outfitCol === c ? 'on' : ''}" style="background:${c}" data-act="clothcol" data-v="${c}" aria-label="Outfit colour ${c}"></button>`).join('')}</div>`;
+    body = `<div class="lgrid">${OUTFITS.map(([k, n], i) => lookTile({ act: 'outfit', v: k, name: n, state: d.outfit === k ? 'sel' : 'on', seed: i, art: catArt({ ...d, outfit: k, acc: [] }) })).join('')}</div>`;
   } else if (lookTab === 'Accessories') {
-    body = `<div class="lgrid">${ACCS.map(([k, n], i) => lookTile({ act: 'acc', v: k, name: n, state: d.acc.includes(k) ? 'sel' : 'on', seed: i, art: doodle(k) })).join('')}</div>
-      <p class="lnote">Wear up to 2 accessories at once.</p>
+    body = `<div class="lgrid">${ACCS.map(([k, n], i) => lookTile({ act: 'acc', v: k, name: n, state: d.acc.includes(k) ? 'sel' : 'on', seed: i, art: `<img class="acc3d" src="assets/acc/${k}.webp" alt="">` })).join('')}</div>
+      <p class="lnote">Wear up to 2 accessories at once, and one thing on your head at a time.</p>
       <div class="label pad" style="margin:18px 0 10px">Earned in the museum</div>
       <div class="lgrid">${EARNED.map((e, i) => { const have = earnedHave(e); return lookTile({ act: have ? 'acc' : 'earned-locked', v: e.key, name: e.name, sub: have ? (d.acc.includes(e.key) ? 'Wearing' : 'Unlocked') : e.how, state: have ? (d.acc.includes(e.key) ? 'sel' : 'on') : 'locked', seed: i + 2,
-        art: `<img src="${KNAvatar.uri({ ...d, acc: [e.key] }, { bust: !['gradcap', 'teamcap', 'glasses', 'pixel'].includes(e.key) })}" alt="">` }); }).join('')}</div>`;
+        art: catArt({ ...d, acc: [e.key] }) }); }).join('')}</div>`;
   } else {
     const next = SECRETS.find(s => s.streak && S.streak < s.streak);
     const ms = SECRETS.filter(s => s.streak).map(s => s.streak);
@@ -278,11 +274,8 @@ SCREENS.look = ({ edit } = {}) => {
       <p class="lnote" style="text-align:center">Keep your streak going to unlock more.</p>`;
   }
   return `${topbar('Make your look', edit ? '' : 'Step 2 of 2', edit ? 'back-look' : '', `<button class="savepill" data-act="look-save">Save</button>`)}
-  <div class="seg2" role="tablist"><span class="knob" style="transform:translateX(${d.girl ? 0 : '100%'})"></span>
-    <button data-act="girl" data-v="1" role="tab" aria-selected="${d.girl}">Girl</button><button data-act="girl" data-v="0" role="tab" aria-selected="${!d.girl}">Boy</button></div>
-  <div class="look-stage"><img id="lookimg" src="${KNAvatar.uri(d)}" alt="Your avatar preview">
-    <button class="round white lsh" data-act="look-shuffle" aria-label="Shuffle look">${ic('shuffle', 20)}</button>
-    <button class="round white lpal" data-act="look-palette" aria-label="Next colour">${ic('palette', 20)}</button>${sparkles([[26, 24, 14, '#e7cf6a'], [330, 50, 11, '#fff', .5]])}</div>
+  <div class="look-stage"><span id="lookimg" class="lookfig" role="img" aria-label="Your cat, wearing the ${esc(OUTFITS.find(o => o[0] === d.outfit)[1])}">${KNAvatar.html(d, { mode: 'full' })}</span>
+    <button class="round white lsh" data-act="look-shuffle" aria-label="Shuffle look">${ic('shuffle', 20)}</button>${sparkles([[26, 24, 14, '#e7cf6a'], [330, 50, 11, '#fff', .5]])}</div>
   <div class="ltabs" role="tablist">${tabs.map(t => `<button class="${t === lookTab ? 'on' : ''}" data-act="look-tab" data-v="${t}" role="tab" aria-selected="${t === lookTab}">${t}${t === 'Secret' ? ' ' + ic('lock', 12, 'currentColor', 2) : ''}</button>`).join('')}</div>
   <div class="lbody" key="${lookTab}">${body}</div>
   <div class="pad" style="padding-top:18px;padding-bottom:34px"><button class="btn ${edit ? 'ink' : 'acc'}" data-act="look-save">${edit ? 'Save my look' : 'Enter the museum'}</button></div>`;
@@ -294,8 +287,10 @@ function rerenderLook(bump = true) {
 function toggleAcc(key) {
   const d = lookDraft, slot = KNAvatar.ACC[key].slot;
   if (d.acc.includes(key)) { d.acc = d.acc.filter(a => a !== key); return; }
+  const swapped = d.acc.find(a => KNAvatar.ACC[a].slot === slot);
   d.acc = d.acc.filter(a => KNAvatar.ACC[a].slot !== slot);
   d.acc.push(key);
+  if (swapped && slot === 'head') toast('One thing on your head at a time. Swapped it for the new one.');
   if (d.acc.length > 2) { d.acc.shift(); toast('You can wear 2 accessories at once. Swapped out the oldest one.'); }
 }
 
@@ -303,19 +298,27 @@ function toggleAcc(key) {
 const DOOR_SIDE = { world: 'L', singapore: 'R', culture: 'R', tech: 'L', environment: 'U', politics: 'U' };
 const DOOR_NAME = { singapore: 'Singapore', politics: 'SG Politics', tech: 'Tech', world: 'World', environment: 'Environment', culture: 'Culture' };
 const lp = (x, y, w = 390, h = 300) => `left:${x / w * 100}%;top:${y / h * 100}%`;
+// wing name signs (on the blank plates above each door) and door curtains with stickers, in the 390 x 300 lobby
+const DOOR_SIGN = { culture: [66, 107, 'L'], environment: [113.5, 80, 'L'], world: [161, 52.5, 'L'], singapore: [222.5, 48.5, 'R'], politics: [273.5, 78, 'R'], tech: [325, 108, 'R'] };
+const DOOR_STICKERS = { singapore: ['🏎️', '🏁', '🦁'], politics: ['🎓', '🏛️', '🗳️'], tech: ['🤖', '💻', '🔐'], environment: ['🌿', '🌫️', '🛵'], world: ['🌍', '🕊️', '📰'], culture: ['🏮', '🥟', '🍵'] };
+const curtainSvg = c => `<svg viewBox="0 0 40 52" aria-hidden="true"><rect x="1" y="0" width="38" height="4" rx="2" fill="#1c1b19"/><path d="M3 3 H19.2 V44 Q15 48 11 45 Q7 48 3 44 Z" fill="${c}" stroke="#1c1b19" stroke-width="1.1" stroke-linejoin="round"/><path d="M20.8 3 H37 V44 Q33 48 29 45 Q25 48 20.8 44 Z" fill="${c}" stroke="#1c1b19" stroke-width="1.1" stroke-linejoin="round"/><path d="M6 8 V40 M24 8 V40" stroke="#fff" stroke-opacity=".28" stroke-width="2" stroke-linecap="round"/></svg>`;
+const doorDeco = () => Object.entries(DOOR_SIGN).map(([k, [x, y, side]]) => { const w = KN.wings.find(v => v.key === k);
+  return `<span class="dsign ${side}" style="${lp(x, y)}" aria-hidden="true"><span>${DOOR_NAME[k]}</span></span>
+  <span class="curtain ${side}" style="${lp(x, y + 11)};--c:${w.color}" aria-hidden="true">${curtainSvg(w.color)}${DOOR_STICKERS[k].map((e, i) => `<i class="stk s${i}">${e}</i>`).join('')}</span>`; }).join('');
 const walkerW = (k, w = 390) => `width:${110 * k / w * 100}%`;
 SCREENS.lobby = () => {
   const L = W_.lobby;
   const wingsDone = KN.wings.filter(w => ART[w.key] ? actsDone(w.key) === 5 : S.topic[w.key]).length;
   return `<div class="lobbyv">
-  <div class="hello rise"><span class="av"><img src="${avatarSrc()}" alt=""></span>
+  <div class="hello rise"><span class="av">${avatar()}</span>
     <div style="flex:1"><b>The Lobby</b><span>Hi, @${esc(S.user.handle)} · this week's stories are in</span></div>
     <button class="chip" data-act="to-hall" style="background:#1c1b19;color:#e7cf6a" aria-label="Hall of Fame">♛</button>
     <span class="chip" style="background:#fdecea">${ic('flame', 15, '#d6544b', 2)} ${S.streak}</span>
     <button class="chip" data-tab="passport" style="background:var(--grey)">${ic('stamp', 15)} ${stampCount()}</button></div>
   <div class="museum" id="museum"><div class="stagein" id="lobbyart"><img src="assets/lobby.webp" alt="The museum lobby with six arched doorways, one for each wing" draggable="false">
+    ${doorDeco()}
     ${L.doors.map(d => `<button class="door ${DOOR_SIDE[d.key]}" aria-label="Enter the ${DOOR_NAME[d.key]} Wing" data-act="enter-wing" data-v="${d.key}" style="${lp(d.x, d.y)};--c:${KN.wings.find(w => w.key === d.key).color}"><span class="dotp"></span><span class="dl">${DOOR_NAME[d.key]}</span></button>`).join('')}
-    <span class="walker grab" id="walker" style="${lp(...lobbyPx())};${walkerW(L.k * 1.25)}" role="img" aria-label="You. Hold and drag to move"><img src="${avatarSrc(null, true)}" alt="" draggable="false"></span>
+    <span class="walker grab" id="walker" style="${lp(...lobbyPx())};${walkerW(L.k * 1.25)}" role="img" aria-label="You. Hold and drag to move">${avatar(null, 'walk')}</span>
     ${coach('lobby', 'Hold your character and drag it to a doorway to enter a wing')}</div>
     <button class="round white helpbtn" data-act="drag-help" data-v="lobby" aria-label="How to move">?</button></div>
   <div class="wingdrawer ${wingsOpen ? 'open' : ''}" id="wingdrawer">
@@ -406,25 +409,36 @@ MOUNT.lobby = el => {
 function walkTo(elId, x, y, w, h, then) {
   const wk = current.querySelector('#' + elId);
   if (!wk) { then(); return; }
+  const from = parseFloat(wk.style.left) || 0; wk.classList.toggle('face-r', x / w * 100 > from + .5);
   wk.classList.add('walking'); wk.style.left = x / w * 100 + '%'; wk.style.top = y / h * 100 + '%';
   setTimeout(() => { wk.classList.add('gone'); setTimeout(then, 220); }, 760);
 }
 
-// --- wing room (isometric) — before and after furnishing
+// --- wing room (3D clay room) — furniture appears as you finish quizzes in the wing
 function wingRuns(k) { return (S.arts[k] && S.arts[k].runs) || 0; }
 function furnLevel(k) { return Math.min(3, wingRuns(k)); }
+// positions in the 390 x 330 room: [x of the item's base centre, y of its base, width]
+const ROOM3D = { wall: [260, 125], me: [232, 236], wk: 16 };
+const FPOS = { sofa: [122, 206, 98], stool: [168, 238, 40], trophy: [136, 252, 32], chair: [270, 250, 54], plant: [306, 228, 38], lamp: [166, 170, 40],
+  simseat: [186, 290, 74], lectern: [200, 288, 46], robot: [200, 290, 44] };
+const SPECIAL = { singapore: ['simseat', 'Racing sim seat'], politics: ['lectern', 'Lectern'], tech: ['robot', 'Robot buddy'] };
+const TINTED = { sofa: 1, chair: 1, lamp: 1 };
+const roomFurn = k => [['sofa', 'Sofa', 1], ['stool', 'Side stool', 2], ['trophy', 'Trophy', 3],
+  ...(ART[k] ? [['chair', 'Armchair', 5], ['plant', 'Potted plant', 7], ['lamp', 'Mushroom lamp', 9], [...SPECIAL[k], 12]] : [])];
+const furnSrc = (kind, k) => `assets/furn/${kind}${TINTED[kind] ? '-' + k : ''}.webp`;
+const furnImg = (kind, k, isNew) => { const [x, y, w] = FPOS[kind];
+  return `<img class="furn ${isNew ? 'fresh' : ''}" src="${furnSrc(kind, k)}" alt="" style="left:${x / 390 * 100}%;top:${y / 330 * 100}%;width:${w / 390 * 100}%;z-index:${Math.round(y)}">`; };
 SCREENS.room = ({ k }) => {
-  const w = KN.wings.find(x => x.key === k), R = W_.rooms[k], art = ART[k];
-  const lvl = art ? furnLevel(k) : 0, st = R[String(lvl)];
-  const runs = wingRuns(k), placed = R.furn.filter(f => runs >= f[3]).length;
+  const w = KN.wings.find(x => x.key === k), art = ART[k], F = roomFurn(k);
+  const runs = wingRuns(k), got = F.filter(f => runs >= f[2]), placed = got.length;
   const topic = !art, only = WALL_ONLY[k];
   const tipShown = !S.tipHidden[k];
   const prizes = art ? LEVELS.map(l => art.rewards[l]).filter(r => r.where === 'room item' && S.arts[k].items.includes(r.item)) : [];
-  return `<div style="--c:${w.color};--t:${w.tint}">${topbar(`${w.name} Wing`, topic ? 'Room 1 of 1 · not furnished yet' : `Room 1 of 1 · ${placed ? placed + ' furnishing' + (placed > 1 ? 's' : '') : 'not furnished yet'}`, 'to-lobby', `<span class="round" style="background:#f4eccb;overflow:hidden;padding:0"><img src="${avatarSrc(null, false, true)}" alt="" style="width:40px;height:40px"></span>`)}
-  <div class="iso room" id="roomart"><img src="assets/rooms/room-${k}-${lvl}.webp" alt="The ${w.name} Wing room${lvl ? ', furnished' : ''}">
-    <button class="hot" data-act="room-wall" data-v="${k}" style="${lp(...st.wall, 390, 330)}"><span class="hring"></span><span class="dl on">Newsworthy wall</span></button>
-    ${lvl >= 3 ? `<span class="hot static" style="${lp(...st.trophy, 390, 330)}"><span class="dl">${art ? 'Trophy' : ''}</span></span>` : ''}
-    <span class="walker" id="rwalker" style="${lp(...st.me, 390, 330)};${walkerW(st.k)}"><img src="${avatarSrc(null, true)}" alt="You"></span></div>
+  return `<div style="--c:${w.color};--t:${w.tint}">${topbar(`${w.name} Wing`, topic ? 'Room 1 of 1 · not furnished yet' : `Room 1 of 1 · ${placed ? placed + ' furnishing' + (placed > 1 ? 's' : '') : 'not furnished yet'}`, 'to-lobby', `<span class="round topav">${avatar()}</span>`)}
+  <div class="iso room room3d" id="roomart"><img src="assets/rooms3d/room-${k}.webp" alt="The ${w.name} Wing room${placed ? ', with ' + got.map(f => f[1].toLowerCase()).join(', ') : ''}">
+    ${got.map(f => furnImg(f[0], k, f[2] === runs)).join('')}
+    <button class="hot" data-act="room-wall" data-v="${k}" style="${lp(...ROOM3D.wall, 390, 330)}"><span class="hring"></span><span class="dl on">Newsworthy wall</span></button>
+    <span class="walker" id="rwalker" style="${lp(...ROOM3D.me, 390, 330)};width:${ROOM3D.wk}%;z-index:${ROOM3D.me[1]}">${avatar(null, 'walk')}</span></div>
   ${tipShown && !placed ? `<div class="tipcard rise"><div class="h"><span class="ic">${ic('spark', 18, '#1c1b19', 1.9)}</span><b>Make this room yours</b><button data-act="hide-tip" data-v="${k}" aria-label="Close tip">${ic('close', 14, '#fff', 2.2)}</button></div>
     <p>${topic ? `This wing's story is on the Newsworthy wall. Its activities land soon, and there's a warm-up topic quiz there meanwhile.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
@@ -432,20 +446,19 @@ SCREENS.room = ({ k }) => {
     <span class="tx"><span class="label">Newsworthy wall</span><b>${topic ? esc(only.headline) : '3 frames to explore'}</b><span class="mini">${ic('chev', 14, '#fff', 2.2)} View wall</span></span></button>
   ${miniSection(k)}
   ${topic ? `<p class="ascii" style="text-align:center;margin:18px 0 30px">*. room furnishings arrive with this wing's quizzes .*</p>` : `
-  <div class="furnish rise"><div class="fh"><b>Furnish your room</b><span>${placed} of ${R.furn.length}</span></div>
-    <div class="fbar"><span>${runs} of 12 quizzes done in this wing</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
-    <div class="lgrid">${R.furn.map(([kind, name, , q], i) => { const got = runs >= q, isNew = got && q === runs;
-      return `<div class="ltile ${got ? (isNew ? 'sel' : 'on') : 'locked'}" style="--r:${(i % 3) - 1}deg"><span class="art">${doodle(kind, !got)}</span><b>${name}</b><small>${got ? (q <= 3 ? (isNew ? 'New · placed' : 'Placed') : 'Unlocked') : `Complete ${q} quiz${q > 1 ? 'zes' : ''} in this wing`}</small>${got ? `<span class="tc ${isNew ? 'sel' : 'ok'}">${tick(13, '#fff', 3)}</span>` : `<span class="tc">${ic('lock', 12, '#9d988f', 1.9)}</span>`}</div>`; }).join('')}</div>
+  <div class="furnish rise"><div class="fh"><b>Furnish your room</b><span>${placed} of ${F.length}</span></div>
+    <div class="fbar"><span>${Math.min(runs, 12)} of 12 quizzes done in this wing</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
+    <div class="lgrid">${F.map(([kind, name, q], i) => { const has = runs >= q, isNew = has && q === runs;
+      return `<div class="ltile ${has ? (isNew ? 'sel' : 'on') : 'locked'}" style="--r:${(i % 3) - 1}deg"><span class="art"><img class="furn3d" src="${furnSrc(kind, k)}" alt=""></span><b>${name}</b><small>${has ? (isNew ? 'New · placed' : 'Placed') : `Complete ${q} quiz${q > 1 ? 'zes' : ''} in this wing`}</small>${has ? `<span class="tc ${isNew ? 'sel' : 'ok'}">${tick(13, '#fff', 3)}</span>` : `<span class="tc">${ic('lock', 12, '#9d988f', 1.9)}</span>`}</div>`; }).join('')}</div>
     ${prizes.length ? `<div class="label" style="margin:16px 0 8px">Quiz prizes in this room</div><div class="sugg" style="margin:0">${prizes.map(p => `<span class="chip">${ic('spark', 14, '#d8bd5a', 2)} ${p.item}</span>`).join('')}</div>` : ''}
     <p class="lnote">Every level you finish counts, retries too.</p></div>`}</div>`;
 };
 MOUNT.room = (el, { k }) => {
   const a = S.arts[k]; if (!a) return;
-  const lvl = furnLevel(k);
-  if ((a.seenLevel || 0) < lvl) {
-    const names = ['', 'Couch', 'Coffee table', 'Trophy'];
-    setTimeout(() => toast(`${sparkSvg('#e7cf6a').replace('<svg', '<svg width="16" height="16"')} ${names[lvl]} placed in your room!`), 500);
-    a.seenLevel = lvl; save();
+  const runs = wingRuns(k), fresh = roomFurn(k).filter(f => f[2] > (a.seenLevel || 0) && f[2] <= runs);
+  if (fresh.length) {
+    setTimeout(() => toast(`${sparkSvg('#e7cf6a').replace('<svg', '<svg width="16" height="16"')} ${fresh.map(f => f[1]).join(', ')} placed in your room!`), 500);
+    a.seenLevel = runs; save();
   }
 };
 function miniSection(k) {
@@ -752,7 +765,7 @@ SCREENS.bonus = ({ k }) => {
     <div class="it" style="padding:6px 0">${tick(20)}<b style="flex:1;font-size:14.5px">Perspectives</b><span class="mono" style="font-size:12px">4 voices</span></div>
     ${LEVELS.map(l => `<div class="it" style="padding:6px 0">${tick(20)}<b style="flex:1;font-size:14.5px">${LV[l].name}</b><span class="mono" style="font-size:12px">${st.best[l]}/5</span></div>`).join('')}</div>
   <div class="unlock-list wob rise" style="margin-top:12px;background:#fbf3d3;display:flex;align-items:center;gap:12px;animation-delay:.6s">
-    <img id="bonusav" src="${KNAvatar.uri({ ...curLook(), acc: [BONUS_ACC[a.bonus.item]] })}" alt="" style="width:62px;height:82px;object-fit:cover;object-position:top"><div style="flex:1"><b style="font-size:16px">${a.bonus.item}</b><small style="display:block;color:var(--body)">New accessory in Make your look</small></div>
+    <span id="bonusav" class="bonusav">${avatar({ ...curLook(), acc: [BONUS_ACC[a.bonus.item]] }, 'full')}</span><div style="flex:1"><b style="font-size:16px">${a.bonus.item}</b><small style="display:block;color:var(--body)">New accessory in Make your look</small></div>
     <button class="chip" style="background:#fff;border:1.3px solid var(--ink)" data-act="wear" data-v="${a.bonus.item}">Wear it</button></div>
   <div class="pad" style="margin-top:18px"><button class="btn ink" data-act="to-wall" data-v="${k}">${ic('back', 20, '#fff', 2.2)} Back to the Wall</button></div></div>`;
 };
@@ -803,7 +816,7 @@ SCREENS.passport = () => {
   const show = latest.slice(-3).reverse();
   const row = (title, list, n, icon) => `<div class="brow rise"><div class="h">${ic(icon, 16)} ${title}</div><div class="imgs">${list.map(b => `<img src="assets/badges/${isEarned(b) ? '' : 'locked-'}${b.key}.webp" alt="${b.name}${isEarned(b) ? '' : ' (locked)'}">`).join('')}</div></div>`;
   return `<div class="pad" style="padding-top:14px"><h1 class="h1">Visitor passport</h1><p style="color:var(--mute);margin:4px 0 14px">@${esc(S.user.handle)} · KN-0427</p></div>
-  <div class="bearer paper rise"><span class="photo"><img src="${avatarSrc()}" alt=""></span><div><b>${esc(S.user.handle)}</b><small>Visitor since ${S.user.since}</small><small class="mono" style="font-size:9.5px;letter-spacing:.08em">KN&lt;VISITOR&lt;&lt;${esc(S.user.handle.toUpperCase().replace(/\./g, '<'))}&lt;&lt;</small></div>
+  <div class="bearer paper rise"><span class="photo">${avatar()}</span><div><b>${esc(S.user.handle)}</b><small>Visitor since ${S.user.since}</small><small class="mono" style="font-size:9.5px;letter-spacing:.08em">KN&lt;VISITOR&lt;&lt;${esc(S.user.handle.toUpperCase().replace(/\./g, '<'))}&lt;&lt;</small></div>
     <div class="pts chrome"><b>${points()}</b><br><span>quiz pts</span></div></div>
   <div class="sec-h"><h3>Stamps<small>${stampCount()} of 18</small></h3><button data-act="to-stamps">See all ${ic('chev', 14, '#1c1b19', 2.2)}</button></div>
   <button class="strip paper rise" data-act="to-stamps" style="width:calc(100% - 32px)">${show.length ? show.map((s, i) => `<img src="assets/stamps/${s}.webp" alt="" style="transform:rotate(${[-8, 6, -3][i]}deg)">`).join('') : '<span class="empty">Finish any quiz level to get your first stamp.</span>'}</button>
@@ -916,7 +929,7 @@ function mapSVG(L) {
 SCREENS.map = () => `<div class="mapv"><div class="maphead"><div style="flex:1"><h1 class="h1">Museum map</h1><p>Hold your character and drag it into a room.</p></div>
     <button class="round white helpbtn static" data-act="drag-help" data-v="map" aria-label="How to move">?</button></div>
   <div class="mapwrap full" id="mapwrap"><div id="mapsvg" class="mapsvg"></div><div id="roomhits"></div>
-    <span class="me grab" id="me" role="img" aria-label="You. Hold and drag to move"><img src="${avatarSrc(null, true)}" alt="" draggable="false"></span>
+    <span class="me grab" id="me" role="img" aria-label="You. Hold and drag to move">${avatar(null, 'walk')}</span>
     ${coach('map', 'Hold your character and drag it into a room')}</div>
   <div class="enterbar float" id="enterbar"></div></div>`;
 MOUNT.map = el => {
@@ -952,13 +965,13 @@ const HALL = [['newsy.nadia', 84, 41, 9], ['quizwiz.kai', 81, 30, 9], ['headline
 const HALL_TABS = [['Quiz points', 1, 'pts'], ['Streak', 2, 'days'], ['Stamps', 3, 'stamps']];
 let hallTab = 0;
 const seedLook = (s) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; const r = n => { h = (Math.imul(h, 1103515245) + 12345) >>> 0; return (h >>> 16) % n; };
-  const girl = !!r(2), g = girl ? 'g' : 'b'; return { girl, hair: HAIR[g][r(6)], hairCol: HAIR_COL[r(6)], outfit: OUTFITS[g][r(6)][0], outfitCol: CLOTH_COL[r(6)], acc: r(3) ? [ACCS[r(6)][0]] : [] }; };
+  return { cat: CATS[r(3)][0], outfit: OUTFITS[r(8)][0], acc: r(3) ? [ACCS[r(6)][0]] : [] }; };
 SCREENS.hall = () => {
   const [tn, ci, unit] = HALL_TABS[hallTab];
   const mine = [points(), S.streak, stampCount()][ci - 1];
   const all = [...HALL.map(r => ({ h: r[0], v: r[ci], look: seedLook(r[0]) })), { h: S.user.handle, v: mine, me: true, look: curLook() }].sort((a, b) => b.v - a.v || (a.me ? 1 : -1));
   const myRank = all.findIndex(x => x.me) + 1, top = all.slice(0, 3), rest = all.slice(3, 12);
-  const av = (x, big) => `<span class="hav ${big ? 'big' : ''}"><img src="${KNAvatar.uri(x.look)}" alt=""></span>`;
+  const av = (x, big) => `<span class="hav ${big ? 'big' : ''}">${avatar(x.look)}</span>`;
   const pod = [top[1], top[0], top[2]];
   return `${topbar('Hall of Fame', 'Leaderboards · demo players', 'to-map')}
   <div class="hall">
@@ -972,7 +985,7 @@ SCREENS.hall = () => {
 };
 
 // --- profile
-SCREENS.profile = () => `<div class="prof"><div class="bigav pop"><img src="${avatarSrc()}" alt="Your avatar"></div><h2 style="margin:0">@${esc(S.user.handle)}</h2>
+SCREENS.profile = () => `<div class="prof"><div class="bigav pop" role="img" aria-label="Your avatar">${avatar()}</div><h2 style="margin:0">@${esc(S.user.handle)}</h2>
   <p style="color:var(--mute);margin:4px 0 0">${esc(S.user.email || 'Signed in with Google')}</p>${curLook().acc.length ? `<p style="margin:8px 0 0"><span class="chip">${ic('spark', 14)} Wearing: ${curLook().acc.map(a => [...ACCS, ...SECRETS.map(s => [s.key, s.name]), ...EARNED.map(e => [e.key, e.name])].find(x => (x[0] || x.key) === a)?.[1] || a).join(', ')}</span></p>` : ''}</div>
   <div class="statgrid stagger"><div><b>${points()}</b><span>quiz points</span></div><div><b>${S.streak}</b><span>day streak</span></div><div><b>${stampCount()}</b><span>stamps</span></div><div><b>${S.badges.length}</b><span>badges</span></div></div>
   <div class="menu rise"><button data-act="edit-look">${ic('pencil', 18)} Edit my look<small>›</small></button>
@@ -991,26 +1004,20 @@ const ACT = {
       S = fresh(); save();
     }
     go('welcome'); },
-  'to-look': () => { lookDraft = null; lookTab = 'Hair'; go('look'); },
-  girl: el => { const girl = el.dataset.v === '1'; if (girl === lookDraft.girl) return; lookDraft.girl = girl; lookDraft.hair = girl ? 'buns' : 'curly';
-    if (!OUTFITS[girl ? 'g' : 'b'].some(o => o[0] === lookDraft.outfit)) lookDraft.outfit = 'hoodie'; rerenderLook(); },
-  hair: el => { lookDraft.hair = el.dataset.v; rerenderLook(); },
-  haircol: el => { lookDraft.hairCol = el.dataset.v; rerenderLook(); },
+  'to-look': () => { lookDraft = null; lookTab = 'Cat'; go('look'); },
+  cat: el => { lookDraft.cat = el.dataset.v; rerenderLook(); },
   outfit: el => { lookDraft.outfit = el.dataset.v; rerenderLook(); },
-  clothcol: el => { lookDraft.outfitCol = el.dataset.v; rerenderLook(); },
   acc: el => { toggleAcc(el.dataset.v); rerenderLook(); },
   'secret-locked': el => { const s = SECRETS.find(x => x.key === el.dataset.v); toast(`${ic('lock', 16, '#fff')} ${s.mystery ? 'A mystery item.' : s.name + ':'} ${s.how} to unlock.`); },
   'earned-locked': el => { const e = EARNED.find(x => x.key === el.dataset.v); toast(`${ic('lock', 16, '#fff')} ${e.name}: ${e.how} to unlock.`); },
   'look-tab': el => { lookTab = el.dataset.v; rerenderLook(false); },
-  'look-shuffle': () => { const g = lookDraft.girl ? 'g' : 'b', pick = a => a[Math.floor(Math.random() * a.length)];
-    Object.assign(lookDraft, { hair: pick(HAIR[g]), hairCol: pick(HAIR_COL), outfit: pick(OUTFITS[g])[0], outfitCol: pick(CLOTH_COL), acc: Math.random() < .7 ? [pick(ACCS)[0]] : [] }); rerenderLook(); },
-  'look-palette': () => { if (lookTab === 'Hair') lookDraft.hairCol = HAIR_COL[(HAIR_COL.indexOf(lookDraft.hairCol) + 1) % HAIR_COL.length];
-    else lookDraft.outfitCol = CLOTH_COL[(CLOTH_COL.indexOf(lookDraft.outfitCol) + 1) % CLOTH_COL.length]; rerenderLook(); },
+  'look-shuffle': () => { const pick = a => a[Math.floor(Math.random() * a.length)];
+    Object.assign(lookDraft, { cat: pick(CATS)[0], outfit: pick(OUTFITS)[0], acc: Math.random() < .7 ? [pick(ACCS)[0]] : [] }); rerenderLook(); },
   'back-look': () => { lookDraft = null; go('profile', {}, 'back'); },
   'look-save': () => {
     const first = !S.user;
     if (first) { S.user = { email: pending.email, handle: pending.handle || 'visitor', since: today() }; }
-    S.user.look = lookDraft; S.user.girl = lookDraft.girl; lookDraft = null; save();
+    S.user.look = KNAvatar.clean(lookDraft); lookDraft = null; save();
     if (first) { go('lobby', {}, 'fade'); const nb = checkBadges(); if (nb.length) setTimeout(() => showBadges(nb), 700); }
     else { go('profile', {}, 'back'); toast(`${tick(18, '#e7cf6a', 3)} Look saved`); }
   },
@@ -1022,8 +1029,8 @@ const ACT = {
   'toggle-wings': () => { wingsOpen = !wingsOpen; const d = current.querySelector('#wingdrawer'); d.classList.toggle('open', wingsOpen); d.querySelector('.wdh').setAttribute('aria-expanded', wingsOpen); },
   'coach-x': el => tipDone(el.dataset.v),
   'drag-help': el => { const k = el.dataset.v; S.tips[k] = false; save(); go(k, {}, 'none'); },
-  'room-wall': el => { const k = el.dataset.v, st = W_.rooms[k][String(ART[k] ? furnLevel(k) : 0)];
-    walkTo('rwalker', st.wall[0] - 6, st.wall[1] + 44, 390, 330, () => go('wall', { k })); },
+  'room-wall': el => { const k = el.dataset.v;
+    walkTo('rwalker', ROOM3D.wall[0] - 8, ROOM3D.wall[1] + 92, 390, 330, () => go('wall', { k })); },
   'hide-tip': el => { S.tipHidden[el.dataset.v] = true; save(); const t = current.querySelector('.tipcard'); if (t) { t.style.animation = 'fadeOut .25s both'; setTimeout(() => t.remove(), 250); } },
   'topic-ans': el => { const k = el.dataset.k, i = +el.dataset.v, R = W_.rooms[k], ok = i === R.quiz[2];
     const box = device.querySelector('#topts'); box.classList.add('locked');
@@ -1079,7 +1086,7 @@ const ACT = {
   },
   'to-wall': el => go('wall', { k: el.dataset.v }, 'back'),
   wear: el => { const key = BONUS_ACC[el.dataset.v]; lookDraft = JSON.parse(JSON.stringify(curLook())); if (!lookDraft.acc.includes(key)) toggleAcc(key); S.user.look = lookDraft; lookDraft = null; save();
-    el.textContent = 'Wearing'; const im = current.querySelector('#bonusav'); if (im) { im.src = avatarSrc(); im.classList.add('bump'); } toast(`${tick(18, '#e7cf6a', 3)} ${el.dataset.v} is on your look.`); },
+    el.textContent = 'Wearing'; const im = current.querySelector('#bonusav'); if (im) { im.innerHTML = avatar(null, 'full'); im.classList.add('bump'); } toast(`${tick(18, '#e7cf6a', 3)} ${el.dataset.v} is on your look.`); },
   'badge-next': () => nextBadge(),
   'badge-profile': () => { badgeQueue = []; afterBadges = null; device.querySelectorAll('.night').forEach(n => n.remove()); setStatus(false); go('badges', {}, 'fade'); },
   'to-stamps': () => { const w = OPEN.find(k => Object.keys(S.arts[k].stamps).length); stampWing = w || 'singapore'; go('stamps'); },
@@ -1089,7 +1096,7 @@ const ACT = {
   'stamp-detail': el => stampDetail(el.dataset.v),
   'retry-from-stamp': el => { Q = { k: el.dataset.k, lv: el.dataset.v, i: 0, marks: [], pts: 0 }; go('question', {}, 'up'); },
   'badge-detail': el => badgeDetail(el.dataset.v),
-  'edit-look': () => { lookDraft = null; lookTab = 'Hair'; go('look', { edit: true }); },
+  'edit-look': () => { lookDraft = null; lookTab = 'Cat'; go('look', { edit: true }); },
   'next-day': () => addDays(1), week: () => addDays(7),
   reset: () => openSheet(`<h2 style="margin:6px 0 4px">Reset everything?</h2><p style="color:var(--body);margin:0 0 18px">This clears your look, stamps, badges and scores on this browser.</p>
     <div style="display:grid;gap:10px"><button class="btn ink" style="background:var(--red)" data-act="reset-yes">Reset progress</button><button class="btn line" data-act="close-sheet">Cancel</button></div>`),
