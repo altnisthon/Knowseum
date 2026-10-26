@@ -49,15 +49,23 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 // ------------------------------------------------------------------ badges
 const ALLB = [...KN.badges.streak.map(b => ({ ...b, kind: 'streak' })), ...KN.badges.quiz.map(b => ({ ...b, kind: 'quiz' })),
   ...OPEN.map(k => ({ key: ART[k].badgeArt, name: ART[k].bonus.badge, sub: ART[k].name, kind: 'article', art: k })),
-  ...[['mini-01', 'First Move', 1], ['mini-03', 'Curious Cat', 3], ['mini-06', 'Wing Walker', 6], ['mini-09', 'Brainstorm', 9], ['mini-12', 'Grand Tour', 12]]
-    .map(([key, name, at]) => ({ key, name, at, sub: at === 1 ? '1st mini game' : `${at} mini games`, kind: 'mini' }))];
-const MINI_BLURB = { 'mini-01': 'Your first mini game. Your ticket into the museum\u2019s back rooms.', 'mini-03': 'Three mini games. Curiosity looks good on you.',
-  'mini-06': 'Six mini games. You\u2019ve walked the wings.', 'mini-09': 'Nine mini games. Your brain is a lightbulb.', 'mini-12': 'All twelve mini games. The grand tour, complete.' };
+  // one badge per mini game, earned the first time you play it (in any wing)
+  ...[['factcap', 'No Cap', 'Fact or Cap'], ['geo', 'Pin Drop', 'GeoGuessr'], ['wiki', 'Link Runner', 'Wikirace'], ['guesswho', 'Who\u2019s Who', 'Guess Who'],
+    ['hole', 'Clean Sweep', 'Hole-some Recycling'], ['realfake', 'Sharp Eye', 'Real or Fake?']]
+    .map(([game, name, sub]) => ({ key: 'mini-' + game, name, sub, game, kind: 'mini' }))];
+const MINI_BLURB = { 'mini-factcap': 'You can tell a fact from cap. No cap.', 'mini-geo': 'You dropped your first pin on the map.',
+  'mini-wiki': 'You raced from page to page on links alone.', 'mini-guesswho': 'You picked out an MP from a handful of facts.',
+  'mini-hole': 'Your hole swallowed the recyclables and skipped the trash.', 'mini-realfake': 'You looked twice before believing a picture or a headline.' };
 Object.assign(KN.badgeBlurbs, MINI_BLURB);
-const miniCount = () => Object.values(S.mini || {}).reduce((n, w) => n + Object.keys(w).length, 0);
-const MINI_TOTAL = 12;
+const miniPlayed = g => Object.values(S.mini || {}).some(w => w[g]);
+const miniCount = () => ALLB.filter(b => b.kind === 'mini' && miniPlayed(b.game)).length;
+const MINI_TOTAL = 6;
+const miniWings = g => KN.wings.filter(w => (KNMiniGame.GAMES[w.key] || []).includes(g)).map(w => w.name);
+S.badges = S.badges.filter(k => ALLB.some(b => b.key === k)); // drop badges that no longer exist
 const BK = kind => ALLB.filter(b => b.kind === kind);
-const isEarned = b => b.kind === 'streak' ? S.streak >= b.at : b.kind === 'quiz' ? (b.at === null ? S.perfectHard : S.quizzesDone >= b.at) : b.kind === 'mini' ? miniCount() >= b.at : S.arts[b.art].bonus;
+const isEarned = b => b.kind === 'streak' ? S.streak >= b.at : b.kind === 'quiz' ? (b.at === null ? S.perfectHard : S.quizzesDone >= b.at) : b.kind === 'mini' ? miniPlayed(b.game) : S.arts[b.art].bonus;
+// games already played under the old milestone badges earn their new game badge straight away
+ALLB.filter(b => b.kind === 'mini' && isEarned(b) && !S.badges.includes(b.key)).forEach(b => S.badges.push(b.key));
 function checkBadges() {
   const fresh = ALLB.filter(b => isEarned(b) && !S.badges.includes(b.key));
   fresh.forEach(b => S.badges.push(b.key));
@@ -871,7 +879,7 @@ SCREENS.passport = () => {
   <div class="sec-h"><h3>Badges<small>${S.badges.length} earned</small></h3><button data-act="to-badges">See all ${ic('chev', 14, '#1c1b19', 2.2)}</button></div>
   ${row(`${S.streak} day streak`, BK('streak'), S.streak, 'flame')}${row(`${S.quizzesDone} quizzes done`, BK('quiz'), S.quizzesDone, 'book')}
   ${row(`${OPEN.filter(k => S.arts[k].bonus).length} of 3 articles complete`, ALLB.filter(b => b.kind === 'article'), 0, 'spark')}
-  ${row(`${miniCount()} of ${MINI_TOTAL} mini games played`, BK('mini'), miniCount(), 'map')}`;
+  ${row(`${miniCount()} of ${MINI_TOTAL} mini games played`, BK('mini').filter(isEarned).concat(BK('mini').filter(b => !isEarned(b))), miniCount(), 'map')}`;
 };
 let stampWing = 'singapore', newStamp = null;
 SCREENS.stamps = () => {
@@ -914,7 +922,9 @@ SCREENS.badges = () => {
   <div class="bcard paper rise"><div class="h">${ic('spark', 20)}<b>Article badges</b><span>${nArt} of 3 earned</span></div>
     <div class="prog"><i data-w="${nArt / 3 * 100}"></i></div><div class="ascii" style="color:var(--body)">finish all 3 levels + Perspectives</div>
     <div class="bgrid">${arts.map(b => tile(b, null)).join('')}</div></div>
-  ${card('Mini game milestones', 'map', `${miniCount()} of ${MINI_TOTAL} played`, BK('mini'), miniCount(), 'game')}
+  <div class="bcard paper rise"><div class="h">${ic('map', 20)}<b>Mini game badges</b><span>${miniCount()} of ${MINI_TOTAL} earned</span></div>
+    <div class="prog"><i data-w="${miniCount() / MINI_TOTAL * 100}"></i></div><div class="ascii" style="color:var(--body)">play each mini game once</div>
+    <div class="bgrid">${BK('mini').map(b => tile(b, null)).join('')}</div></div>
   <div style="height:20px"></div>`;
 };
 MOUNT.badges = el => setTimeout(() => el.querySelectorAll('.prog i').forEach(i => { i.style.width = i.dataset.w + '%'; }), 120);
@@ -923,7 +933,7 @@ function badgeDetail(key) {
   let how = '';
   if (b.kind === 'streak') how = got ? `Earned with a ${b.at}-day streak.` : `Keep a ${b.at}-day streak. You're on ${S.streak}.`;
   else if (b.kind === 'quiz') how = b.at === null ? (got ? 'Full marks on a Dam hard sia quiz.' : 'Score 5/5 on any Dam hard sia quiz.') : got ? `Earned after ${b.at} quiz${b.at > 1 ? 'zes' : ''}.` : `Finish ${b.at} quizzes. You've done ${S.quizzesDone}. Every level you finish counts, retries too.`;
-  else if (b.kind === 'mini') how = got ? `Earned after playing ${b.at} mini game${b.at > 1 ? 's' : ''}.` : `Play ${b.at} different mini game${b.at > 1 ? 's' : ''}. You've played ${miniCount()} of ${MINI_TOTAL}. Find them in each wing's room.`;
+  else if (b.kind === 'mini') { const ws = miniWings(b.game); how = got ? `Earned by playing ${b.sub}.` : `Play ${b.sub} once. ${ws.length > 2 ? 'It\u2019s in every wing\u2019s room.' : `Find it in the ${ws.join(' and ')} Wing room${ws.length > 1 ? 's' : ''}.`}`; }
   else how = got ? `You finished every level and Perspectives in ${ART[b.art].name}.` : `Finish all 3 quiz levels and Perspectives in the ${ART[b.art].wingName}.`;
   openSheet(`<img src="assets/badges/${got ? '' : 'locked-'}${b.key}.webp" alt="" class="pop" style="width:180px;margin:0 auto">
     <h2 style="text-align:center;margin:10px 0 2px">${b.name}</h2><p style="text-align:center;color:var(--body);margin:0 0 6px;font-weight:600">${b.sub}</p>
