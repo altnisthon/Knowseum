@@ -373,7 +373,7 @@ MOUNT.lobby = el => {
   const L = W_.lobby, museum = el.querySelector('#museum'), stage = el.querySelector('#lobbyart'), wk = el.querySelector('#walker');
   // scale the museum up to fill the space above the wings drawer
   let half = 195;
-  const fit = () => { const w = museum.clientWidth, h = museum.clientHeight, sw = Math.min(w * 1.45, h * 390 / 300); stage.style.width = sw + 'px'; half = (w / 2) / (sw / 390) - 16; };
+  const fit = () => { const w = museum.clientWidth, h = museum.clientHeight, sw = Math.min(w - 8, (h - 8) * 390 / 300); /* whole lobby on screen */ stage.style.width = sw + 'px'; half = (w / 2) / (sw / 390) - 16; };
   fit(); requestAnimationFrame(() => { fit(); setPos(...lobbyMe); });
   const doorsF = L.doors.map(d => ({ ...d, f: lbToFloor(d.x, d.y) }));
   let near = null;

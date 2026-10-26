@@ -13,7 +13,7 @@ const OUTFITS = [['hoodie', 'Hoodie'], ['uniform', 'School uniform'], ['fusion',
 
 // slot decides what an item replaces. Every head-worn item shares one slot, so only one is worn at a time.
 const ACC = {
-  headphones: { slot: 'phones' }, cat: { slot: 'head' }, bucket: { slot: 'head' }, fedora: { slot: 'head' }, gradcap: { slot: 'head' }, teamcap: { slot: 'head' },
+  headphones: { slot: 'head' }, cat: { slot: 'head' }, bucket: { slot: 'head' }, fedora: { slot: 'head' }, gradcap: { slot: 'head' }, teamcap: { slot: 'head' },
   shades: { slot: 'face' }, glasses: { slot: 'face' }, pixel: { slot: 'face' },
   presspass: { slot: 'neck' }, vip: { slot: 'neck' },
   camera: { slot: 'hand' }, bubbletea: { slot: 'hand' }, mic: { slot: 'hand' }, goldmic: { slot: 'hand' }, notebook: { slot: 'hand' }, bottle: { slot: 'hand' }, gloves: { slot: 'hand' },
@@ -33,6 +33,7 @@ const EXTRA = {
   cyberhoodie: `<path d="M8 30 H92 M18 52 H82" stroke="#d8ff3d" stroke-width="9" stroke-linecap="round"/><path d="M8 30 H92 M18 52 H82" stroke="#6a47ff" stroke-width="2.5" stroke-linecap="round"/>`,
 };
 const LANYARD = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 58"><g fill="none" stroke-linecap="round"><path d="M5 2 C9 28 30 48 46 56 M95 2 C91 28 70 48 54 56" stroke="#9d968a" stroke-width="9"/><path d="M5 2 C9 28 30 48 46 56 M95 2 C91 28 70 48 54 56" stroke="#ece6dc" stroke-width="6.5"/><path d="M6 6 C11 28 30 46 45 53 M94 6 C89 28 70 46 55 53" stroke="#fff" stroke-opacity=".6" stroke-width="1.6"/></g></svg>`);
+const BAND = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 54"><g fill="none" stroke-linecap="round"><path d="M7 52 C5 6 103 6 101 52" stroke="#a49d91" stroke-width="10"/><path d="M7 52 C5 6 103 6 101 52" stroke="#e9e3d9" stroke-width="7.5"/><path d="M12 30 C20 12 88 12 96 30" stroke="#fff" stroke-opacity=".55" stroke-width="2"/></g></svg>`);
 const doodleSrc = (k) => {
   const body = EXTRA[k] || (window.KN_DOODLE || {})[k] || '';
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${body}</svg>`);
@@ -55,7 +56,7 @@ function place(k, pose, m) {
   switch (k) {
     case 'cat': return at(m.hx + (side ? HW * .05 : 0), c + HW * .12 - HW * .36 * ar, HW * .36);
     case 'bucket': return at(m.hx, c - HW * .38, HW * .72);
-    case 'headphones': return side ? null : at(m.hx, c + HW * .7, HW * .8); // resting round the neck
+    case 'headphones': return null; // band + cups, drawn in figure()
     case 'fedora': return at(m.hx, c - HW * .6, HW * 1.0);
     case 'gradcap': return at(m.hx, c - HW * .5, HW * 1.0);
     case 'teamcap': return at(m.hx, c - HW * .42, HW * .98);
@@ -78,7 +79,7 @@ function place(k, pose, m) {
 
 // one pose of the figure. Box = sprite plus room above the head and at the sides for items.
 const PAD_X = .2, PAD_T = .2;
-function figure(look, pose, refW) {
+function figure(look, pose, refW, bust) {
   const L = clean(look), key = `${L.cat}-${L.outfit}-${pose}`, m = META[key];
   if (!m) return '';
   const BW = m.w * (1 + PAD_X * 2), BH = m.h * (1 + PAD_T), ox = m.w * PAD_X, oy = m.h * PAD_T;
@@ -89,6 +90,15 @@ function figure(look, pose, refW) {
       if (pose !== 'front') return;
       const g = m.w * .2;
       [[m.bx - m.w * .4, 1], [m.bx + m.w * .4, -1]].forEach(([x, f]) => { front += `<img class="ki" src="${doodleSrc('gloves')}" alt="" style="${pct(x - g / 2, m.h * .58, g, g)};transform:scaleX(${f}) !important">`; });
+      return;
+    }
+    if (k === 'headphones') {
+      // band arcs over the crown behind the ears; the cups sit on the sides of the head, clear of the face
+      const HW = m.headW, c = m.crown, cw = HW * (pose === 'side' ? .3 : .3), side = pose === 'side';
+      const bw = HW * (side ? .86 : 1.08), bh = bw * .5, bx = side ? m.hx + HW * .02 : m.hx;
+      back += `<img class="ki back" src="${BAND}" alt="" style="${pct(bx - bw / 2, c - HW * .24, bw, bh)}">`;
+      const cup = (n, cx) => { const car = AR['acc/headphones-cup-' + n] || 1.35; front += `<img class="ki" src="assets/acc/headphones-cup-${n}.webp" alt="" style="${pct(cx - cw / 2, c + HW * .4 - cw * car / 2, cw, cw * car)}">`; };
+      if (side) cup('r', m.hx + HW * .06); else { cup('l', m.hx - HW * .52); cup('r', m.hx + HW * .52); }
       return;
     }
     if (k === 'presspass') {
@@ -104,7 +114,11 @@ function figure(look, pose, refW) {
     const tag = `<img class="ki${behind ? ' back' : ''}" src="${itemSrc(k, pose)}" alt="" style="${pct(cx - wd / 2, top, wd, ht)}">`;
     if (behind) back += tag; else front += tag;
   });
-  const width = refW ? `width:${BW / refW * 100}%;` : '';
+  let width = refW ? `width:${BW / refW * 100}%;` : '';
+  if (bust) { // frame the face: head about 80% of the circle, centred
+    const D = m.headW * 1.22, hy = oy + m.crown + m.headW * .42;
+    width = `width:${BW / D * 100}%;left:${(D / 2 - (m.hx + ox)) / D * 100}%;top:${(D * .52 - hy) / D * 100}%;`;
+  }
   return `<span class="kfig p-${pose}" style="${width}aspect-ratio:${BW.toFixed(1)}/${BH.toFixed(1)}">${back}<img class="kb" src="assets/cats/${key}.webp" alt="" style="${pct(0, 0, m.w, m.h)}">${front}</span>`;
 }
 
@@ -115,7 +129,7 @@ function html(look, opt = {}) {
     const fm = META[`${L.cat}-${L.outfit}-front`], refW = fm ? fm.w * (1 + PAD_X * 2) : 0;
     return `<span class="kc walk">${figure(L, 'front')}${figure(L, 'side', refW)}${figure(L, 'jump', refW)}</span>`;
   }
-  return `<span class="kc ${mode}" aria-hidden="true">${figure(L, opt.pose || 'front')}</span>`;
+  return `<span class="kc ${mode}" aria-hidden="true">${figure(L, opt.pose || 'front', 0, mode === 'bust')}</span>`;
 }
 
 window.KNAvatar = { html, clean, ACC, CATS, OUTFITS, doodleSrc };

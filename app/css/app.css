@@ -541,7 +541,7 @@ img { max-width: 100%; display: block; }
 .lobbyv .hello b { font-size: 20px; }
 .museum { flex: 1; min-height: 0; position: relative; display: grid; place-items: center; overflow: hidden;
   background: radial-gradient(120% 80% at 50% 45%, #fbf6e8 0%, #f3ecd8 70%, #ece3c9 100%); }
-.stagein { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); aspect-ratio: 390 / 300; width: 145%; flex: none; touch-action: none; user-select: none; -webkit-user-select: none; }
+.stagein { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); aspect-ratio: 390 / 300; width: 100%; flex: none; touch-action: none; user-select: none; -webkit-user-select: none; }
 .stagein > img { width: 100%; pointer-events: none; }
 .helpbtn { position: absolute; right: 12px; top: 10px; width: 36px; height: 36px; font: 800 16px var(--sans); box-shadow: 0 2px 8px rgba(0,0,0,.12); z-index: 5; }
 .helpbtn.static { position: static; flex: none; }
@@ -1143,10 +1143,9 @@ img { max-width: 100%; display: block; }
 .kc.full { height: 100%; display: flex; justify-content: center; align-items: flex-end; }
 .kc.full .kfig { height: 100%; width: auto; }
 .kc.bust { position: absolute; inset: 0; overflow: hidden; }
-.kc.bust .kfig { position: absolute; width: 148%; left: -24%; top: -3%; }
+.kc.bust .kfig { position: absolute; }
 .hello .av, .backav, .prof .bigav, .bearer .photo, .hav, .round.topav { position: relative; }
 .round.topav { background: #f4eccb; overflow: hidden; padding: 0; }
-.bearer .photo .kc.bust .kfig { width: 175%; left: -37.5%; top: -2%; }
 .lookfig { display: block; height: 236px; position: relative; z-index: 1; }
 .lookfig.bump { animation: bump .45s var(--spring); }
 .bonusav { display: block; width: 62px; height: 82px; overflow: hidden; flex: none; }
