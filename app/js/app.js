@@ -426,8 +426,12 @@ const TINTED = { sofa: 1, chair: 1, lamp: 1 };
 const roomFurn = k => [['sofa', 'Sofa', 1], ['stool', 'Side stool', 2], ['trophy', 'Trophy', 3],
   ...(ART[k] ? [['chair', 'Armchair', 5], ['plant', 'Potted plant', 7], ['lamp', 'Mushroom lamp', 9], [...SPECIAL[k], 12]] : [])];
 const furnSrc = (kind, k) => `assets/furn/${kind}${TINTED[kind] ? '-' + k : ''}.webp`;
-const furnImg = (kind, k, isNew) => { const [x, y, w] = FPOS[kind];
-  return `<img class="furn ${isNew ? 'fresh' : ''}" src="${furnSrc(kind, k)}" alt="" style="left:${x / 390 * 100}%;top:${y / 330 * 100}%;width:${w / 390 * 100}%;z-index:${Math.round(y)}">`; };
+// where the visitor has moved each piece to (saved per wing), else the default spot
+const furnAt = (kind, k) => { const p = ((S.furn || {})[k] || {})[kind], d = FPOS[kind]; return p ? [p[0], p[1], d[2], p[2] ? -1 : 1] : [d[0], d[1], d[2], 1]; };
+const furnImg = (kind, k, isNew) => { const [x, y, w, fx] = furnAt(kind, k);
+  return `<img class="furn ${isNew ? 'fresh' : ''}" data-kind="${kind}" src="${furnSrc(kind, k)}" alt="" draggable="false" style="left:${x / 390 * 100}%;top:${y / 330 * 100}%;width:${w / 390 * 100}%;z-index:${Math.round(y)};--fx:${fx}">`; };
+// keep a piece's base on the floor diamond (back 195,132 · left 65,220 · front 195,300 · right 325,222)
+const onFloor = (x, y) => { const d = Math.abs(x - 195) / 130 + Math.abs(y - 216) / 84, m = .88; if (d <= m) return [x, y]; const f = m / d; return [195 + (x - 195) * f, 216 + (y - 216) * f]; };
 SCREENS.room = ({ k }) => {
   const w = KN.wings.find(x => x.key === k), art = ART[k], F = roomFurn(k);
   const runs = wingRuns(k), got = F.filter(f => runs >= f[2]), placed = got.length;
@@ -437,8 +441,11 @@ SCREENS.room = ({ k }) => {
   return `<div style="--c:${w.color};--t:${w.tint}">${topbar(`${w.name} Wing`, topic ? 'Room 1 of 1 · not furnished yet' : `Room 1 of 1 · ${placed ? placed + ' furnishing' + (placed > 1 ? 's' : '') : 'not furnished yet'}`, 'to-lobby', `<span class="round topav">${avatar()}</span>`)}
   <div class="iso room room3d" id="roomart"><img src="assets/rooms3d/room-${k}.webp" alt="The ${w.name} Wing room${placed ? ', with ' + got.map(f => f[1].toLowerCase()).join(', ') : ''}">
     ${got.map(f => furnImg(f[0], k, f[2] === runs)).join('')}
+    ${placed ? `<button class="arrbtn" data-room="arrange" aria-label="Arrange your furniture">${ic('spark', 14, '#1c1b19', 2)} Arrange</button>` : ''}
     <button class="hot" data-act="room-wall" data-v="${k}" style="${lp(...ROOM3D.wall, 390, 330)}"><span class="hring"></span><span class="dl on">Newsworthy wall</span></button>
     <span class="walker" id="rwalker" style="${lp(...ROOM3D.me, 390, 330)};width:${ROOM3D.wk}%;z-index:${ROOM3D.me[1]}">${avatar(null, 'walk')}</span></div>
+  ${placed ? `<div class="arrbar" id="arrbar"><span><b>Arrange your room</b><small>Drag a piece to move it · tap it to flip</small></span>
+    <button class="btn line sm" data-room="reset">Reset</button><button class="btn ink sm" data-room="done">Done</button></div>` : ''}
   ${tipShown && !placed ? `<div class="tipcard rise"><div class="h"><span class="ic">${ic('spark', 18, '#1c1b19', 1.9)}</span><b>Make this room yours</b><button data-act="hide-tip" data-v="${k}" aria-label="Close tip">${ic('close', 14, '#fff', 2.2)}</button></div>
     <p>${topic ? `This wing's story is on the Newsworthy wall. Its activities land soon, and there's a warm-up topic quiz there meanwhile.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
@@ -454,6 +461,7 @@ SCREENS.room = ({ k }) => {
     <p class="lnote">Every level you finish counts, retries too.</p></div>`}</div>`;
 };
 MOUNT.room = (el, { k }) => {
+  arrangeRoom(el, k);
   const a = S.arts[k]; if (!a) return;
   const runs = wingRuns(k), fresh = roomFurn(k).filter(f => f[2] > (a.seenLevel || 0) && f[2] <= runs);
   if (fresh.length) {
@@ -461,6 +469,41 @@ MOUNT.room = (el, { k }) => {
     a.seenLevel = runs; save();
   }
 };
+// arrange mode: drag furniture around the floor, tap to flip it; positions saved per wing
+function arrangeRoom(el, k) {
+  const room = el.querySelector('#roomart'), bar = el.querySelector('#arrbar'); if (!room || !bar) return;
+  const setMode = on => { room.classList.toggle('arranging', on); bar.classList.toggle('on', on); };
+  const store = () => { S.furn = S.furn || {}; S.furn[k] = S.furn[k] || {}; return S.furn[k]; };
+  el.querySelector('[data-room="arrange"]').addEventListener('click', e => { e.stopPropagation(); setMode(!room.classList.contains('arranging')); });
+  bar.querySelector('[data-room="done"]').addEventListener('click', () => { setMode(false); save(); toast(`${tick(18, '#e7cf6a', 3)} Room saved`); });
+  bar.querySelector('[data-room="reset"]').addEventListener('click', () => {
+    if (S.furn) delete S.furn[k]; save();
+    room.querySelectorAll('.furn').forEach(f => { const [x, y, , fx] = furnAt(f.dataset.kind, k); f.style.left = x / 390 * 100 + '%'; f.style.top = y / 330 * 100 + '%'; f.style.zIndex = Math.round(y); f.style.setProperty('--fx', fx); });
+  });
+  room.querySelectorAll('.furn').forEach(f => {
+    let held = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    const toRoom = e => { const r = room.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 390, (e.clientY - r.top) / r.height * 330]; };
+    f.addEventListener('pointerdown', e => {
+      if (!room.classList.contains('arranging')) return;
+      e.preventDefault(); e.stopPropagation(); f.setPointerCapture(e.pointerId); held = true; moved = false; sx = e.clientX; sy = e.clientY;
+      const [px, py] = toRoom(e), [x, y] = furnAt(f.dataset.kind, k); ox = x - px; oy = y - py; f.classList.add('dragging');
+    });
+    f.addEventListener('pointermove', e => {
+      if (!held) return;
+      if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) < 5) return;
+      moved = true;
+      const [px, py] = toRoom(e), [x, y] = onFloor(px + ox, py + oy);
+      f.style.left = x / 390 * 100 + '%'; f.style.top = y / 330 * 100 + '%'; f.style.zIndex = Math.round(y);
+      const cur = furnAt(f.dataset.kind, k); store()[f.dataset.kind] = [Math.round(x), Math.round(y), cur[3] === -1];
+    });
+    const up = () => {
+      if (!held) return; held = false; f.classList.remove('dragging');
+      if (!moved) { const [x, y, , fx] = furnAt(f.dataset.kind, k); store()[f.dataset.kind] = [x, y, fx === 1]; f.style.setProperty('--fx', -fx); }
+      save();
+    };
+    f.addEventListener('pointerup', up); f.addEventListener('pointercancel', up);
+  });
+}
 function miniSection(k) {
   const G = KNMiniGame.GAMES[k]; if (!G) return '';
   return `<div class="minis rise"><div class="fh"><b>Mini games</b><span>Background + general knowledge</span></div>

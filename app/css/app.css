@@ -1167,9 +1167,9 @@ img { max-width: 100%; display: block; }
 
 /* ---------- 3D wing rooms ---------- */
 .iso.room3d { background: transparent; }
-.room3d .furn { position: absolute; transform: translate(-50%, -100%); pointer-events: none; filter: drop-shadow(0 3px 3px rgba(0,0,0,.16)); }
+.room3d .furn { --fx: 1; position: absolute; transform: translate(-50%, -100%) scaleX(var(--fx)); pointer-events: none; filter: drop-shadow(0 3px 3px rgba(0,0,0,.16)); transition: transform .25s var(--spring); user-select: none; -webkit-user-select: none; }
 .room3d .furn.fresh { animation: furnIn .6s var(--spring) .2s both; }
-@keyframes furnIn { from { transform: translate(-50%, -130%) scale(.6); opacity: 0; } }
+@keyframes furnIn { from { transform: translate(-50%, -130%) scale(.6) scaleX(var(--fx)); opacity: 0; } }
 .room3d .hot { z-index: 400; }
 
 /* ---------- lobby: wing signs and door curtains ---------- */
@@ -1187,3 +1187,17 @@ img { max-width: 100%; display: block; }
 .curtain .s0 { left: 8%; top: 24%; transform: rotate(-12deg); }
 .curtain .s1 { left: 54%; top: 14%; transform: rotate(10deg); }
 .curtain .s2 { left: 32%; top: 54%; transform: rotate(-4deg); }
+
+/* arrange mode */
+.room3d .arrbtn { position: absolute; left: 10px; top: 10px; z-index: 500; display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: 999px; background: #fff; border: 1.3px solid var(--ink); font-weight: 700; font-size: 12.5px; box-shadow: 2px 2px 0 var(--ink); }
+.room3d.arranging .arrbtn { background: var(--acc, #e7cf6a); }
+.room3d.arranging .furn { pointer-events: auto; cursor: grab; touch-action: none; filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px var(--c)) drop-shadow(0 3px 3px rgba(0,0,0,.16)); animation: none; }
+.room3d.arranging .furn.dragging { cursor: grabbing; transform: translate(-50%, -104%) scale(1.06) scaleX(var(--fx)); filter: drop-shadow(0 10px 8px rgba(0,0,0,.28)); transition: none; }
+.room3d.arranging .hot, .room3d.arranging .walker { opacity: 0; pointer-events: none; transition: opacity .2s; }
+.arrbar { display: none; align-items: center; gap: 8px; margin: -2px 16px 10px; padding: 10px 12px; border-radius: 16px; background: var(--ink); color: #fff; }
+.arrbar.on { display: flex; animation: arrIn .3s var(--spring); }
+@keyframes arrIn { from { opacity: 0; transform: translateY(-6px); } }
+.arrbar span { flex: 1; display: flex; flex-direction: column; } .arrbar b { font-size: 14px; } .arrbar small { font-size: 11.5px; opacity: .75; }
+.arrbar .btn.sm { width: auto; height: auto; padding: 8px 14px; font-size: 13px; border-radius: 999px; flex: none; }
+.arrbar .btn.ink.sm { background: #e7cf6a; color: #1c1b19; }
+.arrbar .btn.line.sm { background: transparent; color: #fff; border-color: rgba(255,255,255,.5); }

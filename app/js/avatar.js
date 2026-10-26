@@ -13,7 +13,7 @@ const OUTFITS = [['hoodie', 'Hoodie'], ['uniform', 'School uniform'], ['fusion',
 
 // slot decides what an item replaces. Every head-worn item shares one slot, so only one is worn at a time.
 const ACC = {
-  headphones: { slot: 'head' }, cat: { slot: 'head' }, bucket: { slot: 'head' }, fedora: { slot: 'head' }, gradcap: { slot: 'head' }, teamcap: { slot: 'head' },
+  headphones: { slot: 'phones' }, cat: { slot: 'head' }, bucket: { slot: 'head' }, fedora: { slot: 'head' }, gradcap: { slot: 'head' }, teamcap: { slot: 'head' },
   shades: { slot: 'face' }, glasses: { slot: 'face' }, pixel: { slot: 'face' },
   presspass: { slot: 'neck' }, vip: { slot: 'neck' },
   camera: { slot: 'hand' }, bubbletea: { slot: 'hand' }, mic: { slot: 'hand' }, goldmic: { slot: 'hand' }, notebook: { slot: 'hand' }, bottle: { slot: 'hand' }, gloves: { slot: 'hand' },
@@ -32,12 +32,14 @@ const EXTRA = {
   gloves: `<path d="M30 92 L30 58 Q30 50 36 50 L36 36 Q36 30 42 30 Q48 30 48 36 L48 48 L48 30 Q48 24 54 24 Q60 24 60 30 L60 50 L66 46 Q72 42 74 50 L62 92 Z" fill="#b5403a" ${st}/>`,
   cyberhoodie: `<path d="M8 30 H92 M18 52 H82" stroke="#d8ff3d" stroke-width="9" stroke-linecap="round"/><path d="M8 30 H92 M18 52 H82" stroke="#6a47ff" stroke-width="2.5" stroke-linecap="round"/>`,
 };
+const LANYARD = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 58"><g fill="none" stroke-linecap="round"><path d="M5 2 C9 28 30 48 46 56 M95 2 C91 28 70 48 54 56" stroke="#9d968a" stroke-width="9"/><path d="M5 2 C9 28 30 48 46 56 M95 2 C91 28 70 48 54 56" stroke="#ece6dc" stroke-width="6.5"/><path d="M6 6 C11 28 30 46 45 53 M94 6 C89 28 70 46 55 53" stroke="#fff" stroke-opacity=".6" stroke-width="1.6"/></g></svg>`);
 const doodleSrc = (k) => {
   const body = EXTRA[k] || (window.KN_DOODLE || {})[k] || '';
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${body}</svg>`);
 };
-const itemSrc = (k, pose) => PHOTO[k] ? `assets/acc/${k}${k === 'backpack' && pose === 'side' ? '-side' : ''}.webp` : doodleSrc(k);
-const itemAR = (k, pose) => PHOTO[k] ? (AR[`acc/${k}${k === 'backpack' && pose === 'side' ? '-side' : ''}`] || 1) : 1;
+const VARIANT = (k, pose) => k === 'backpack' && pose === 'side' ? '-side' : k === 'headphones' ? '-neck' : k === 'presspass' ? '-card' : '';
+const itemSrc = (k, pose) => PHOTO[k] ? `assets/acc/${k}${VARIANT(k, pose)}.webp` : doodleSrc(k);
+const itemAR = (k, pose) => PHOTO[k] ? (AR[`acc/${k}${VARIANT(k, pose)}`] || 1) : 1;
 
 function clean(look) {
   const l = look || {};
@@ -53,13 +55,13 @@ function place(k, pose, m) {
   switch (k) {
     case 'cat': return at(m.hx + (side ? HW * .05 : 0), c + HW * .12 - HW * .36 * ar, HW * .36);
     case 'bucket': return at(m.hx, c - HW * .38, HW * .72);
-    case 'headphones': return side ? at(m.hx + HW * .2, c - HW * .1, HW * .42, HW * .82) : at(m.hx, c - HW * .1, HW * 1.34, HW * .95);
+    case 'headphones': return side ? null : at(m.hx, c + HW * .7, HW * .8); // resting round the neck
     case 'fedora': return at(m.hx, c - HW * .6, HW * 1.0);
     case 'gradcap': return at(m.hx, c - HW * .5, HW * 1.0);
     case 'teamcap': return at(m.hx, c - HW * .42, HW * .98);
     case 'shades': case 'glasses': case 'pixel':
       return side ? null : at(m.hx, c + HW * .44 - HW * .82 / 2, HW * .82);
-    case 'presspass': return side ? null : at(m.hx, c + HW * .66, HW * .3);
+    case 'presspass': return null; // lanyard + card, drawn in figure()
     case 'vip': return side ? null : at(m.hx, c + HW * .6, HW * .5);
     case 'camera': case 'bubbletea': case 'mic': case 'goldmic': case 'notebook': case 'bottle': {
       if (side || jump) return null;
@@ -87,6 +89,14 @@ function figure(look, pose, refW) {
       if (pose !== 'front') return;
       const g = m.w * .2;
       [[m.bx - m.w * .4, 1], [m.bx + m.w * .4, -1]].forEach(([x, f]) => { front += `<img class="ki" src="${doodleSrc('gloves')}" alt="" style="${pct(x - g / 2, m.h * .58, g, g)};transform:scaleX(${f}) !important">`; });
+      return;
+    }
+    if (k === 'presspass') {
+      if (pose === 'side') return;
+      // a lanyard round the neck, with the card resting on the chest
+      const lw = m.headW * .5, lh = lw * .58, ly = m.crown + m.headW * .74, cw = m.headW * .24, car = AR['acc/presspass-card'] || 1;
+      front += `<img class="ki" src="${LANYARD}" alt="" style="${pct(m.hx - lw / 2, ly, lw, lh)}">`;
+      front += `<img class="ki" src="assets/acc/presspass-card.webp" alt="" style="${pct(m.hx - cw / 2, ly + lh * .86, cw, cw * car)}">`;
       return;
     }
     const p = place(k, pose, m); if (!p) return;
