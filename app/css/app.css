@@ -1133,3 +1133,57 @@ img { max-width: 100%; display: block; }
 .rf-res .tip { background: #fdf6dc; border-radius: 12px; padding: 10px 12px; } .rf-res .tip .k { color: #9a7b16; } .rf-res .tip p { margin-top: 3px; color: var(--ink); }
 
 .rf-credit { display: block; font-size: 11px; color: #8a867e; margin: 6px 0 2px; line-height: 1.35; }
+
+/* ---------- 3D cat avatar (js/avatar.js) ---------- */
+.kc { display: block; position: relative; }
+.kc .kfig { display: block; position: relative; width: 100%; }
+.kc .kfig img { position: absolute !important; max-width: none !important; margin: 0 !important; transform: none; object-fit: fill !important; filter: none !important; animation: none !important; transition: none !important; }
+.kc .kfig .kb { z-index: 1; } .kc .kfig .ki { z-index: 2; }
+.kc .kfig .ki.back { z-index: 0; }
+.kc.full { height: 100%; display: flex; justify-content: center; align-items: flex-end; }
+.kc.full .kfig { height: 100%; width: auto; }
+.kc.bust { position: absolute; inset: 0; overflow: hidden; }
+.kc.bust .kfig { position: absolute; width: 148%; left: -24%; top: -3%; }
+.hello .av, .backav, .prof .bigav, .bearer .photo, .hav, .round.topav { position: relative; }
+.round.topav { background: #f4eccb; overflow: hidden; padding: 0; }
+.bearer .photo .kc.bust .kfig { width: 175%; left: -37.5%; top: -2%; }
+.lookfig { display: block; height: 236px; position: relative; z-index: 1; }
+.lookfig.bump { animation: bump .45s var(--spring); }
+.bonusav { display: block; width: 62px; height: 82px; overflow: hidden; flex: none; }
+.ltile .art .kc.full { height: 94%; align-self: end; }
+.ltile .art img.acc3d, .ltile .art img.furn3d { width: 72%; height: 72%; object-fit: contain; object-position: center; }
+.ltile.locked .art img.furn3d { filter: grayscale(1) opacity(.45); }
+/* walkers: front when standing, side when walking (mirrored to face right), jump when picked up */
+.kc.walk { width: 100%; }
+.kc.walk .p-side, .kc.walk .p-jump { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); visibility: hidden; }
+.walking .kc.walk .p-front, .held .kc.walk .p-front, .held .kc.walk .p-side { visibility: hidden; }
+.walking .kc.walk .p-side { visibility: visible; }
+.walking.face-r .kc.walk .p-side { transform: translateX(-50%) scaleX(-1); }
+.held .kc.walk .p-jump { visibility: visible; }
+.walker .kc, .me .kc { filter: drop-shadow(0 3px 2px rgba(0,0,0,.22)); transition: transform .2s var(--spring); }
+.walker.walking .kc { animation: bob .25s ease-in-out infinite; }
+.walker.held .kc, .me.held .kc { transform: translateY(-8px) scale(1.1); filter: drop-shadow(0 10px 6px rgba(0,0,0,.25)); }
+.walker.grab:not(.held):not(.walking) .kc, .me.grab:not(.held) .kc { animation: idle 2.4s ease-in-out infinite; }
+
+/* ---------- 3D wing rooms ---------- */
+.iso.room3d { background: transparent; }
+.room3d .furn { position: absolute; transform: translate(-50%, -100%); pointer-events: none; filter: drop-shadow(0 3px 3px rgba(0,0,0,.16)); }
+.room3d .furn.fresh { animation: furnIn .6s var(--spring) .2s both; }
+@keyframes furnIn { from { transform: translate(-50%, -130%) scale(.6); opacity: 0; } }
+.room3d .hot { z-index: 400; }
+
+/* ---------- lobby: wing signs and door curtains ---------- */
+.stagein { container-type: inline-size; }
+.door .dl { display: none; }
+.door.near .dl { display: block; }
+.dsign { position: absolute; z-index: 2; pointer-events: none; transform: translate(-50%, -50%) skewY(-26.57deg); }
+.dsign.R { transform: translate(-50%, -50%) skewY(26.57deg); }
+.dsign span { display: block; background: #fff; border: 1.2px solid var(--ink); border-radius: 3px; padding: .35cqw .8cqw; font-weight: 800; font-size: 1.75cqw; line-height: 1.15; letter-spacing: -.01em; white-space: nowrap; color: var(--ink); box-shadow: .4cqw .4cqw 0 var(--ink); }
+.curtain { position: absolute; z-index: 1; width: 8.8cqw; aspect-ratio: 40 / 52; pointer-events: none; transform: translateX(-50%) skewY(-26.57deg); transform-origin: 50% 0; }
+.curtain.R { transform: translateX(-50%) skewY(26.57deg); }
+.curtain svg { width: 100%; height: 100%; display: block; animation: sway 3.2s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes sway { 50% { transform: skewX(2deg); } }
+.curtain .stk { position: absolute; font-style: normal; font-size: 2.35cqw; line-height: 1; filter: drop-shadow(0 0 .25cqw #fff) drop-shadow(0 0 .25cqw #fff) drop-shadow(0 .2cqw .2cqw rgba(0,0,0,.25)); }
+.curtain .s0 { left: 8%; top: 24%; transform: rotate(-12deg); }
+.curtain .s1 { left: 54%; top: 14%; transform: rotate(10deg); }
+.curtain .s2 { left: 32%; top: 54%; transform: rotate(-4deg); }
