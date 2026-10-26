@@ -423,10 +423,11 @@ function walkTo(elId, x, y, w, h, then) {
 }
 
 // --- wing room (3D clay room) — furniture appears as you finish quizzes in the wing
-// progress that unlocks furniture: quiz levels finished in the open wings; in the other wings the warm-up quiz and every mini game played
+// progress that unlocks furniture in a wing: every quiz level finished (or the warm-up quiz) plus every mini game played there, replays included
+const miniPlays = k => Object.values(S.mini[k] || {}).reduce((t, r) => t + (r.plays || 1), 0);
 function wingRuns(k) {
-  if (ART[k]) return (S.arts[k] && S.arts[k].runs) || 0;
-  return (S.topic[k] ? 1 : 0) + Object.values(S.mini[k] || {}).reduce((t, r) => t + (r.plays || 1), 0);
+  const quizzes = ART[k] ? ((S.arts[k] && S.arts[k].runs) || 0) : (S.topic[k] ? 1 : 0);
+  return quizzes + miniPlays(k);
 }
 function furnLevel(k) { return Math.min(3, wingRuns(k)); }
 // positions in the 390 x 330 room: [x of the item's base centre, y of its base, width]
@@ -460,18 +461,18 @@ SCREENS.room = ({ k }) => {
   ${placed ? `<div class="arrbar" id="arrbar"><span><b>Arrange your room</b><small>Drag a piece to move it · tap it to flip</small></span>
     <button class="btn line sm" data-room="reset">Reset</button><button class="btn ink sm" data-room="done">Done</button></div>` : ''}
   ${tipShown && !placed ? `<div class="tipcard rise"><div class="h"><span class="ic">${ic('spark', 18, '#1c1b19', 1.9)}</span><b>Make this room yours</b><button data-act="hide-tip" data-v="${k}" aria-label="Close tip">${ic('close', 14, '#fff', 2.2)}</button></div>
-    <p>${topic ? `This wing's story is on the Newsworthy wall. Play its warm-up quiz and the mini games below to unlock furniture for this room.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
+    <p>${topic ? `This wing's story is on the Newsworthy wall. Play its warm-up quiz and the mini games below to unlock furniture for this room.` : 'Finish quizzes and play the mini games in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
   <button class="wallcard rise" data-act="room-wall" data-v="${k}"><span class="thumb"><img src="assets/paintings/${(art || only).painting}.webp" alt=""></span>
     <span class="tx"><span class="label">Newsworthy wall</span><b>${topic ? esc(only.headline) : '3 frames to explore'}</b><span class="mini">${ic('chev', 14, '#fff', 2.2)} View wall</span></span></button>
   ${miniSection(k)}
   ${`
   <div class="furnish rise"><div class="fh"><b>Furnish your room</b><span>${placed} of ${F.length}</span></div>
-    <div class="fbar"><span>${Math.min(runs, 12)} of 12 ${topic ? 'activities (warm-up quiz + mini games)' : 'quizzes'} done in this wing</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
+    <div class="fbar"><span>${Math.min(runs, 12)} of 12 activities done in this wing · ${topic ? 'warm-up quiz' : 'quizzes'} and mini games count</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
     <div class="lgrid">${F.map(([kind, name, q], i) => { const has = runs >= q, isNew = has && q === runs;
-      return `<div class="ltile ${has ? (isNew ? 'sel' : 'on') : 'locked'}" style="--r:${(i % 3) - 1}deg"><span class="art"><img class="furn3d" src="${furnSrc(kind, k)}" alt=""></span><b>${name}</b><small>${has ? (isNew ? 'New · placed' : 'Placed') : (topic ? `Do ${q} activit${q > 1 ? 'ies' : 'y'} in this wing` : `Complete ${q} quiz${q > 1 ? 'zes' : ''} in this wing`)}</small>${has ? `<span class="tc ${isNew ? 'sel' : 'ok'}">${tick(13, '#fff', 3)}</span>` : `<span class="tc">${ic('lock', 12, '#9d988f', 1.9)}</span>`}</div>`; }).join('')}</div>
+      return `<div class="ltile ${has ? (isNew ? 'sel' : 'on') : 'locked'}" style="--r:${(i % 3) - 1}deg"><span class="art"><img class="furn3d" src="${furnSrc(kind, k)}" alt=""></span><b>${name}</b><small>${has ? (isNew ? 'New · placed' : 'Placed') : `Do ${q} activit${q > 1 ? 'ies' : 'y'} in this wing`}</small>${has ? `<span class="tc ${isNew ? 'sel' : 'ok'}">${tick(13, '#fff', 3)}</span>` : `<span class="tc">${ic('lock', 12, '#9d988f', 1.9)}</span>`}</div>`; }).join('')}</div>
     ${prizes.length ? `<div class="label" style="margin:16px 0 8px">Quiz prizes in this room</div><div class="sugg" style="margin:0">${prizes.map(p => `<span class="chip">${ic('spark', 14, '#d8bd5a', 2)} ${p.item}</span>`).join('')}</div>` : ''}
-    <p class="lnote">${topic ? 'Every mini game you play counts, replays too.' : 'Every level you finish counts, retries too.'}</p></div>`}</div>`;
+    <p class="lnote">${topic ? 'Every mini game you play counts, replays too.' : 'Every quiz level and mini game counts, retries and replays too.'}</p></div>`}</div>`;
 };
 MOUNT.room = (el, { k }) => {
   arrangeRoom(el, k);
