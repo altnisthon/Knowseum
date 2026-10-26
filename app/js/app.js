@@ -418,7 +418,7 @@ function walkTo(elId, x, y, w, h, then) {
 function wingRuns(k) { return (S.arts[k] && S.arts[k].runs) || 0; }
 function furnLevel(k) { return Math.min(3, wingRuns(k)); }
 // positions in the 390 x 330 room: [x of the item's base centre, y of its base, width]
-const ROOM3D = { wall: [260, 125], me: [232, 236], wk: 16 };
+const ROOM3D = { wall: [260, 125], me: [222, 220], wk: 16 };
 const FPOS = { sofa: [122, 206, 98], stool: [168, 238, 40], trophy: [136, 252, 32], chair: [270, 250, 54], plant: [306, 228, 38], lamp: [166, 170, 40],
   simseat: [186, 290, 74], lectern: [200, 288, 46], robot: [200, 290, 44] };
 const SPECIAL = { singapore: ['simseat', 'Racing sim seat'], politics: ['lectern', 'Lectern'], tech: ['robot', 'Robot buddy'] };
