@@ -1200,3 +1200,22 @@ img { max-width: 100%; display: block; }
 .arrbar .btn.sm { width: auto; height: auto; padding: 8px 14px; font-size: 13px; border-radius: 999px; flex: none; }
 .arrbar .btn.ink.sm { background: #e7cf6a; color: #1c1b19; }
 .arrbar .btn.line.sm { background: transparent; color: #fff; border-color: rgba(255,255,255,.5); }
+
+/* ---------- small phones (and long usernames) ---------- */
+.lobbyv .hello > div { min-width: 0; }
+.lobbyv .hello > div span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lobbyv .hello .chip { flex: none; }
+.bearer > div { min-width: 0; } .bearer b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bearer .pts { flex: none; }
+@media (max-width: 360px) {
+  .lobbyv .hello { gap: 8px; padding: 8px 12px 4px; }
+  .lobbyv .hello .av { width: 44px; height: 44px; }
+  .lobbyv .hello b { font-size: 18px; }
+  .lobbyv .hello .chip { padding: 5px 8px; font-size: 12.5px; }
+  .ltabs { margin: 0 10px; }
+  .ltabs button { font-size: 12.5px; gap: 2px; }
+  .bearer { padding: 12px; gap: 10px; } .bearer .photo { width: 48px; height: 60px; }
+  .bearer .pts { padding: 6px 8px; } .bearer .pts b { font-size: 15px; }
+  .look-stage .sparkle { display: none; }
+}
+.bearer small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

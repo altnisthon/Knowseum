@@ -415,16 +415,21 @@ function walkTo(elId, x, y, w, h, then) {
 }
 
 // --- wing room (3D clay room) — furniture appears as you finish quizzes in the wing
-function wingRuns(k) { return (S.arts[k] && S.arts[k].runs) || 0; }
+// progress that unlocks furniture: quiz levels finished in the open wings; in the other wings the warm-up quiz and every mini game played
+function wingRuns(k) {
+  if (ART[k]) return (S.arts[k] && S.arts[k].runs) || 0;
+  return (S.topic[k] ? 1 : 0) + Object.values(S.mini[k] || {}).reduce((t, r) => t + (r.plays || 1), 0);
+}
 function furnLevel(k) { return Math.min(3, wingRuns(k)); }
 // positions in the 390 x 330 room: [x of the item's base centre, y of its base, width]
 const ROOM3D = { wall: [260, 125], me: [222, 220], wk: 16 };
 const FPOS = { sofa: [122, 206, 98], stool: [168, 238, 40], trophy: [136, 252, 32], chair: [270, 250, 54], plant: [306, 228, 38], lamp: [166, 170, 40],
-  simseat: [186, 290, 74], lectern: [200, 288, 46], robot: [200, 290, 44] };
-const SPECIAL = { singapore: ['simseat', 'Racing sim seat'], politics: ['lectern', 'Lectern'], tech: ['robot', 'Robot buddy'] };
+  simseat: [186, 290, 74], lectern: [200, 288, 46], robot: [200, 290, 44], purifier: [200, 290, 40], globe: [200, 290, 44], teaset: [196, 292, 62] };
+const SPECIAL = { singapore: ['simseat', 'Racing sim seat'], politics: ['lectern', 'Lectern'], tech: ['robot', 'Robot buddy'],
+  environment: ['purifier', 'Air purifier'], world: ['globe', 'Globe'], culture: ['teaset', 'Tea set'] };
 const TINTED = { sofa: 1, chair: 1, lamp: 1 };
 const roomFurn = k => [['sofa', 'Sofa', 1], ['stool', 'Side stool', 2], ['trophy', 'Trophy', 3],
-  ...(ART[k] ? [['chair', 'Armchair', 5], ['plant', 'Potted plant', 7], ['lamp', 'Mushroom lamp', 9], [...SPECIAL[k], 12]] : [])];
+  ['chair', 'Armchair', 5], ['plant', 'Potted plant', 7], ['lamp', 'Mushroom lamp', 9], [...SPECIAL[k], 12]];
 const furnSrc = (kind, k) => `assets/furn/${kind}${TINTED[kind] ? '-' + k : ''}.webp`;
 // where the visitor has moved each piece to (saved per wing), else the default spot
 const furnAt = (kind, k) => { const p = ((S.furn || {})[k] || {})[kind], d = FPOS[kind]; return p ? [p[0], p[1], d[2], p[2] ? -1 : 1] : [d[0], d[1], d[2], 1]; };
@@ -438,7 +443,7 @@ SCREENS.room = ({ k }) => {
   const topic = !art, only = WALL_ONLY[k];
   const tipShown = !S.tipHidden[k];
   const prizes = art ? LEVELS.map(l => art.rewards[l]).filter(r => r.where === 'room item' && S.arts[k].items.includes(r.item)) : [];
-  return `<div style="--c:${w.color};--t:${w.tint}">${topbar(`${w.name} Wing`, topic ? 'Room 1 of 1 · not furnished yet' : `Room 1 of 1 · ${placed ? placed + ' furnishing' + (placed > 1 ? 's' : '') : 'not furnished yet'}`, 'to-lobby', `<span class="round topav">${avatar()}</span>`)}
+  return `<div style="--c:${w.color};--t:${w.tint}">${topbar(`${w.name} Wing`, `Room 1 of 1 · ${placed ? placed + ' furnishing' + (placed > 1 ? 's' : '') : 'not furnished yet'}`, 'to-lobby', `<span class="round topav">${avatar()}</span>`)}
   <div class="iso room room3d" id="roomart"><img src="assets/rooms3d/room-${k}.webp" alt="The ${w.name} Wing room${placed ? ', with ' + got.map(f => f[1].toLowerCase()).join(', ') : ''}">
     ${got.map(f => furnImg(f[0], k, f[2] === runs)).join('')}
     ${placed ? `<button class="arrbtn" data-room="arrange" aria-label="Arrange your furniture">${ic('spark', 14, '#1c1b19', 2)} Arrange</button>` : ''}
@@ -447,22 +452,22 @@ SCREENS.room = ({ k }) => {
   ${placed ? `<div class="arrbar" id="arrbar"><span><b>Arrange your room</b><small>Drag a piece to move it · tap it to flip</small></span>
     <button class="btn line sm" data-room="reset">Reset</button><button class="btn ink sm" data-room="done">Done</button></div>` : ''}
   ${tipShown && !placed ? `<div class="tipcard rise"><div class="h"><span class="ic">${ic('spark', 18, '#1c1b19', 1.9)}</span><b>Make this room yours</b><button data-act="hide-tip" data-v="${k}" aria-label="Close tip">${ic('close', 14, '#fff', 2.2)}</button></div>
-    <p>${topic ? `This wing's story is on the Newsworthy wall. Its activities land soon, and there's a warm-up topic quiz there meanwhile.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
+    <p>${topic ? `This wing's story is on the Newsworthy wall. Play its warm-up quiz and the mini games below to unlock furniture for this room.` : 'Finish the quizzes in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
   <button class="wallcard rise" data-act="room-wall" data-v="${k}"><span class="thumb"><img src="assets/paintings/${(art || only).painting}.webp" alt=""></span>
     <span class="tx"><span class="label">Newsworthy wall</span><b>${topic ? esc(only.headline) : '3 frames to explore'}</b><span class="mini">${ic('chev', 14, '#fff', 2.2)} View wall</span></span></button>
   ${miniSection(k)}
-  ${topic ? `<p class="ascii" style="text-align:center;margin:18px 0 30px">*. room furnishings arrive with this wing's quizzes .*</p>` : `
+  ${`
   <div class="furnish rise"><div class="fh"><b>Furnish your room</b><span>${placed} of ${F.length}</span></div>
-    <div class="fbar"><span>${Math.min(runs, 12)} of 12 quizzes done in this wing</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
+    <div class="fbar"><span>${Math.min(runs, 12)} of 12 ${topic ? 'activities (warm-up quiz + mini games)' : 'quizzes'} done in this wing</span><i><em style="width:${Math.min(1, runs / 12) * 100}%"></em></i></div>
     <div class="lgrid">${F.map(([kind, name, q], i) => { const has = runs >= q, isNew = has && q === runs;
-      return `<div class="ltile ${has ? (isNew ? 'sel' : 'on') : 'locked'}" style="--r:${(i % 3) - 1}deg"><span class="art"><img class="furn3d" src="${furnSrc(kind, k)}" alt=""></span><b>${name}</b><small>${has ? (isNew ? 'New · placed' : 'Placed') : `Complete ${q} quiz${q > 1 ? 'zes' : ''} in this wing`}</small>${has ? `<span class="tc ${isNew ? 'sel' : 'ok'}">${tick(13, '#fff', 3)}</span>` : `<span class="tc">${ic('lock', 12, '#9d988f', 1.9)}</span>`}</div>`; }).join('')}</div>
+      return `<div class="ltile ${has ? (isNew ? 'sel' : 'on') : 'locked'}" style="--r:${(i % 3) - 1}deg"><span class="art"><img class="furn3d" src="${furnSrc(kind, k)}" alt=""></span><b>${name}</b><small>${has ? (isNew ? 'New · placed' : 'Placed') : (topic ? `Do ${q} activit${q > 1 ? 'ies' : 'y'} in this wing` : `Complete ${q} quiz${q > 1 ? 'zes' : ''} in this wing`)}</small>${has ? `<span class="tc ${isNew ? 'sel' : 'ok'}">${tick(13, '#fff', 3)}</span>` : `<span class="tc">${ic('lock', 12, '#9d988f', 1.9)}</span>`}</div>`; }).join('')}</div>
     ${prizes.length ? `<div class="label" style="margin:16px 0 8px">Quiz prizes in this room</div><div class="sugg" style="margin:0">${prizes.map(p => `<span class="chip">${ic('spark', 14, '#d8bd5a', 2)} ${p.item}</span>`).join('')}</div>` : ''}
-    <p class="lnote">Every level you finish counts, retries too.</p></div>`}</div>`;
+    <p class="lnote">${topic ? 'Every mini game you play counts, replays too.' : 'Every level you finish counts, retries too.'}</p></div>`}</div>`;
 };
 MOUNT.room = (el, { k }) => {
   arrangeRoom(el, k);
-  const a = S.arts[k]; if (!a) return;
+  const a = S.arts[k] || (S.seenFurn = S.seenFurn || {}, S.seenFurn[k] = S.seenFurn[k] || { seenLevel: 0 });
   const runs = wingRuns(k), fresh = roomFurn(k).filter(f => f[2] > (a.seenLevel || 0) && f[2] <= runs);
   if (fresh.length) {
     setTimeout(() => toast(`${sparkSvg('#e7cf6a').replace('<svg', '<svg width="16" height="16"')} ${fresh.map(f => f[1]).join(', ')} placed in your room!`), 500);
@@ -525,7 +530,7 @@ SCREENS.mini = ({ k, g }) => { const w = KN.wings.find(x => x.key === k); return
 MOUNT.mini = (el, { k, g }) => KNMiniGame.mount(el, {
   vetting: () => openSheet(vetSheet()),
   done: (score, total) => { S.mini[k] = S.mini[k] || {}; const r = S.mini[k][g]; const first = !r;
-    if (!r || score > r.best) S.mini[k][g] = { best: score, total }; save();
+    S.mini[k][g] = { best: r ? Math.max(r.best, score) : score, total, plays: ((r && r.plays) || 1) + (r ? 1 : 0) }; save();
     const nb = checkBadges();
     if (nb.length) setTimeout(() => showBadges(nb), 900);
     else if (first) setTimeout(() => toast(`${tick(18, '#e7cf6a', 3)} ${KNMiniGame.META[g].name} done in the ${wingNm(k)} Wing`), 400); },
