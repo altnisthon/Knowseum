@@ -106,15 +106,64 @@
       <button class="sbtn" data-x="rank" data-b="${id}">Run the ranking</button>
       <div class="usage hide" data-after><div class="lt">Usage vs. size</div><div class="ub"><span>Expected</span><i style="--w:12%"></i></div><div class="ub act"><span>Actual</span><i style="--w:70%"></i><b>~6×</b></div><p>Nearly six times what Singapore’s size alone would predict.</p></div></div>`,
     bignum: b => `<div class="sb-big"><b data-countto="${b.n}">0</b><span class="plus">${b.plus ? '+' : ''}</span><p>${esc(b.v)}</p></div>`,
+
+    // ---- Environment / World / Culture blocks
+    gauge: (b, id) => `<div class="sb-gauge" data-b="${id}"><svg viewBox="0 0 320 178">${PSI.map(([a, z, c]) => `<path d="${arc(a, Math.min(z, 400))}" stroke="${c}" stroke-width="18" fill="none"/>`).join('')}
+        <path d="${arc(b.target - 1.5, b.target + 1.5, 140)}" stroke="var(--fg)" stroke-width="10" fill="none"/>
+        <text x="${pt(b.target, 154)[0]}" y="${pt(b.target, 154)[1]}" class="gmk" text-anchor="start">${esc(b.mark)}</text>
+        <g class="needle" data-needle style="transform:rotate(${rot(b.start)}deg)"><path d="M160 150 L160 46" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/><circle cx="160" cy="150" r="7" fill="var(--fg)"/></g></svg>
+      <div class="gread"><b data-gv>${b.start}</b><span data-gb>${band(b.start)[3]}</span></div>
+      <input type="range" min="0" max="400" value="${b.start}" data-x="gauge" data-b="${id}" aria-label="PSI dial">
+      <div class="gscale"><span>0</span><span>Good · Moderate · Unhealthy · Very unhealthy · Hazardous</span><span>400</span></div>
+      <button class="sbtn" data-x="gauge-go" data-b="${id}">Show 15 Oct’s reading</button></div>`,
+    shift: (b, id) => `<div class="sb-shift" data-b="${id}"><div class="sgrid">
+        <div class="sc"><span class="k">Earnings potential</span><b data-pay>$0</b><small>Estimated range</small><div class="sbars" data-sbars>${Array.from({ length: b.max }, () => '<i></i>').join('')}</div></div>
+        <div class="sc hz"><span class="k">Health impact</span><b data-risk>None</b><small data-hrs>0 h in PSI ${b.psi} air</small><div class="lung" data-lung><i></i></div></div></div>
+      <div class="sl"><input type="range" min="0" max="${b.max}" step="0.5" value="0" data-x="shift" data-b="${id}" aria-label="Shift length in hours"><div class="ticks"><span>0 h</span><span>2.5 h · Md Amri</span><span>10 h · Darren Tan</span></div></div>
+      <p class="ill">Illustration, not a calculator. Pay is worked out from the riders’ own figures, before petrol and CPF.</p></div>`,
+    profiles: (b, id) => `<div class="sb-cards sb-prof"><div class="sb-lbl"><span>${esc(b.label || '')}</span><span class="cnt" data-cnt>1/${b.items.length}</span></div>
+      <div class="track">${b.items.map(it => `<div class="card"><div class="ph"><svg viewBox="0 0 120 90"><circle cx="60" cy="34" r="20" fill="currentColor"/><path d="M40 30 C40 12 80 12 80 30 L80 36 L40 36 Z" fill="var(--acc)"/><path d="M22 90 C24 62 96 62 98 90 Z" fill="currentColor"/></svg><span class="tag">${esc(it.tag)}</span></div>
+        <div class="nm"><b>${esc(it.name)}</b><em>${it.age}</em></div>${it.stats.map(([k, v]) => `<div class="st"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}
+        <p>${esc(it.line)}</p>${it.q ? `<div class="pq">“${esc(it.q)}”</div>` : ''}</div>`).join('')}</div>
+      <div class="pips">${b.items.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div></div>`,
+    poll: (b, id) => `<div class="sb-poll">${b.opts.map((o, i) => `<button class="po" data-x="poll" data-b="${id}" data-i="${i}"><span class="L">${'ABC'[i]}</span><span class="t"><b>${esc(o.h)}</b><small>${esc(o.s)}</small></span><span class="rd"></span></button>`).join('')}
+      <div class="pr hide" data-pr></div></div>`,
+    sort: (b, id) => `<div class="sb-sort">${b.items.map((it, i) => `<div class="so" data-i="${i}"><p>${esc(it.c)}</p><div class="btns">${b.opts.map((o, j) => `<button data-x="sort" data-b="${id}" data-i="${i}" data-j="${j}">${esc(o)}</button>`).join('')}</div><small class="why" data-why></small></div>`).join('')}
+      <div class="sdone hide" data-after><b data-sc></b><span>${esc(b.doneMsg || 'Nice sorting.')}</span></div></div>`,
+    habits: (b, id) => `<div class="sb-habits">${b.items.map((h, i) => `<button class="hb" data-x="habit" data-b="${id}" data-i="${i}"><span class="bx"></span>${esc(h)}</button>`).join('')}
+      <div class="score"><span>Your Chinese-ness score</span><b data-hs>0<small>/100</small></b></div>
+      <button class="sbtn wide" data-x="habit-go" data-b="${id}">See my breakdown</button>
+      <div class="hres hide" data-after><b data-hr></b><p>Hold that thought. Swipe on for the plot twist.</p></div></div>`,
+    combine: (b, id) => `<div class="sb-combine"><div class="tiles"><span class="tl a">${esc(b.a)}</span><span class="pl">+</span><span class="tl b">${esc(b.b)}</span></div>
+      <button class="sbtn wide" data-x="combine" data-b="${id}">Combine</button>
+      <div class="word hide" data-after><b>${esc(b.word)}</b><p>${esc(b.def)}</p><div class="more"><span>Also on your feed</span>${b.more.map(m => `<i>${esc(m)}</i>`).join('')}</div></div></div>`,
+    scale: (b, id) => `<div class="sb-scale"><div class="ends"><b>${esc(b.l)}</b><b>${esc(b.r)}</b></div>
+      <input type="range" min="0" max="100" value="50" data-x="scale" data-b="${id}" aria-label="${esc(b.l)} to ${esc(b.r)}">
+      <p class="sm" data-sm>Drag to reflect and slide.</p></div>`,
+    map: (b, id) => { const U = window.KN_UA; return `<div class="sb-map"><svg viewBox="0 0 ${U.w} ${U.h}" data-x="map" data-b="${id}"><path d="${U.d}" class="land"/>
+        <circle cx="${U.kyiv[0]}" cy="${U.kyiv[1]}" r="2.6" class="cap"/><text x="${U.kyiv[0] + 5}" y="${U.kyiv[1] + 3}" class="ml">Kyiv</text><g data-mg></g></svg>
+      <p class="mres" data-mres>Tap anywhere on Ukraine</p></div>`; },
+    intercept: (b, id) => `<div class="sb-icpt"><div class="dots" data-dots>${Array.from({ length: b.total }, () => '<i></i>').join('')}</div>
+      <div class="cts"><div><b data-il>0</b><small>launched</small></div><div><b data-id>0</b><small>shot down</small></div><div class="hit"><b data-ih>0</b><small>not shot down</small></div></div>
+      <button class="holdscan" data-hold="intercept" data-b="${id}"><i data-scanfill></i><span>Hold to play the night</span></button>
+      <p class="after hide" data-after>The air force said ${b.total} drones attacked and ${b.down} were shot down. ${b.total - b.down} were not, by our maths.</p></div>`,
   };
   function quizOpts(b, qi, id) { return b.qs[qi].o.map((o, i) => `<button class="qo" data-x="quiz" data-b="${id}" data-i="${i}"><span class="L">${'ABC'[i]}</span><span>${esc(o)}</span><span class="mk"></span></button>`).join(''); }
   function raceRow(code, i) { const [n, t] = DRIVERS[code]; return `<div class="rr ${code === 'ANT' ? 'ant' : ''}" data-code="${code}" style="--y:${i}"><span class="pos">${i + 3}</span><span class="bar"></span><div><b>${code}</b><small>${esc(n)} · ${esc(t)}</small></div><span class="tag" data-tag></span></div>`; }
   function barsInner(b, i) { const t = b.tabs[i], m = Math.max(t.a, t.b); return `<div class="bcol"><em>${esc(t.la)}</em><i style="--h:${t.a / m * 100}%"></i><b>${esc(b.names[0])}</b></div><div class="bcol r"><em>${esc(t.lb)}</em><i style="--h:${Math.max(4, t.b / m * 100)}%"></i><b>${esc(b.names[1])}</b></div>`; }
 
+
+  // PSI bands (NEA): [from, to, colour, name]
+  const PSI = [[0, 50, '#4caf6e', 'Good'], [50, 100, '#e5c443', 'Moderate'], [100, 200, '#f08a24', 'Unhealthy'], [200, 300, '#d9452e', 'Very unhealthy'], [300, 400, '#7d2e72', 'Hazardous']];
+  const band = v => PSI.find(([a, z]) => v <= z) || PSI[4];
+  const pt = (v, r = 120) => { const a = Math.PI * (1 - v / 400); return [(160 + r * Math.cos(a)).toFixed(1), (150 - r * Math.sin(a)).toFixed(1)]; };
+  const arc = (a, z, r = 120) => { const [x0, y0] = pt(a, r), [x1, y1] = pt(z, r); return `M${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1}`; };
+  const rot = v => -90 + v / 400 * 180;
+
   // ------------------------------------------------------------ frame
   function frameHTML(k, i) {
     const S = window.KN_STORY[k], f = S.frames[i], n = S.frames.length;
-    const lab = S.theme === 'case' ? `<span>${esc(S.label)}</span><em>No. ${String(i + 1).padStart(2, '0')} of ${n}</em>` : S.theme === 'race' ? `<span>${esc(S.label)}</span><em>${String(i + 1).padStart(2, '0')} / ${n}</em>` : `<span>KNOWSEUM_<small>TECH.WING // STEP INTO STORY</small></span><em>SCN_${String(i + 1).padStart(2, '0')}<small>${String(i + 1).padStart(2, '0')}/${n}</small></em>`;
+    const lab = ['haze', 'noir', 'tea'].includes(S.theme) ? `<span>${esc(S.label)}</span><em>${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</em>` : S.theme === 'case' ? `<span>${esc(S.label)}</span><em>No. ${String(i + 1).padStart(2, '0')} of ${n}</em>` : S.theme === 'race' ? `<span>${esc(S.label)}</span><em>${String(i + 1).padStart(2, '0')} / ${n}</em>` : `<span>KNOWSEUM_<small>TECH.WING // STEP INTO STORY</small></span><em>SCN_${String(i + 1).padStart(2, '0')}<small>${String(i + 1).padStart(2, '0')}/${n}</small></em>`;
     const head = `<div class="sp-top"><div class="segs">${S.frames.map((_, j) => `<i class="${j < i ? 'on' : j === i ? 'cur' : ''}"></i>`).join('')}</div>
       <div class="bar"><button class="x" data-act="story-close" aria-label="Close story"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M6 6 L18 18 M18 6 L6 18"/></svg></button><div class="lab">${lab}</div><span class="sp40"></span></div></div>`;
     const blocks = (f.blocks || []).map((b, j) => R[b.t](b, j)).join('');
@@ -126,7 +175,7 @@
         <button class="cta" data-sx="next">${esc(f.cta)} <span>→</span></button><small class="src">${esc(S.source)}</small></div></div>`;
     } else {
       body = `<div class="sp-body"><span class="kick">${esc(f.kick)}</span>${title}${f.body ? `<p class="lede">${esc(f.body)}</p>` : ''}<div class="blocks">${blocks}</div>
-        ${f.end ? `<div class="endbtns"><button class="cta" data-sx="finish">Back to the wall</button><button class="cta ghost" data-act="read-article">Read the article</button><span class="visited"><b>Knowseum</b><em>Visited</em></span></div>` : ''}</div>`;
+        ${f.end ? `<div class="endbtns"><button class="cta" data-sx="finish">Back to the wall</button><button class="cta ghost" data-act="read-article" data-url="${esc(S.url || '')}">Read the article</button><span class="visited"><b>Knowseum</b><em>Visited</em></span></div>` : ''}</div>`;
     }
     const foot = f.cover || f.end ? `<div class="sp-foot"><span class="sp-hint">${esc(f.hint)}</span></div>`
       : `<div class="sp-foot"><span class="sp-hint" data-hint>${esc(f.hint)}</span><div class="nav"><button class="back" data-sx="prev" aria-label="Previous frame">‹</button><button class="next" data-sx="next">Continue <span>›</span></button></div></div>`;
@@ -196,9 +245,27 @@
     if (sx) { if (sx.dataset.sx === 'next') step(1); else if (sx.dataset.sx === 'prev') step(-1); else st.hooks.finish(); return; }
     const t = e.target.closest('[data-x]'); if (!t) return;
     const b = blk(t), host = t.closest('.blocks') || st.frame, x = t.dataset.x;
-    if (X[x]) X[x](t, b, host);
+    if (X[x]) X[x](t, b, host, e);
   }
   const X = {
+
+    'gauge-go': (t, b) => { const p = t.closest('.sb-gauge'), inp = p.querySelector('input'); let v = +inp.value; const go = () => { v += (b.target - v) * .12; if (Math.abs(b.target - v) < .6) v = b.target; inp.value = Math.round(v); setGauge(p, v, b); if (v !== b.target) requestAnimationFrame(go); }; go(); },
+    poll: (t, b) => { const p = t.closest('.sb-poll'), i = +t.dataset.i; p.querySelectorAll('.po').forEach((o, j) => { o.classList.toggle('on', j === i); o.classList.toggle('dim', j !== i); });
+      const r = p.querySelector('[data-pr]'); r.innerHTML = `<span class="k">${esc(b.opts[i].s)}</span><p>${esc(b.opts[i].r)}</p>`; r.classList.remove('hide', 'pop'); void r.offsetWidth; r.classList.add('pop'); markDone(); },
+    sort: (t, b) => { const row = t.closest('.so'); if (row.classList.contains('ok') || row.classList.contains('no')) return;
+      const it = b.items[+t.dataset.i], ok = +t.dataset.j === it.a; row.classList.add(ok ? 'ok' : 'no');
+      row.querySelectorAll('button').forEach((x, j) => { x.classList.toggle('right', j === it.a); if (x === t && !ok) x.classList.add('wrong', 'shake'); });
+      row.querySelector('[data-why]').textContent = it.w; const p = t.closest('.sb-sort');
+      if (!p.querySelector('.so:not(.ok):not(.no)')) { p.querySelector('[data-sc]').textContent = `${p.querySelectorAll('.so.ok').length}/${b.items.length}`; after(p); markDone(); } },
+    habit: (t, b) => { t.classList.toggle('on'); const p = t.closest('.sb-habits'), n = p.querySelectorAll('.hb.on').length, s = Math.round(n / b.items.length * 100);
+      p.querySelector('[data-hs]').innerHTML = `${s}<small>/100</small>`; p.querySelector('[data-hs]').classList.remove('pop'); void p.offsetWidth; p.querySelector('[data-hs]').classList.add('pop'); },
+    'habit-go': (t, b) => { const p = t.closest('.sb-habits'), n = p.querySelectorAll('.hb.on').length, s = Math.round(n / b.items.length * 100);
+      p.querySelector('[data-hr]').textContent = s >= 80 ? 'Solid daily game. Very Chinese on the low.' : s >= 40 ? 'Halfway there, by TikTok’s rules.' : 'Not very Chinese, by TikTok’s rules.'; t.classList.add('hide'); after(p); markDone(); },
+    combine: (t) => { const p = t.closest('.sb-combine'); p.classList.add('go'); t.classList.add('hide'); setTimeout(() => { after(p); markDone(); }, 520); },
+    map: (t, b, host, e) => { const sv = t.closest('svg'); if (sv.dataset.done) return; const U = window.KN_UA, r = sv.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width * U.w, y = (e.clientY - r.top) / r.height * U.h, [px, py] = U.pin, km = Math.round(Math.hypot(x - px, y - py) * U.km / 10) * 10;
+      sv.dataset.done = 1; sv.querySelector('[data-mg]').innerHTML = `<line x1="${x}" y1="${y}" x2="${px}" y2="${py}" class="ml2"/><circle cx="${x}" cy="${y}" r="4" class="you"/><circle cx="${px}" cy="${py}" r="11" class="pulse"/><circle cx="${px}" cy="${py}" r="5" class="pin"/><text x="${px + 9}" y="${py - 8}" class="ml b">Kirovohrad region</text>`;
+      sv.closest('.sb-map').querySelector('[data-mres]').innerHTML = km < 40 ? '<b>Spot on.</b> Right in the centre of Ukraine.' : `<b>About ${km} km off.</b> The region is right in the middle of the country.`; markDone(); },
     ladder: (t, b, host) => { if (t.classList.contains('on')) return; t.classList.add('on'); after(host); markDone(); },
     quote2: t => { t.classList.add('on'); markDone(); },
     draw: (t, b) => { const d = t.closest('.sb-draw'); d.classList.add('go'); t.textContent = '↻ Replay'; setTimeout(markDone, 1200);
@@ -254,7 +321,20 @@
       const tag = r.querySelector('[data-tag]'); tag.textContent = y < was ? '▲' : y > was ? '▼' : ''; tag.className = 'tag ' + (y < was ? 'up' : y > was ? 'down' : ''); });
     const cap = p.querySelector('[data-cap]'); cap.textContent = b.caps[s] || ''; cap.classList.remove('pop'); void cap.offsetWidth; cap.classList.add('pop');
   }
+  function setGauge(p, v, b) { const [, , c, nm] = band(v); p.querySelector('[data-needle]').style.transform = `rotate(${rot(v)}deg)`;
+    const gv = p.querySelector('[data-gv]'); gv.textContent = Math.round(v); gv.style.color = c; p.querySelector('[data-gb]').textContent = nm;
+    if (v > 200 && v <= 300) markDone(); }
   function onInput(e) {
+    const g = e.target.closest('[data-x="gauge"]'); if (g) return setGauge(g.closest('.sb-gauge'), +g.value, blk(g));
+    const sh = e.target.closest('[data-x="shift"]');
+    if (sh) { const b = blk(sh), h = +sh.value, p = sh.closest('.sb-shift');
+      p.querySelector('[data-pay]').textContent = h ? `$${Math.round(h * b.low)}–${Math.round(h * b.high)}` : '$0';
+      p.querySelectorAll('[data-sbars] i').forEach((x, i) => x.classList.toggle('on', i < Math.ceil(h)));
+      const risk = h === 0 ? 'None' : h <= 2.5 ? 'Lower' : h <= 6 ? 'Moderate' : 'High';
+      p.querySelector('[data-risk]').textContent = risk; p.querySelector('[data-hrs]').textContent = `${h} h in PSI ${b.psi} air`;
+      p.querySelector('[data-lung] i').style.height = (h / b.max * 100) + '%'; p.dataset.r = risk; if (h > 0) markDone(); return; }
+    const sc = e.target.closest('[data-x="scale"]');
+    if (sc) { const b = blk(sc), v = +sc.value, m = sc.closest('.sb-scale').querySelector('[data-sm]'); m.textContent = b.msgs[v < 34 ? 0 : v < 67 ? 1 : 2]; sc.style.setProperty('--v', v + '%'); markDone(); return; }
     const t = e.target.closest('[data-x="race-slide"]'); if (!t) return;
     const b = blk(t), s = Math.min(b.steps.length - 1, Math.floor(+t.value / 100 * (b.steps.length - .01)));
     const p = t.closest('.sb-race'); if (+p.dataset.s !== s) { p.dataset.s = s; raceTo(p, b, s); }
@@ -265,6 +345,7 @@
     const t = e.target.closest('[data-hold]'); if (!t) return;
     e.preventDefault(); t.setPointerCapture && t.setPointerCapture(e.pointerId);
     if (t.dataset.hold === 'scan') return holdScan(t, e);
+    if (t.dataset.hold === 'intercept') return holdIntercept(t);
     holdLights(t);
   }
   function holdScan(t) {
@@ -273,6 +354,21 @@
     let v = +t.dataset.v || 0, raf, last = performance.now();
     const run = now => { v = Math.min(1, v + (now - last) / 1600); last = now; t.dataset.v = v; f.style.width = v * 100 + '%'; fills.forEach((x, i) => x.style.width = Math.min(1, v * 1.2 - i * .1) * 100 + '%');
       if (v >= 1) { t.classList.add('done'); t.querySelector('span').textContent = 'Scan complete: still ???'; after(p); markDone(); return; } raf = requestAnimationFrame(run); };
+    raf = requestAnimationFrame(run);
+    const stop = () => { cancelAnimationFrame(raf); t.removeEventListener('pointerup', stop); t.removeEventListener('pointercancel', stop); };
+    t.addEventListener('pointerup', stop); t.addEventListener('pointercancel', stop);
+  }
+
+  function holdIntercept(t) {
+    if (t.classList.contains('done')) return;
+    const p = t.closest('.sb-icpt'), b = blk(t), dots = p.querySelectorAll('[data-dots] i'), f = t.querySelector('[data-scanfill]');
+    if (!p._hit) { const set = new Set(); let r = 7; while (set.size < b.total - b.down) { r = (r * 9301 + 49297) % 233280; set.add(Math.floor(r / 233280 * b.total)); } p._hit = set; }
+    let v = +t.dataset.v || 0, raf, last = performance.now();
+    const run = now => { v = Math.min(1, v + (now - last) / 2600); last = now; t.dataset.v = v; f.style.width = v * 100 + '%';
+      const n = Math.round(v * b.total); let dn = 0;
+      dots.forEach((d, i) => { if (i < n) { d.className = p._hit.has(i) ? 'hit' : 'down'; if (!p._hit.has(i)) dn++; } });
+      p.querySelector('[data-il]').textContent = n; p.querySelector('[data-id]').textContent = dn; p.querySelector('[data-ih]').textContent = n - dn;
+      if (v >= 1) { t.classList.add('done'); t.querySelector('span').textContent = 'Night over'; after(p); markDone(); return; } raf = requestAnimationFrame(run); };
     raf = requestAnimationFrame(run);
     const stop = () => { cancelAnimationFrame(raf); t.removeEventListener('pointerup', stop); t.removeEventListener('pointercancel', stop); };
     t.addEventListener('pointerup', stop); t.addEventListener('pointercancel', stop);

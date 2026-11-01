@@ -32,7 +32,7 @@ const fresh = () => ({
 });
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch (e) { S = fresh(); }
-S.topic = S.topic || {}; S.tips = S.tips || {}; S.mini = S.mini || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
+S.topic = S.topic || {}; S.wstory = S.wstory || {}; S.tips = S.tips || {}; S.mini = S.mini || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const today = () => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const points = () => OPEN.reduce((t, k) => t + LEVELS.reduce((u, l) => u + (S.arts[k].best[l] || 0) * LV[l].mult, 0), 0);
@@ -426,7 +426,7 @@ function walkTo(elId, x, y, w, h, then) {
 // progress that unlocks furniture in a wing: every quiz level finished (or the warm-up quiz) plus every mini game played there, replays included
 const miniPlays = k => Object.values(S.mini[k] || {}).reduce((t, r) => t + (r.plays || 1), 0);
 function wingRuns(k) {
-  const quizzes = ART[k] ? ((S.arts[k] && S.arts[k].runs) || 0) : (S.topic[k] ? 1 : 0);
+  const quizzes = ART[k] ? ((S.arts[k] && S.arts[k].runs) || 0) : (S.topic[k] ? 1 : 0) + (S.wstory[k] ? 1 : 0);
   return quizzes + miniPlays(k);
 }
 function furnLevel(k) { return Math.min(3, wingRuns(k)); }
@@ -461,7 +461,7 @@ SCREENS.room = ({ k }) => {
   ${placed ? `<div class="arrbar" id="arrbar"><span><b>Arrange your room</b><small>Drag a piece to move it · tap it to flip</small></span>
     <button class="btn line sm" data-room="reset">Reset</button><button class="btn ink sm" data-room="done">Done</button></div>` : ''}
   ${tipShown && !placed ? `<div class="tipcard rise"><div class="h"><span class="ic">${ic('spark', 18, '#1c1b19', 1.9)}</span><b>Make this room yours</b><button data-act="hide-tip" data-v="${k}" aria-label="Close tip">${ic('close', 14, '#fff', 2.2)}</button></div>
-    <p>${topic ? `This wing's story is on the Newsworthy wall. Play its warm-up quiz and the mini games below to unlock furniture for this room.` : 'Finish quizzes and play the mini games in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
+    <p>${topic ? `Step into this wing's story on the Newsworthy wall, then play its warm-up quiz and the mini games below to unlock furniture for this room.` : 'Finish quizzes and play the mini games in this wing to unlock furnishings for this room and new accessories for your look.'}</p>
     <button class="hide" data-act="hide-tip" data-v="${k}">Hide tip</button></div>` : ''}
   <button class="wallcard rise" data-act="room-wall" data-v="${k}"><span class="thumb"><img src="assets/paintings/${(art || only).painting}.webp" alt=""></span>
     <span class="tx"><span class="label">Newsworthy wall</span><b>${topic ? esc(only.headline) : '3 frames to explore'}</b><span class="mini">${ic('chev', 14, '#fff', 2.2)} View wall</span></span></button>
@@ -570,8 +570,10 @@ function wallInfo(k, i) {
     const R = W_.rooms[k], done = S.topic[k];
     return `<div class="plaque rise"><div class="label">${a.wingName} · Frame 1 of ${N}</div><h2>${esc(a.headline)}</h2>
     <div class="row"><span>${a.src} · ${a.date}</span><button data-act="read-article" data-url="${a.url}">${ic('book', 15)} Read article</button></div></div>
-  <div class="acts-h"><span class="label" style="color:var(--ink)">Activities for this story land soon</span><span class="ascii" style="color:${a.color}">[---]</span></div>
-  <div class="acts locked">${['Step into the story', 'Perspectives', 'Quiz'].map((n, j) => `<button class="act ph rise" data-act="wall-soon" data-v="this" style="animation-delay:${j * .05}s"><span class="lk">${ic('lock', 18, '#9d988f', 2)}</span><b>${n}</b><small>Coming soon</small></button>`).join('')}</div>
+  <div class="acts-h"><span class="label" style="color:var(--ink)">Step into the story · more activities soon</span><span class="ascii" style="color:${a.color}">[${S.wstory[k] ? '#' : '-'}--]</span></div>
+  <div class="acts locked">
+    <button class="act story rise" data-act="story" data-v="${k}"><span class="play">${ic('play', 18, '#fff', 2, '#fff')}</span><b>Step into the story</b><small>${KNStory.count(k)} frames</small>${S.wstory[k] ? `<span class="tick-badge">${tick(16, '#fff', 3)}</span>` : ''}</button>
+    ${['Perspectives', 'Quiz'].map((n, j) => `<button class="act ph rise" data-act="wall-soon" data-v="this" style="animation-delay:${(j + 1) * .05}s"><span class="lk">${ic('lock', 18, '#9d988f', 2)}</span><b>${n}</b><small>Coming soon</small></button>`).join('')}</div>
   <button class="tqcard rise" data-act="topic-open" data-v="${k}"><span class="q">?</span><span class="tx"><span class="label">Warm-up · topic quiz</span><b>${esc(R.quiz[0])}</b><small>${done ? (done.ok ? 'Done · you got it right' : 'Done · try again any time') : '1 question · counts toward your quiz badges'}</small></span>${ic('chev', 18, '#1c1b19', 2.2)}</button>`;
   }
   const st = S.arts[k] || { best: {} }, lvDone = a.only ? 0 : LEVELS.filter(l => st.best[l] !== null).length;
@@ -586,7 +588,7 @@ function wallInfo(k, i) {
     <div class="row"><span>The Straits Times · ${a.date}</span><button data-act="read-article" data-url="${ARTICLE_URL[k] || ''}">${ic('book', 15)} Read article</button></div></div>
   <div class="acts-h"><span class="label" style="color:var(--ink)">Pick an activity · any order</span><span class="ascii" style="color:${a.color}">[${'#'.repeat([st.story, st.persp, lvDone === 3].filter(Boolean).length)}${'-'.repeat(3 - [st.story, st.persp, lvDone === 3].filter(Boolean).length)}]</span></div>
   <div class="acts">
-    <button class="act story rise" data-act="story" data-v="${k}"><span class="play">${ic('play', 18, '#fff', 2, '#fff')}</span><b>Step into the story</b><small>14 frames</small>${st.story ? `<span class="tick-badge">${tick(16, '#fff', 3)}</span>` : ''}</button>
+    <button class="act story rise" data-act="story" data-v="${k}"><span class="play">${ic('play', 18, '#fff', 2, '#fff')}</span><b>Step into the story</b><small>${KNStory.count(k)} frames</small>${st.story ? `<span class="tick-badge">${tick(16, '#fff', 3)}</span>` : ''}</button>
     <button class="act persp rise" data-act="persp" data-v="${k}" style="animation-delay:.06s"><span class="bub"><i style="left:0;top:0;width:50px;background:#e9e9eb"></i><i style="left:0;top:26px;width:36px;background:#e9e9eb"></i><i style="right:0;top:13px;width:50px;background:linear-gradient(#5aa4ff,#1a68d8)"></i></span><b>Perspectives</b><small>3 voices + you</small>${st.persp ? `<span class="tick-badge">${tick(16, '#fff', 3)}</span>` : ''}</button>
     <button class="act quiz rise" data-act="levels" data-v="${k}" style="animation-delay:.12s"><span class="q">?</span><span style="position:absolute;top:66px;left:14px">${stars(3, '#fff')}</span><b>Quiz</b><small>${lvDone ? `${lvDone} of 3 levels` : '3 levels'}</small><span class="lvpips">${LEVELS.map(l => `<i class="${st.best[l] !== null ? 'on' : ''}"></i>`).join('')}</span>${lvDone === 3 ? `<span class="tick-badge">${tick(16, '#fff', 3)}</span>` : ''}</button>
   </div>`;
@@ -639,7 +641,8 @@ MOUNT.wall = (el, { k }) => {
 SCREENS.story = () => `<div class="player" style="position:absolute;inset:0"><div id="sp-stage" class="sp-stage"></div></div>`;
 MOUNT.story = (el, { k }) => (storyK = k, KNStory.mount(el, k, { finish: () => finishStory(k) }));
 function finishStory(k) {
-  const first = !S.arts[k].story; S.arts[k].story = true; save();
+  const rec = S.arts[k], first = rec ? !rec.story : !S.wstory[k];
+  if (rec) rec.story = true; else S.wstory[k] = true; save();
   go('wall', { k }, 'fade');
   if (first) setTimeout(() => toast(`${tick(18, '#e7cf6a', 3)} Story complete. Ticked on the wall.`), 450);
 }
@@ -1113,7 +1116,7 @@ const ACT = {
   'hall-tab': el => { hallTab = +el.dataset.v; const sc = current.scrollTop; current.innerHTML = SCREENS.hall(); current.scrollTop = sc; },
   'to-hall': () => go('hall'),
   'wall-go': el => { const tr = current.querySelector('#wtrack'); if (!tr) return; const w = tr.children[0].offsetWidth + 16; const n = Math.max(0, Math.min(tr.children.length - 1, wallIdx + +el.dataset.v)); tr.scrollTo({ left: n * w, behavior: 'smooth' }); },
-  'wall-soon': el => el.dataset.v === 'this' ? toast(`${ic('lock', 16, '#fff')} Step into the story, Perspectives and Quiz for this article land soon.`) : toast(`${ic('lock', 16, '#fff')} This frame opens when its story lands. It's a placeholder for the demo.`),
+  'wall-soon': el => el.dataset.v === 'this' ? toast(`${ic('lock', 16, '#fff')} Perspectives and Quiz for this article land soon.`) : toast(`${ic('lock', 16, '#fff')} This frame opens when its story lands. It's a placeholder for the demo.`),
   'read-article': el => { const u = el.dataset.url; if (u) window.open(u, '_blank', 'noopener'); else toast(`${ic('book', 16, '#fff')} This would open the Straits Times article.`); },
   story: el => { S.seenTip = true; save(); go('story', { k: el.dataset.v }, 'up'); },
   'story-close': () => go('wall', { k: curK() }, 'fade'),

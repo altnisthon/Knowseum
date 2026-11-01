@@ -27,7 +27,7 @@ On a computer it shows inside a phone frame. On a phone it fills the screen.
 | Wing room | Each wing's 3D room in its own colours, with the wing's painting on the wall. Tap the Newsworthy wall to walk up to it. Furnish the room by finishing quizzes there: sofa (1), side stool (2), trophy (3), then for Singapore, SG Politics and Tech an armchair (5), plant (7), mushroom lamp (9) and a wing special at 12 (racing sim seat, lectern, robot buddy). Sofa, armchair and lamp take the wing's colour. Tap **Arrange** to drag pieces anywhere on the floor and tap one to flip it; the layout is saved per wing, and Reset puts everything back. Every wing has the same 7 furnishings plus its own special (air purifier, globe, tea set for Environment, World and Culture). In every wing, furniture unlocks from activities done there: quiz levels (or the warm-up quiz) and every mini game played, replays included. World, Environment and Culture show their painting; their wall has the headline, a link to the article, "coming soon" activities and a one-question warm-up quiz |
 | Newsworthy Wall | Gilded painting, headline plaque, three activity cards with completion ticks |
 | Newsworthy Wall | Swipe the gilded frames (or use the arrows). Frame 1 is this week's story; the others are "coming soon" placeholders for the demo |
-| Step into the story | 14 interactive frames per article: swipe the panel, tap to reveal, hold for the F1 lights-out start, drag the race replay, toggle comparisons, run a scan, read the incident log, and a 3-question checkpoint quiz. Continue lights up once you've done each frame's thing |
+| Step into the story | Interactive frames for all six wings. Environment (haze riders, orange "Rider's choice" look): drag the PSI dial, swipe rider profiles, a shift simulator, myth or fact, make your call. World (Kirovohrad drone attack, sober noir look): find the region on a map, hold to play the night's 580 drones, tap the targets, match each figure to its source. Culture (Chinamaxxing, TikTok cream-and-red look): habit checklist score, plot twist, word builder, appreciation-vs-costume slider, fact or opinion. Perspectives and Quiz for these three are still coming soon. The original three have 14 frames each: swipe the panel, tap to reveal, hold for the F1 lights-out start, drag the race replay, toggle comparisons, run a scan, read the incident log, and a 3-question checkpoint quiz. Continue lights up once you've done each frame's thing |
 | Perspectives | iMessage-style thread with typing dots: 3 people from the article, then "What this means for you" |
 | Quiz | Pick Easy la / Not bad leh / Dam hard sia; 5 questions each with green/red feedback, shake and explanations |
 | Results → Rewards → Bonus | Counting score, travel-stamp reveal, unlocked items, article badge after finishing everything |
@@ -50,6 +50,8 @@ js/data.js        article content: threads, 45 quiz questions, rewards, badges
 js/world.js       lobby + room layout (door, wall and avatar positions), furniture and accessory doodles
 js/avatar.js      draws the avatar from your look (hair, colours, outfit, accessories)
 js/stories.js     content for the interactive story frames (facts from the articles)
+js/stories-more.js  story frames for Environment, World and Culture
+js/ua-map.js      Ukraine outline (with Crimea) for the World story map, from Natural Earth via world-atlas
 js/story.js       story engine: draws each frame and runs its interaction
 js/minigames-data.js  content for the 12 mini games (edit here; every item is an AI draft for the demo)
 js/minigames.js   mini game engine
@@ -77,6 +79,9 @@ assets/
 Every fact in the stories, threads and quizzes comes from three Straits Times reports:
 
 - "Govts must incentivise private sector to hire fresh grads amid declining entry-level roles: President", Tham Yuen-C, 12 Oct 2026
+- "'Why would I want to harm myself?': Some delivery riders look to cut hours as haze worsens", Joyce ZK Lim, 15 Oct 2026
+- "Central Ukrainian region hit by vast drone attack, killing three", Reuters (Max Hunder), via The Straits Times, 15 Oct 2026
+- "Chinamaxxing? Boiling apples won't make you Chinese", Tan Dawn Wei, 1 Mar 2026 (the Culture story uses the headline, standfirst and opening only)
 - "Mercedes' Kimi Antonelli within touching distance of maiden F1 title after finishing 3rd at S'pore GP", Laura Chia, 11 Oct 2026
 - "Anthropic to work with Singapore to evaluate AI models for safety and security", Sarah Koh, 14 Oct 2026
 
