@@ -40,7 +40,7 @@
             <text class="dl midt" x="120" y="78" font-style="italic">the broad middle</text></svg>`;
       return `<div class="sb-draw">${b.label ? `<div class="lbl">${esc(b.label)}</div>` : ''}${svg}<button class="sbtn" data-x="draw" data-b="${id}">▶ ${esc(b.btn)}</button></div>`;
     },
-    note: b => `<div class="sb-note ${b.dark ? 'dark' : ''} ${b.blue ? 'blue' : ''} ${b.lime ? 'lime' : ''} ${b.tyre ? 'tyre' : ''}">${b.tyre ? '<span class="tyreart"><i></i></span>' : ''}<div><div class="k">${esc(b.k)}</div>${b.big ? `<div class="big">${esc(b.big)}</div>` : ''}<p>${esc(b.v)}</p></div></div>`,
+    note: b => `<div class="sb-note ${b.dark ? 'dark' : ''} ${b.blue ? 'blue' : ''} ${b.lime ? 'lime' : ''} ${b.tyre ? 'tyre' : ''}">${b.tyre ? '<span class="tyreart"><i></i></span>' : ''}${b.shield ? ico('shield', 30) : ''}${b.bulb ? ico('bulb', 30) : ''}<div><div class="k">${esc(b.k)}</div>${b.big ? `<div class="big">${esc(b.big)}</div>` : ''}<p>${esc(b.v)}</p></div></div>`,
     reveal: (b, id) => `<div class="sb-reveal ${b.flip ? 'flip' : ''} ${b.big ? 'bigflip' : ''}">${b.label ? `<div class="lbl">${esc(b.label)}</div>` : ''}
       ${b.items.map((it, i) => {
         const arr = Array.isArray(it) ? it : [b.roman ? ROMAN[i] : b.num ? String(i + 1) : '', it];
@@ -108,6 +108,29 @@
     bignum: b => `<div class="sb-big"><b data-countto="${b.n}">0</b><span class="plus">${b.plus ? '+' : ''}</span><p>${esc(b.v)}</p></div>`,
 
     // ---- Environment / World / Culture blocks
+
+    photo: b => `<div class="mk-photo ${b.cls || ''}" style="height:${b.h || 220}px;background-image:url(assets/story/${b.src}.webp);background-position:${b.pos || 'center'}">${b.cap ? `<span class="cap">${esc(b.cap)}</span>` : ''}</div>`,
+    icon: b => `<div class="mk-icon ${b.cls || ''}">${ico(b.n, b.s || 44)}</div>`,
+    src: b => `<div class="mk-src ${b.tag ? 'tag' : ''}">${esc(b.v)}</div>`,
+    minigauge: b => `<div class="mk-mg"><svg viewBox="0 0 320 170">${PSI.map(([a, z, c]) => `<path d="${arc(a, Math.min(z, 400))}" stroke="${c}" stroke-width="14" fill="none" opacity=".9"/>`).join('')}
+      <circle cx="${pt(b.v)[0]}" cy="${pt(b.v)[1]}" r="11" fill="#fff" stroke="#222326" stroke-width="4"/></svg>
+      <div class="v"><small>PSI</small><b>${b.v}</b><span>${esc(band(b.v)[3])}</span></div></div>`,
+    mapcover: () => { const U = window.KN_UA; return `<div class="mk-mapc"><svg viewBox="0 0 ${U.w} ${U.h}"><path d="${U.d}" class="land"/><circle cx="${U.pin[0]}" cy="${U.pin[1]}" r="16" class="glow"/><circle cx="${U.pin[0]}" cy="${U.pin[1]}" r="4" class="pin"/></svg></div>`; },
+    target: (b, id) => `<div class="mk-target"><div class="stack" data-stack></div><button class="tgt" data-x="target" data-b="${id}"><i></i><i></i><i></i><span>${ico('target', 30)}</span></button>
+      <button class="mk-pill dark" data-x="target" data-b="${id}" data-lbl>Tap here</button></div>`,
+    claims: (b, id) => `<div class="mk-claims" data-b="${id}" data-q="0">${claimHTML(b, 0, id)}</div>`,
+    bigpic: (b, id) => `<div class="mk-bigpic"><div class="q" data-bq>${b.opts.map((o, i) => `<button class="po" data-x="bigpic" data-b="${id}" data-i="${i}"><span class="L">${'ABC'[i]}.</span><span class="t"><b>${esc(o.h)}</b><small>${esc(o.s)}</small></span><span class="rd"></span></button>`).join('')}</div>
+      <div class="bp hide" data-after></div></div>`,
+    catlist: (b, id) => `<div class="mk-cat">${b.items.map((it, i) => `<div class="row" data-i="${i}"><button data-x="cat" data-b="${id}" data-i="${i}">${ico(it.ico, 26)}<span>${esc(it.h)}</span><em>${ico('plus', 22)}</em></button>
+      <div class="det"><div><small>${esc(it.s)}</small><p>${esc(it.d)}</p></div>${art(it.ico)}</div></div>`).join('')}
+      <div class="mk-src">Tap any card to reveal details</div></div>`,
+    scalecards: (b, id) => `<div class="mk-sc">${b.items.map((it, i) => `<button class="c" data-x="sc" data-b="${id}" data-i="${i}">${ico(it.ico, 34)}<div><b>${esc(it.pre || '')}<span data-to>???</span></b><small>${esc(it.k)}</small><p>${esc(it.d)}</p></div><span class="tap">Tap to count</span></button>`).join('')}</div>`,
+    tear: (b, id) => `<div class="mk-tear"><svg viewBox="0 0 300 300" preserveAspectRatio="none"><path d="M40 30 L80 52 L96 18 L130 44 L170 10 L190 46 L236 22 L246 70 L290 92 L258 128 L284 170 L246 196 L262 244 L214 246 L196 290 L156 258 L118 288 L96 246 L50 262 L58 214 L12 190 L44 152 L8 116 L52 96 Z"/></svg>
+      <div class="in"><b>${esc(b.a)}</b><p>${esc(b.b)}</p></div></div>
+      <button class="mk-pill red" data-x="tear" data-b="${id}">${esc(b.btn)}</button><div class="mk-teamore hide" data-after><p>${esc(b.more)}</p><small>${esc(b.by)}</small></div>`,
+    pics: (b, id) => `<div class="mk-pics">${b.items.map((it, i) => `<button class="pc" data-x="pics" data-b="${id}" data-i="${i}"><span class="k">${esc(it.k)}</span><span class="im" style="background-image:url(assets/story/${it.img}.webp)"></span><b>${esc(it.h)}</b><small>${esc(it.s)}</small><span class="go">›</span></button>`).join('')}</div>
+      <div class="mk-picr hide" data-after></div>`,
+    react: (b, id) => `<button class="mk-pill dark react" data-x="react" data-b="${id}">${esc(b.label)} ${b.heart ? ico('heart', 16) : ''}</button>`,
     gauge: (b, id) => `<div class="sb-gauge" data-b="${id}"><svg viewBox="0 0 320 178">${PSI.map(([a, z, c]) => `<path d="${arc(a, Math.min(z, 400))}" stroke="${c}" stroke-width="18" fill="none"/>`).join('')}
         <path d="${arc(b.target - 1.5, b.target + 1.5, 140)}" stroke="var(--fg)" stroke-width="10" fill="none"/>
         <text x="${pt(b.target, 154)[0]}" y="${pt(b.target, 154)[1]}" class="gmk" text-anchor="start">${esc(b.mark)}</text>
@@ -120,9 +143,9 @@
         <div class="sc"><span class="k">Earnings potential</span><b data-pay>$0</b><small>Estimated range</small><div class="sbars" data-sbars>${Array.from({ length: b.max }, () => '<i></i>').join('')}</div></div>
         <div class="sc hz"><span class="k">Health impact</span><b data-risk>None</b><small data-hrs>0 h in PSI ${b.psi} air</small><div class="lung" data-lung><i></i></div></div></div>
       <div class="sl"><input type="range" min="0" max="${b.max}" step="0.5" value="0" data-x="shift" data-b="${id}" aria-label="Shift length in hours"><div class="ticks"><span>0 h</span><span>2.5 h · Md Amri</span><span>10 h · Darren Tan</span></div></div>
-      <p class="ill">Illustration, not a calculator. Pay is worked out from the riders’ own figures, before petrol and CPF.</p></div>`,
+      ${b.pill ? `<button class="mk-pill" data-x="shift-cycle" data-b="${id}">${esc(b.pill)}</button>` : ''}<p class="ill">Illustration, not a calculator. Pay is worked out from the riders’ own figures, before petrol and CPF.</p></div>`,
     profiles: (b, id) => `<div class="sb-cards sb-prof"><div class="sb-lbl"><span>${esc(b.label || '')}</span><span class="cnt" data-cnt>1/${b.items.length}</span></div>
-      <div class="track">${b.items.map(it => `<div class="card"><div class="ph"><svg viewBox="0 0 120 90"><circle cx="60" cy="34" r="20" fill="currentColor"/><path d="M40 30 C40 12 80 12 80 30 L80 36 L40 36 Z" fill="var(--acc)"/><path d="M22 90 C24 62 96 62 98 90 Z" fill="currentColor"/></svg><span class="tag">${esc(it.tag)}</span></div>
+      <div class="track">${b.items.map(it => `<div class="card"><div class="ph ${it.img ? 'img' : ''}" ${it.img ? `style="background-image:url(assets/story/${it.img}.webp);background-position:${it.pos || 'center'}"` : ''}>${it.img ? '' : '<svg viewBox="0 0 120 90"><circle cx="60" cy="34" r="20" fill="currentColor"/><path d="M22 90 C24 62 96 62 98 90 Z" fill="currentColor"/></svg>'}<span class="tag">${esc(it.tag)}</span></div>
         <div class="nm"><b>${esc(it.name)}</b><em>${it.age}</em></div>${it.stats.map(([k, v]) => `<div class="st"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}
         <p>${esc(it.line)}</p>${it.q ? `<div class="pq">“${esc(it.q)}”</div>` : ''}</div>`).join('')}</div>
       <div class="pips">${b.items.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div></div>`,
@@ -148,6 +171,8 @@
       <button class="holdscan" data-hold="intercept" data-b="${id}"><i data-scanfill></i><span>Hold to play the night</span></button>
       <p class="after hide" data-after>The air force said ${b.total} drones attacked and ${b.down} were shot down. ${b.total - b.down} were not, by our maths.</p></div>`,
   };
+  function claimHTML(b, qi, id) { const it = b.items[qi]; return `<div class="cl"><span class="k">Claim ${qi + 1} of ${b.items.length}</span><b>${esc(it.c)}</b></div>
+    <div class="btns">${b.opts.map((o, j) => `<button data-x="claim" data-b="${id}" data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="ans" data-ans></div>${ico(b.ico || 'mask', 64)}`; }
   function quizOpts(b, qi, id) { return b.qs[qi].o.map((o, i) => `<button class="qo" data-x="quiz" data-b="${id}" data-i="${i}"><span class="L">${'ABC'[i]}</span><span>${esc(o)}</span><span class="mk"></span></button>`).join(''); }
   function raceRow(code, i) { const [n, t] = DRIVERS[code]; return `<div class="rr ${code === 'ANT' ? 'ant' : ''}" data-code="${code}" style="--y:${i}"><span class="pos">${i + 3}</span><span class="bar"></span><div><b>${code}</b><small>${esc(n)} · ${esc(t)}</small></div><span class="tag" data-tag></span></div>`; }
   function barsInner(b, i) { const t = b.tabs[i], m = Math.max(t.a, t.b); return `<div class="bcol"><em>${esc(t.la)}</em><i style="--h:${t.a / m * 100}%"></i><b>${esc(b.names[0])}</b></div><div class="bcol r"><em>${esc(t.lb)}</em><i style="--h:${Math.max(4, t.b / m * 100)}%"></i><b>${esc(b.names[1])}</b></div>`; }
@@ -160,8 +185,53 @@
   const arc = (a, z, r = 120) => { const [x0, y0] = pt(a, r), [x1, y1] = pt(z, r); return `M${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1}`; };
   const rot = v => -90 + v / 400 * 180;
 
+
+  // line-art icons for the mockup-style stories
+  const IC = {
+    target: '<circle cx="24" cy="24" r="18"/><circle cx="24" cy="24" r="11"/><circle cx="24" cy="24" r="4"/>',
+    shield: '<path d="M24 5 L39 11 V23 C39 33 32 40 24 43 C16 40 9 33 9 23 V11 Z"/><path d="M17 24 L22 29 L31 19"/>',
+    bulb: '<path d="M17 30 C12 26 11 21 12 17 C14 10 20 7 24 7 C28 7 34 10 36 17 C37 21 36 26 31 30 V35 H17 Z"/><path d="M18 40 H30 M20 44 H28"/>',
+    star: '<path d="M24 4 L27 21 L44 24 L27 27 L24 44 L21 27 L4 24 L21 21 Z"/>',
+    check: '<circle cx="24" cy="24" r="19"/><path d="M15 24 L21 30 L33 18"/>',
+    mask: '<path d="M10 18 C16 14 32 14 38 18 V27 C34 34 14 34 10 27 Z"/><path d="M10 20 C5 20 4 26 9 28 M38 20 C43 20 44 26 39 28 M16 22 H32 M15 26 H33"/>',
+    heart: '<path d="M24 41 C10 31 5 23 8 16 C11 9 20 9 24 16 C28 9 37 9 40 16 C43 23 38 31 24 41 Z"/>',
+    bolt: '<path d="M27 4 L12 27 H23 L20 44 L36 20 H25 Z"/>',
+    train: '<rect x="11" y="6" width="26" height="30" rx="5"/><path d="M11 22 H37 M17 30 h2 M29 30 h2 M15 42 L19 36 M33 42 L29 36"/>',
+    box: '<path d="M6 16 L24 7 L42 16 V36 L24 45 L6 36 Z"/><path d="M6 16 L24 25 L42 16 M24 25 V45"/>',
+    home: '<path d="M6 22 L24 7 L42 22"/><path d="M11 18 V42 H37 V18"/><rect x="20" y="29" width="8" height="13"/>',
+    pin: '<path d="M24 44 C24 44 10 29 10 19 C10 11 16 5 24 5 C32 5 38 11 38 19 C38 29 24 44 24 44 Z"/><circle cx="24" cy="19" r="5"/>',
+    plus: '<circle cx="24" cy="24" r="17"/><path d="M24 16 V32 M16 24 H32"/>',
+    bookmark: '<path d="M13 6 H35 V43 L24 34 L13 43 Z"/>',
+  };
+  const ico = (n, s = 28) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[n] || ''}</svg>`;
+  // large line-art illustrations for the Kirovohrad category pages
+  const ART = {
+    bolt: '<path d="M60 12 L40 120 M60 12 L80 120 M44 40 H76 M40 60 H80 M36 80 H84 M28 40 H92 M50 12 H70"/><path d="M28 40 L20 52 M92 40 L100 52 M48 60 L44 120 M72 60 L76 120 M44 80 L76 120 M76 80 L44 120"/>',
+    train: '<rect x="22" y="22" width="76" height="70" rx="12"/><path d="M22 56 H98 M38 30 H82 V50 H38 Z M36 76 h8 M76 76 h8 M34 104 L42 92 M86 104 L78 92 M6 112 H114 M14 104 H106"/>',
+    box: '<path d="M10 50 L60 20 L110 50 V112 H10 Z"/><path d="M30 112 V66 H90 V112 M30 80 H90 M30 94 H90 M10 50 H110"/>',
+    home: '<path d="M18 112 V34 L50 18 V112 M50 40 H102 V112 M18 112 H110"/><path d="M28 44 h10 M28 60 h10 M28 76 h10 M28 92 h10 M62 54 h10 M80 54 h10 M62 70 h10 M80 70 h10 M62 86 h10 M80 86 h10"/>',
+  };
+  const art = n => `<svg class="art" viewBox="0 0 120 124" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ART[n] || ''}</svg>`;
+  const MOCK = ['haze', 'noir', 'tea'];
+  function mockHTML(k, i) {
+    const S = window.KN_STORY[k], f = S.frames[i], n = S.frames.length, th = S.theme;
+    const blocks = (f.blocks || []).map((b, j) => R[b.t](b, j)).join('');
+    const top = `<div class="mk-top"><div class="mk-prog">${S.frames.map((_, j) => `<i class="${j <= i ? 'on' : ''}"></i>`).join('')}</div>
+      <div class="mk-bar"><button class="mk-x" data-act="story-close" aria-label="Close story"><svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M6 6 L18 18 M18 6 L6 18"/></svg></button>
+      ${i ? '<button class="mk-x" data-sx="prev" aria-label="Previous frame"><svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"/></svg></button>' : ''}
+      <span class="mk-n">${esc(S.short || '')} · ${i + 1}/${n}</span></div></div>`;
+    const H = f.h || [], h = (H[0] || H[1]) ? `<h1 class="mk-h">${H[0] ? `<span>${esc(H[0])}</span>` : ''}${H[1] ? `<em>${esc(H[1])}</em>` : ''}</h1>` : '';
+    const body = `${f.kick ? `<div class="mk-kick">${esc(f.kick)}</div>` : ''}${h}${f.sub ? `<div class="mk-sub">${esc(f.sub)}</div>` : ''}${f.tag ? `<div class="mk-src tag">${esc(f.tag)}</div>` : ''}${f.body ? `<p class="mk-lede">${esc(f.body)}</p>` : ''}
+      <div class="blocks">${blocks}</div>${f.pill ? `<button class="mk-pill" data-sx="next">${esc(f.pill)}</button>` : ''}${f.small ? `<p class="mk-small">${esc(f.small)}</p>` : ''}
+      ${f.end ? `<div class="mk-end"><button class="mk-pill" data-sx="finish">${esc(f.endBtn || 'Back to the wall')}</button><button class="mk-pill ghost" data-act="read-article" data-url="${esc(S.url || '')}">Read the article</button></div>` : ''}`;
+    const swipe = th === 'haze' ? 'Swipe to continue  ↓' : th === 'noir' ? (i === 0 ? 'Swipe to begin' : 'Tap to continue') : 'Swipe up';
+    const foot = f.end ? (f.foot ? `<div class="mk-foot"><span class="mk-swipe ready">${esc(f.foot)}</span></div>` : '') : `<div class="mk-foot">${th === 'tea' ? '<span class="mk-sp"></span>' : ''}<button class="mk-swipe" data-sx="next" data-swipe="${esc(swipe)}">${esc(f.hint)}</button>${th === 'tea' ? `<button class="mk-heart" data-x="heart" aria-label="Like this frame">${ico('heart', 22)}</button>` : ''}</div>`;
+    return `<div class="sp mk t-${th} ${f.dark ? 'dk' : 'lt'} ${f.cls || ''}" style="--acc:${S.accent}">${f.bg ? `<div class="mk-bg" style="background-image:url(assets/story/${f.bg}.webp);background-position:${f.bgpos || 'center'}"></div>` : ''}${top}<div class="mk-body">${body}</div>${foot}</div>`;
+  }
+
   // ------------------------------------------------------------ frame
   function frameHTML(k, i) {
+    if (MOCK.includes(window.KN_STORY[k].theme)) return mockHTML(k, i);
     const S = window.KN_STORY[k], f = S.frames[i], n = S.frames.length;
     const lab = ['haze', 'noir', 'tea'].includes(S.theme) ? `<span>${esc(S.label)}</span><em>${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</em>` : S.theme === 'case' ? `<span>${esc(S.label)}</span><em>No. ${String(i + 1).padStart(2, '0')} of ${n}</em>` : S.theme === 'race' ? `<span>${esc(S.label)}</span><em>${String(i + 1).padStart(2, '0')} / ${n}</em>` : `<span>KNOWSEUM_<small>TECH.WING // STEP INTO STORY</small></span><em>SCN_${String(i + 1).padStart(2, '0')}<small>${String(i + 1).padStart(2, '0')}/${n}</small></em>`;
     const head = `<div class="sp-top"><div class="segs">${S.frames.map((_, j) => `<i class="${j < i ? 'on' : j === i ? 'cur' : ''}"></i>`).join('')}</div>
@@ -192,7 +262,8 @@
     el.addEventListener('input', onInput);
     let x0 = null, y0 = 0;
     el.addEventListener('touchstart', e => { if (e.target.closest('.track, input, [data-hold]')) { x0 = null; return; } x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
-    el.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1); });
+    el.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
+      else if (dy < -70 && Math.abs(dy) > Math.abs(dx) * 1.5 && st.frame.querySelector('.mk')) { const bd = st.frame.querySelector('.mk-body'); if (!bd || bd.scrollTop + bd.clientHeight >= bd.scrollHeight - 4) step(1); } });
     document.onkeydown = e => { if (!st || st.el !== el || !el.isConnected) return; if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); };
   }
   function show(i, dir) {
@@ -206,7 +277,7 @@
     st.i = i; st.frame = wrap;
     const f = window.KN_STORY[st.k].frames[i];
     // frames with nothing to do are "done" straight away
-    const needs = (f.blocks || []).some(b => !['meta', 'note', 'quote', 'list', 'rows', 'statrow', 'parties', 'wave', 'count', 'bignum'].includes(b.t));
+    const needs = (f.blocks || []).some(b => !['meta', 'note', 'quote', 'list', 'rows', 'statrow', 'parties', 'wave', 'count', 'bignum', 'photo', 'icon', 'src', 'minigauge', 'mapcover'].includes(b.t));
     if (!needs) markDone(true);
     else if (st.done[i]) markDone(true);
     // count-ups
@@ -229,6 +300,7 @@
   function markDone(silent) {
     st.done[st.i] = true;
     const nx = st.frame.querySelector('.next'); if (nx) nx.classList.add('ready');
+    const sw = st.frame.querySelector('.mk-swipe[data-swipe]'); if (sw) { sw.classList.add('ready'); sw.textContent = sw.dataset.swipe; return; }
     if (!silent) { const h = st.frame.querySelector('[data-hint]'); if (h) { h.textContent = 'Nice. Tap continue or swipe on'; h.classList.add('ok'); } }
   }
   function step(d) {
@@ -248,6 +320,31 @@
     if (X[x]) X[x](t, b, host, e);
   }
   const X = {
+
+    heart: t => { t.classList.toggle('on'); t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop'); },
+    react: t => { t.classList.add('on'); t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop'); const h = st.frame.querySelector('.mk-heart'); if (h) h.classList.add('on'); markDone(); },
+    target: (t, b) => { const p = t.closest('.mk-target'), stk = p.querySelector('[data-stack]'), n = stk.children.length; if (n >= b.items.length) return;
+      const [h, d] = b.items[n], c = document.createElement('div'); c.className = 'rs'; c.innerHTML = `<span>${n + 1}</span><div><b>${esc(h)}</b><small>${esc(d)}</small></div>`; stk.appendChild(c);
+      const ring = p.querySelector('.tgt'); ring.classList.remove('hit'); void ring.offsetWidth; ring.classList.add('hit');
+      p.querySelector('[data-lbl]').textContent = n + 1 < b.items.length ? `Tap again · ${n + 1}/${b.items.length}` : `All ${b.items.length} revealed`;
+      if (n + 1 === b.items.length) { p.classList.add('done'); markDone(); } },
+    claim: (t, b) => { const p = t.closest('.mk-claims'), qi = +p.dataset.q, it = b.items[qi], j = +t.dataset.j, ok = j === it.a; if (p.dataset.lock) return; p.dataset.lock = 1;
+      p.querySelectorAll('.btns button').forEach((x, k) => { x.classList.toggle('right', k === it.a); if (x === t && !ok) x.classList.add('wrong', 'shake'); });
+      const last = qi === b.items.length - 1;
+      p.querySelector('[data-ans]').innerHTML = `<b class="${ok ? 'ok' : 'no'}">${esc(b.opts[it.a])}:</b><p>${esc(it.w)}</p>${last ? '' : `<button class="mk-link" data-x="claim-next" data-b="${t.dataset.b}">Next claim →</button>`}`;
+      if (last) markDone(); },
+    'claim-next': (t, b) => { const p = t.closest('.mk-claims'), qi = +p.dataset.q + 1; p.dataset.q = qi; delete p.dataset.lock; p.innerHTML = claimHTML(b, qi, t.dataset.b); p.classList.remove('flip'); void p.offsetWidth; p.classList.add('flip'); },
+    bigpic: (t, b) => { const p = t.closest('.mk-bigpic'), o = b.opts[+t.dataset.i];
+      p.querySelectorAll('.po').forEach(x => x.classList.toggle('on', x === t));
+      const bp = p.querySelector('.bp'); bp.innerHTML = `<div class="lbl2">${esc(b.title || 'Here’s the big picture')}</div><div class="two"><div class="cc"><span class="k">Your choice</span><b>${esc(o.h)}</b><p>${esc(o.c)}</p>${ico('check', 40)}</div><div class="cc"><span class="k">The trade-off</span><b>${esc(o.s)}</b><p>${esc(o.r)}</p>${ico('shield', 40)}</div></div><p class="cap">${esc(b.cap || '')}</p>`;
+      bp.classList.remove('hide'); markDone(); },
+    cat: (t, b) => { const row = t.closest('.row'), was = row.classList.contains('open'); row.parentElement.querySelectorAll('.row.open').forEach(r => r.classList.remove('open')); row.classList.toggle('open', !was); row.classList.add('seen'); const p = t.closest('.mk-cat'); if (!p.querySelector('.row:not(.seen)')) markDone(); },
+    sc: (t, b) => { if (t.classList.contains('on')) return; t.classList.add('on'); const n = t.querySelector('[data-to]'), it = b.items[+t.dataset.i]; n.textContent = '0'; countUp(n, String(it.n));
+      if (!t.parentElement.querySelector('.c:not(.on)')) markDone(); },
+    tear: t => { t.classList.add('hide'); after(t.parentElement); markDone(); },
+    pics: (t, b) => { const p = t.closest('.blocks'), it = b.items[+t.dataset.i]; p.querySelectorAll('.pc').forEach(x => { x.classList.toggle('on', x === t); x.classList.toggle('dim', x !== t); });
+      const r = p.querySelector('.mk-picr'); r.innerHTML = `<b>${esc(it.k)}</b><p>${esc(it.r)}</p>`; r.classList.remove('hide'); markDone(); },
+    'shift-cycle': (t, b) => { const inp = t.closest('.sb-shift').querySelector('input'), pre = [2.5, 10, 6, 0], cur = +inp.value, nx = pre[(pre.indexOf(cur) + 1) % pre.length]; inp.value = nx; inp.dispatchEvent(new Event('input', { bubbles: true })); },
 
     'gauge-go': (t, b) => { const p = t.closest('.sb-gauge'), inp = p.querySelector('input'); let v = +inp.value; const go = () => { v += (b.target - v) * .12; if (Math.abs(b.target - v) < .6) v = b.target; inp.value = Math.round(v); setGauge(p, v, b); if (v !== b.target) requestAnimationFrame(go); }; go(); },
     poll: (t, b) => { const p = t.closest('.sb-poll'), i = +t.dataset.i; p.querySelectorAll('.po').forEach((o, j) => { o.classList.toggle('on', j === i); o.classList.toggle('dim', j !== i); });
