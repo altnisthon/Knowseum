@@ -12,7 +12,7 @@ Object.assign(window.KN_STORY, {
     frames: [
       { cls: 'cover', bg: 'haze-skyline', bgpos: 'center bottom', kick: 'Rider’s choice', h: ['Would you', 'ride today?'],
         body: 'Air quality updates. Real riders. Your call.',
-        blocks: [{ t: 'minigauge', v: 212 }], pill: 'Step inside  →', small: 'Your story. Your decision.', hint: 'Swipe to continue  ↓' },
+        blocks: [{ t: 'minigauge', v: 212 }], pill: 'Step inside  →', small: 'Your story. Your decision.', hint: 'Tap to continue' },
 
       { kick: 'Rider profile · Clementi', h: ['Meet the', 'riders.'],
         body: 'ST spoke to delivery riders around Clementi on 14 Oct. Swipe to meet three of them.',
@@ -93,7 +93,7 @@ Object.assign(window.KN_STORY, {
     frames: [
       { cls: 'center', kick: 'Ukraine · 15 Oct 2026', h: ['Step inside', 'the story'], sub: 'Kirovohrad',
         blocks: [{ t: 'mapcover' }, { t: 'note', dark: true, k: 'Night attack summary', v: 'The largest Russian attack on the region in the war. Three people killed, six wounded.' }],
-        hint: 'Swipe to begin' },
+        hint: 'Tap to begin' },
 
       { cls: 'center', h: ['The scale', ''], sub: 'Drone activity overnight',
         blocks: [{ t: 'scalecards', items: [
@@ -175,7 +175,7 @@ Object.assign(window.KN_STORY, {
         blocks: [{ t: 'combine', a: 'China', b: '-maxxing', word: 'Chinamaxxing', def: 'Optimising your whole self around one obsession. This time: being “Chinese”.', more: ['gymmaxxing', 'looksmaxxing', 'fibermaxxing'] }],
         hint: 'Tap Combine' },
 
-      { h: ['Trend vs', 'tradition'], body: 'Swipe to feel the difference. Tap one.',
+      { h: ['Trend vs', 'tradition'], body: 'Feel the difference. Tap one.',
         blocks: [{ t: 'pics', items: [
           { k: 'Trend', img: 'apples', h: 'Boiled apples', s: 'All over TikTok', r: 'A habit you can copy from a video in a day. The column asks if that’s enough to call it a culture.' },
           { k: 'Tradition', img: 'congee', h: 'Congee', s: 'Long before the trend', r: 'For many families it’s just breakfast. That’s the gap the headline points at.' }] }],
