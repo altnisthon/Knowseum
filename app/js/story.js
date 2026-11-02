@@ -224,7 +224,7 @@
     const body = `${f.kick ? `<div class="mk-kick">${esc(f.kick)}</div>` : ''}${h}${f.sub ? `<div class="mk-sub">${esc(f.sub)}</div>` : ''}${f.tag ? `<div class="mk-src tag">${esc(f.tag)}</div>` : ''}${f.body ? `<p class="mk-lede">${esc(f.body)}</p>` : ''}
       <div class="blocks">${blocks}</div>${f.pill ? `<button class="mk-pill" data-sx="next">${esc(f.pill)}</button>` : ''}${f.small ? `<p class="mk-small">${esc(f.small)}</p>` : ''}
       ${f.end ? `<div class="mk-end"><button class="mk-pill" data-sx="finish">${esc(f.endBtn || 'Back to the wall')}</button><button class="mk-pill ghost" data-act="read-article" data-url="${esc(S.url || '')}">Read the article</button></div>` : ''}`;
-    const swipe = th === 'haze' ? 'Swipe to continue  ↓' : th === 'noir' ? (i === 0 ? 'Swipe to begin' : 'Tap to continue') : 'Swipe up';
+    const swipe = th === 'haze' ? 'Swipe to continue  ↓' : th === 'noir' ? (i === 0 ? 'Swipe to begin' : 'Tap to continue') : 'Tap to continue';
     const foot = f.end ? (f.foot ? `<div class="mk-foot"><span class="mk-swipe ready">${esc(f.foot)}</span></div>` : '') : `<div class="mk-foot">${th === 'tea' ? '<span class="mk-sp"></span>' : ''}<button class="mk-swipe" data-sx="next" data-swipe="${esc(swipe)}">${esc(f.hint)}</button>${th === 'tea' ? `<button class="mk-heart" data-x="heart" aria-label="Like this frame">${ico('heart', 22)}</button>` : ''}</div>`;
     return `<div class="sp mk t-${th} ${f.dark ? 'dk' : 'lt'} ${f.cls || ''}" style="--acc:${S.accent}">${f.bg ? `<div class="mk-bg" style="background-image:url(assets/story/${f.bg}.webp);background-position:${f.bgpos || 'center'}"></div>` : ''}${top}<div class="mk-body">${body}</div>${foot}</div>`;
   }
