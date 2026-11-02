@@ -1525,3 +1525,28 @@ img { max-width: 100%; display: block; }
 .mk-mg { width: 220px; } .mk-mg .v { position: static; margin-top: -54px; } .mk-mg small { opacity: .8; } .mk-mg b { font-size: 36px; }
 .mk-icon.circ .ic { width: 52px; height: 52px; padding: 16px; }
 .mk.t-noir .mk-end .mk-pill { align-self: stretch; }
+
+/* ---- alignment pass (2 Nov) */
+.mk .blocks .mk-pill { display: flex; margin-left: auto; margin-right: auto; }
+.mk .sb-gauge { margin-top: 14px; }
+.mk .mk-src { text-align: left; } .mk.center .mk-src, .mk-cat .mk-src { text-align: center; }
+.mk .mk-src.tag { margin: 4px 0 6px; }
+.mk.mid .mk-body { justify-content: center; }
+.mk.center .lbl { justify-content: center; }
+.mk .mk-pill.ghost { background: transparent; color: var(--fg); border: 1.4px solid color-mix(in srgb, var(--fg) 45%, transparent); }
+.mk .mk-end { align-self: stretch; }
+.mk.t-tea .mk-body:has(.mk-end), .mk.t-noir .mk-body:has(.mk-end) { justify-content: center; }
+.mk.t-tea .mk-pill.ghost { color: #141414; }
+.mk-sp { width: 40px; flex: none; }
+.sb-reveal .rv .n:empty { display: none; } .sb-reveal .rv:has(.n:empty) .cover { inset: 0; padding-left: 14px; }
+.mk-cat .row.open .det { display: grid; grid-template-columns: 1fr 96px; gap: 12px; align-items: end; }
+.mk-cat .det small { font: 700 9.5px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--mute); } .mk-cat .det p { margin: 6px 0 0; }
+.mk-cat .art { width: 96px; margin: 0; }
+.mk.t-noir .sb-icpt .cts { text-align: center; } .mk.t-noir .sb-icpt .cts div { padding-top: 8px; }
+.mk.t-noir .sb-sort .so.ok { border-color: color-mix(in srgb, var(--acc) 70%, transparent); } .mk.t-noir .sb-sort .so.no { border-color: #7a3a33; }
+.mk.t-noir .sb-sort .so .btns button.right { background: var(--acc); border-color: var(--acc); color: #0c0c0d; } .mk.t-noir .sb-sort .btns button.wrong { background: transparent; border-color: #b4574b; color: #e09a8f; }
+.mk.t-noir .sb-quiz .qdone, .mk.t-noir .sb-quiz .qfeed { border-radius: 2px; }
+.mk.t-noir .sb-quiz .qo.right { border-color: var(--acc); } .mk.t-noir .sb-quiz .qo.right .mk { background: var(--acc); }
+.mk .sb-gauge .gread { flex-direction: column; align-items: center; gap: 2px; margin-top: -14px; }
+.mk.t-haze .sb-gauge .sbtn { align-self: center; height: 40px; padding: 0 20px; border-radius: 20px; font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+.mk.t-tea.full.sm .mk-h { font-size: 37px; }
