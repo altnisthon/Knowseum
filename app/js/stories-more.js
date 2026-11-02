@@ -12,7 +12,7 @@ Object.assign(window.KN_STORY, {
     frames: [
       { cls: 'cover', bg: 'haze-skyline', bgpos: 'center bottom', kick: 'Rider’s choice', h: ['Would you', 'ride today?'],
         body: 'Air quality updates. Real riders. Your call.',
-        blocks: [{ t: 'minigauge', v: 212 }], pill: 'Step inside  →', small: 'Your story. Your decision.', hint: 'Swipe to continue  ↓' },
+        blocks: [{ t: 'minigauge', v: 212 }], pill: 'Step inside  →', small: 'Your story. Your decision.', hint: 'Tap to continue' },
 
       { kick: 'Rider profile · Clementi', h: ['Meet the', 'riders.'],
         body: 'ST spoke to delivery riders around Clementi on 14 Oct. Swipe to meet three of them.',
@@ -93,7 +93,7 @@ Object.assign(window.KN_STORY, {
     frames: [
       { cls: 'center', kick: 'Ukraine · 15 Oct 2026', h: ['Step inside', 'the story'], sub: 'Kirovohrad',
         blocks: [{ t: 'mapcover' }, { t: 'note', dark: true, k: 'Night attack summary', v: 'The largest Russian attack on the region in the war. Three people killed, six wounded.' }],
-        hint: 'Swipe to begin' },
+        hint: 'Tap to begin' },
 
       { cls: 'center', h: ['The scale', ''], sub: 'Drone activity overnight',
         blocks: [{ t: 'scalecards', items: [
@@ -160,7 +160,7 @@ Object.assign(window.KN_STORY, {
     frames: [
       { cls: 'full', bg: 'tea', bgpos: '60% 70%', h: ['Let’s diagnose your', 'Chinese-ness'],
         tag: 'A quick quiz  →', body: '5 quick habits. Zero judgement.',
-        pill: 'Start quiz', hint: 'Swipe up' },
+        pill: 'Start quiz', hint: 'Tap to continue' },
 
       { h: ['Your daily habits,', 'your score.'], body: 'Let’s see how Chinese your life really is, by TikTok’s rules.',
         blocks: [{ t: 'habits', items: ['Drink hot water', 'Wear house slippers', 'Spoon up congee', 'Boil apples', 'Practise qigong in the park'] }],
@@ -175,14 +175,14 @@ Object.assign(window.KN_STORY, {
         blocks: [{ t: 'combine', a: 'China', b: '-maxxing', word: 'Chinamaxxing', def: 'Optimising your whole self around one obsession. This time: being “Chinese”.', more: ['gymmaxxing', 'looksmaxxing', 'fibermaxxing'] }],
         hint: 'Tap Combine' },
 
-      { h: ['Trend vs', 'tradition'], body: 'Swipe to feel the difference. Tap one.',
+      { h: ['Trend vs', 'tradition'], body: 'Feel the difference. Tap one.',
         blocks: [{ t: 'pics', items: [
           { k: 'Trend', img: 'apples', h: 'Boiled apples', s: 'All over TikTok', r: 'A habit you can copy from a video in a day. The column asks if that’s enough to call it a culture.' },
           { k: 'Tradition', img: 'congee', h: 'Congee', s: 'Long before the trend', r: 'For many families it’s just breakfast. That’s the gap the headline points at.' }] }],
         hint: 'Tap the one that feels right' },
 
       { cls: 'full lightbg sm', bg: 'apples', bgpos: 'center 60%', kick: 'Perspective check:', h: ['Grandma boiled apples', 'before it was cool.'],
-        blocks: [{ t: 'react', label: 'Save this vibe' }], hint: 'Swipe up' },
+        blocks: [{ t: 'react', label: 'Save this vibe' }], hint: 'Tap “Save this vibe”' },
 
       { h: ['Appreciation', 'vs costume'], body: 'Where do you land? This is your take, not a fact.',
         blocks: [{ t: 'scale', l: 'Appreciation', r: 'Costume', msgs: ['Respect and curiosity. Learning the why behind a habit makes it more than a trend.', 'Somewhere in between. A habit can be a door in, if you keep going past the video.', 'Dressing up in a culture for views. The headline says it isn’t that simple.'] }],
@@ -190,15 +190,15 @@ Object.assign(window.KN_STORY, {
 
       { cls: 'full brush', bg: 'slippers', bgpos: 'center 70%', h: ['Slippers are not just footwear.', 'They’re a trend now.'],
         body: 'Shuffling around in house slippers is all over “very Chinese time” videos.',
-        blocks: [{ t: 'react', label: 'Agree?', heart: true }], hint: 'Swipe up' },
+        blocks: [{ t: 'react', label: 'Agree?', heart: true }], hint: 'Tap “Agree?”' },
 
       { cls: 'full brush', dark: true, bg: 'hotwater', bgpos: 'center 60%', h: ['Hot water isn’t boring.', 'It’s the #1 habit.'],
         body: 'Sipping hot water tops the Chinamaxxing list.',
-        blocks: [{ t: 'react', label: 'I get it' }], hint: 'Swipe up' },
+        blocks: [{ t: 'react', label: 'I get it' }], hint: 'Tap “I get it”' },
 
       { cls: 'full lightbg', bg: 'congee', bgpos: 'center 40%', h: ['Congee is basically', 'a hug you can eat.'],
         body: 'Spooning up congee is on the list too.',
-        blocks: [{ t: 'react', label: 'Yum' }], hint: 'Swipe up' },
+        blocks: [{ t: 'react', label: 'Yum' }], hint: 'Tap “Yum”' },
 
       { h: ['Different lens,', 'same culture?'], body: 'This piece is a column: a writer arguing a point. Sort each line.',
         blocks: [{ t: 'sort', opts: ['Fact', 'Opinion'], items: [

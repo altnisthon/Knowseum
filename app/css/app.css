@@ -1469,7 +1469,7 @@ img { max-width: 100%; display: block; }
 .mk.t-noir.center .mk-body { align-items: center; text-align: center; } .mk.t-noir.center .blocks { align-self: stretch; text-align: left; }
 .mk.t-noir .mk-kick { font-size: 10px; letter-spacing: .22em; color: var(--mute); } .mk.t-noir .mk-sub { color: var(--fg); opacity: .8; letter-spacing: .22em; }
 .mk.t-noir .mk-pill { background: transparent; border: 1px solid color-mix(in srgb, var(--fg) 50%, transparent); color: var(--fg); border-radius: 2px; font-size: 11px; letter-spacing: .2em; }
-.mk.t-noir .mk-foot .mk-swipe { font-size: 10px; letter-spacing: .24em; } .mk.t-noir .mk-foot .mk-swipe.ready::before { content: '⌄'; display: block; font-size: 16px; line-height: .6; margin-bottom: 4px; }
+.mk.t-noir .mk-foot .mk-swipe { font-size: 10px; letter-spacing: .24em; } 
 .mk.t-noir .mk-x { border-radius: 2px; }
 .mk-mapc svg { width: 100%; display: block; } .mk-mapc .land { fill: #1d1d1f; stroke: #4a4844; stroke-width: .6; }
 .mk-mapc .glow { fill: rgba(217,201,163,.18); stroke: rgba(217,201,163,.6); stroke-width: .6; animation: mapPulse 2.2s ease-out infinite; transform-box: fill-box; transform-origin: center; } .mk-mapc .pin { fill: var(--acc); }
