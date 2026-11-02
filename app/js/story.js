@@ -122,7 +122,7 @@
     bigpic: (b, id) => `<div class="mk-bigpic"><div class="q" data-bq>${b.opts.map((o, i) => `<button class="po" data-x="bigpic" data-b="${id}" data-i="${i}"><span class="L">${'ABC'[i]}.</span><span class="t"><b>${esc(o.h)}</b><small>${esc(o.s)}</small></span><span class="rd"></span></button>`).join('')}</div>
       <div class="bp hide" data-after></div></div>`,
     catlist: (b, id) => `<div class="mk-cat">${b.items.map((it, i) => `<div class="row" data-i="${i}"><button data-x="cat" data-b="${id}" data-i="${i}">${ico(it.ico, 26)}<span>${esc(it.h)}</span><em>${ico('plus', 22)}</em></button>
-      <div class="det"><div class="dh"><b>${esc(it.h)}</b><small>${esc(it.s)}</small></div><p>${esc(it.d)}</p>${art(it.ico)}</div></div>`).join('')}
+      <div class="det"><div><small>${esc(it.s)}</small><p>${esc(it.d)}</p></div>${art(it.ico)}</div></div>`).join('')}
       <div class="mk-src">Tap any card to reveal details</div></div>`,
     scalecards: (b, id) => `<div class="mk-sc">${b.items.map((it, i) => `<button class="c" data-x="sc" data-b="${id}" data-i="${i}">${ico(it.ico, 34)}<div><b>${esc(it.pre || '')}<span data-to>???</span></b><small>${esc(it.k)}</small><p>${esc(it.d)}</p></div><span class="tap">Tap to count</span></button>`).join('')}</div>`,
     tear: (b, id) => `<div class="mk-tear"><svg viewBox="0 0 300 300" preserveAspectRatio="none"><path d="M40 30 L80 52 L96 18 L130 44 L170 10 L190 46 L236 22 L246 70 L290 92 L258 128 L284 170 L246 196 L262 244 L214 246 L196 290 L156 258 L118 288 L96 246 L50 262 L58 214 L12 190 L44 152 L8 116 L52 96 Z"/></svg>
@@ -221,11 +221,11 @@
       ${i ? '<button class="mk-x" data-sx="prev" aria-label="Previous frame"><svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"/></svg></button>' : ''}
       <span class="mk-n">${esc(S.short || '')} · ${i + 1}/${n}</span></div></div>`;
     const H = f.h || [], h = (H[0] || H[1]) ? `<h1 class="mk-h">${H[0] ? `<span>${esc(H[0])}</span>` : ''}${H[1] ? `<em>${esc(H[1])}</em>` : ''}</h1>` : '';
-    const body = `${f.kick ? `<div class="mk-kick">${esc(f.kick)}</div>` : ''}${h}${f.sub ? `<div class="mk-sub">${esc(f.sub)}</div>` : ''}${f.body ? `<p class="mk-lede">${esc(f.body)}</p>` : ''}
+    const body = `${f.kick ? `<div class="mk-kick">${esc(f.kick)}</div>` : ''}${h}${f.sub ? `<div class="mk-sub">${esc(f.sub)}</div>` : ''}${f.tag ? `<div class="mk-src tag">${esc(f.tag)}</div>` : ''}${f.body ? `<p class="mk-lede">${esc(f.body)}</p>` : ''}
       <div class="blocks">${blocks}</div>${f.pill ? `<button class="mk-pill" data-sx="next">${esc(f.pill)}</button>` : ''}${f.small ? `<p class="mk-small">${esc(f.small)}</p>` : ''}
       ${f.end ? `<div class="mk-end"><button class="mk-pill" data-sx="finish">${esc(f.endBtn || 'Back to the wall')}</button><button class="mk-pill ghost" data-act="read-article" data-url="${esc(S.url || '')}">Read the article</button></div>` : ''}`;
     const swipe = th === 'haze' ? 'Swipe to continue  ↓' : th === 'noir' ? (i === 0 ? 'Swipe to begin' : 'Tap to continue') : 'Swipe up';
-    const foot = f.end ? (f.foot ? `<div class="mk-foot"><span class="mk-swipe ready">${esc(f.foot)}</span></div>` : '') : `<div class="mk-foot"><button class="mk-swipe" data-sx="next" data-swipe="${esc(swipe)}">${esc(f.hint)}</button>${th === 'tea' ? `<button class="mk-heart" data-x="heart" aria-label="Like this frame">${ico('heart', 22)}</button>` : ''}</div>`;
+    const foot = f.end ? (f.foot ? `<div class="mk-foot"><span class="mk-swipe ready">${esc(f.foot)}</span></div>` : '') : `<div class="mk-foot">${th === 'tea' ? '<span class="mk-sp"></span>' : ''}<button class="mk-swipe" data-sx="next" data-swipe="${esc(swipe)}">${esc(f.hint)}</button>${th === 'tea' ? `<button class="mk-heart" data-x="heart" aria-label="Like this frame">${ico('heart', 22)}</button>` : ''}</div>`;
     return `<div class="sp mk t-${th} ${f.dark ? 'dk' : 'lt'} ${f.cls || ''}" style="--acc:${S.accent}">${f.bg ? `<div class="mk-bg" style="background-image:url(assets/story/${f.bg}.webp);background-position:${f.bgpos || 'center'}"></div>` : ''}${top}<div class="mk-body">${body}</div>${foot}</div>`;
   }
 
@@ -338,7 +338,7 @@
       p.querySelectorAll('.po').forEach(x => x.classList.toggle('on', x === t));
       const bp = p.querySelector('.bp'); bp.innerHTML = `<div class="lbl2">${esc(b.title || 'Here’s the big picture')}</div><div class="two"><div class="cc"><span class="k">Your choice</span><b>${esc(o.h)}</b><p>${esc(o.c)}</p>${ico('check', 40)}</div><div class="cc"><span class="k">The trade-off</span><b>${esc(o.s)}</b><p>${esc(o.r)}</p>${ico('shield', 40)}</div></div><p class="cap">${esc(b.cap || '')}</p>`;
       bp.classList.remove('hide'); markDone(); },
-    cat: (t, b) => { const row = t.closest('.row'); row.classList.toggle('open'); row.classList.add('seen'); const p = t.closest('.mk-cat'); if (!p.querySelector('.row:not(.seen)')) markDone(); },
+    cat: (t, b) => { const row = t.closest('.row'), was = row.classList.contains('open'); row.parentElement.querySelectorAll('.row.open').forEach(r => r.classList.remove('open')); row.classList.toggle('open', !was); row.classList.add('seen'); const p = t.closest('.mk-cat'); if (!p.querySelector('.row:not(.seen)')) markDone(); },
     sc: (t, b) => { if (t.classList.contains('on')) return; t.classList.add('on'); const n = t.querySelector('[data-to]'), it = b.items[+t.dataset.i]; n.textContent = '0'; countUp(n, String(it.n));
       if (!t.parentElement.querySelector('.c:not(.on)')) markDone(); },
     tear: t => { t.classList.add('hide'); after(t.parentElement); markDone(); },

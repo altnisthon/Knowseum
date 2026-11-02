@@ -63,7 +63,7 @@ Object.assign(window.KN_STORY, {
           { h: 'Take the day off', s: 'No pay, no haze', c: 'Zareth Tan did this after his eyes got itchy.', r: 'Your lungs get a break. Your wallet doesn’t.' }] }],
         hint: 'Tap your answer  ↑' },
 
-      { dark: true, kick: 'A rider’s advice', h: ['', ''],
+      { dark: true, cls: 'mid', kick: 'A rider’s advice', h: ['', ''],
         body: 'Darren Tan caught Covid-19 three times while delivering in the pandemic. Before riding off into the haze, he had one tip.',
         blocks: [{ t: 'quote2', a: 'Wear your', b: 'mask.', by: 'Darren Tan, 49', sub: 'Delivery rider for about 10 years' }],
         hint: 'Tap the quote' },
@@ -159,7 +159,7 @@ Object.assign(window.KN_STORY, {
     url: 'https://www.pressreader.com/singapore/the-straits-times/20260301/281844355118509',
     frames: [
       { cls: 'full', bg: 'tea', bgpos: '60% 70%', h: ['Let’s diagnose your', 'Chinese-ness'],
-        blocks: [{ t: 'src', v: 'A quick quiz  →', tag: true }], body: '5 quick habits. Zero judgement.',
+        tag: 'A quick quiz  →', body: '5 quick habits. Zero judgement.',
         pill: 'Start quiz', hint: 'Swipe up' },
 
       { h: ['Your daily habits,', 'your score.'], body: 'Let’s see how Chinese your life really is, by TikTok’s rules.',
@@ -181,7 +181,7 @@ Object.assign(window.KN_STORY, {
           { k: 'Tradition', img: 'congee', h: 'Congee', s: 'Long before the trend', r: 'For many families it’s just breakfast. That’s the gap the headline points at.' }] }],
         hint: 'Tap the one that feels right' },
 
-      { cls: 'full lightbg', bg: 'apples', bgpos: 'center 60%', kick: 'Perspective check:', h: ['Your grandma boiled apples', 'before it was cool.'],
+      { cls: 'full lightbg sm', bg: 'apples', bgpos: 'center 60%', kick: 'Perspective check:', h: ['Grandma boiled apples', 'before it was cool.'],
         blocks: [{ t: 'react', label: 'Save this vibe' }], hint: 'Swipe up' },
 
       { h: ['Appreciation', 'vs costume'], body: 'Where do you land? This is your take, not a fact.',
