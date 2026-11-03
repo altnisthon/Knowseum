@@ -17,7 +17,7 @@
     geo: { name: 'GeoGuessr', sub: 'Read the clue, drop a pin', how: 'Read the clue, then tap the map where you think it is. The closer your pin, the more points, plus a fun fact about the place.', ico: 'globe' },
     wiki: { name: 'Wikirace', sub: 'Click links to reach the target page', how: 'Start on one page and reach the target page using only the blue links. Fewest clicks wins.', ico: 'race' },
     guesswho: { name: 'Guess Who', sub: '5 cards, 5 facts, 1 MP', how: 'Five MPs, one answer. Facts drip in one by one: flip down anyone they rule out, then make your guess. The fewer facts you need, the more points. 4 rounds, 2 PAP and 2 WP answers.', ico: 'who' },
-    hole: { name: 'Hole-some Recycling', sub: 'Swallow the recyclables', how: 'Drag your hole around the floor. Recyclables make it grow, trash shrinks it. Each wave adds a stricter rule, and empty bottles earn 10¢ to spend on perks.', ico: 'leaf' },
+    hole: { name: 'Hole-some Recycling', sub: 'Swallow the recyclables', how: 'Drag your hole around the floor. Recyclables make it grow, trash shrinks it. Reach the goal before the clock runs out: right items add 3 seconds (up to the starting time), wrong ones take 3 off. Each wave adds a stricter rule, and empty bottles earn 10¢ to spend on perks.', ico: 'leaf' },
     realfake: { name: 'Real or Fake?', sub: 'Spot AI images and fake news', how: 'Real photo or AI? Real headline or fake news? Three rounds, each one harder. Get one wrong and you get a tip for next time.', ico: 'eye' },
   };
   const ICO = {
@@ -263,6 +263,7 @@
     frog: '<ellipse cx="12" cy="15" rx="8" ry="6" fill="#57b05e" stroke="#1c1b19"/><circle cx="8" cy="9" r="3" fill="#57b05e" stroke="#1c1b19"/><circle cx="16" cy="9" r="3" fill="#57b05e" stroke="#1c1b19"/><circle cx="8" cy="9" r="1.3" fill="#1c1b19"/><circle cx="16" cy="9" r="1.3" fill="#1c1b19"/><path d="M8 16c2 2 6 2 8 0" stroke="#1c1b19" fill="none"/><path d="M6 21l2-3M18 21l-2-3" stroke="#1c1b19"/><path d="M4 8l4-3 4 3" fill="#d6544b" stroke="#1c1b19" stroke-width=".8"/>',
   };
   const iic = (k, s) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">${II[k] || ''}</svg>`;
+  const TIME_BONUS = 3; // seconds added for a right item, taken off for a wrong one
   const HG = {
     H() { return D().hole; },
     start() { st.w = 0; st.coins = 0; st.total = 0; st.cleared = 0; st.perks = {}; HG.intro(); },
@@ -275,7 +276,7 @@
       const tag = k => { const t = HG.kindOf(k); return t.good ? 'good' : 'bad'; };
       body().innerHTML = `<div class="hg-intro rise"><span class="k">Wave ${st.w + 1} · ${esc(w.name)}</span><p class="rule">${esc(w.rule)}</p>
         <div class="hg-legend">${keys.map(k => `<span class="it ${tag(k)} ${prev.has(k) ? '' : 'nw'}">${iic(k, 26)}<small>${esc(H.items[k][0])}</small></span>`).join('')}</div>
-        <div class="hg-stats"><span>Goal <b>${w.goal}</b> pts</span><span>Time <b>${w.time}s</b></span><span class="coins">${iic('bottle', 16)} <b>${st.coins}</b> × 10¢</span></div>
+        <div class="hg-stats"><span>Goal <b>${w.goal}</b> pts</span><span>Time <b>${w.time}s</b> <small class="tb">+3s right (max ${w.time}s) · −3s wrong</small></span><span class="coins">${iic('bottle', 16)} <b>${st.coins}</b> × 10¢</span></div>
         <p class="mg-hint">Drag the hole around. You can only swallow things smaller than the hole.</p>
         <button class="btn acc" data-mx="hg-go">Start wave ${st.w + 1}</button></div>`;
     },
@@ -304,7 +305,7 @@
       f.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') mv(e); });
       for (let i = 0; i < 9; i++) HG.spawn(true);
       HG.perkUI();
-      st.timer = setInterval(() => { if (!st.run) return; st.left--; const t = body().querySelector('#hgt'); if (t) t.textContent = st.left; if (st.left <= 0) HG.stop(); }, 1000);
+      st.timer = setInterval(() => { if (!st.run) return; HG.clock(-1); }, 1000);
       requestAnimationFrame(HG.loop);
     },
     spawn(init) {
@@ -333,7 +334,7 @@
         if (it.x < it.s / 2 || it.x > st.W - it.s / 2) it.vx *= -1; if (it.y < it.s / 2 || it.y > st.Hh - it.s / 2) it.vy *= -1;
         const d = Math.hypot(it.x - st.hx, it.y - st.hy);
         if (d < st.r * .95) {
-          if (it.s < st.r * 1.9) HG.eat(it);
+          if (it.s < st.r * 1.9) { HG.eat(it); if (!st.run) return; } // eating can end the wave
           else { const a = Math.atan2(it.y - st.hy, it.x - st.hx); it.x = st.hx + Math.cos(a) * (st.r + 2); it.y = st.hy + Math.sin(a) * (st.r + 2); it.el.classList.add('big'); }
         } else it.el.classList.remove('big');
         HG.place(it);
@@ -347,7 +348,7 @@
         if (!st.lick || now - st.lick > 650) {
           const tgt = st.items.filter(i => !i.gone && HG.kindOf(i.k, i.washed).good && Math.hypot(i.x - fx, i.y - fy) < 170).sort((a, b) => Math.hypot(a.x - fx, a.y - fy) - Math.hypot(b.x - fx, b.y - fy))[0];
           if (tgt) { st.lick = now; const l = body().querySelector('#hgtg line'); l.setAttribute('x1', fx); l.setAttribute('y1', fy); l.setAttribute('x2', tgt.x); l.setAttribute('y2', tgt.y);
-            body().querySelector('#hgtg').classList.add('on'); setTimeout(() => body().querySelector('#hgtg')?.classList.remove('on'), 220); HG.eat(tgt, true); }
+            body().querySelector('#hgtg').classList.add('on'); setTimeout(() => body().querySelector('#hgtg')?.classList.remove('on'), 220); HG.eat(tgt, true); if (!st.run) return; }
         }
       } else fr.classList.add('hide');
       requestAnimationFrame(HG.loop);
@@ -368,8 +369,19 @@
       const w = HG.H().waves[st.w];
       body().querySelector('#hgbar').style.width = Math.min(100, st.pts / w.goal * 100) + '%';
       body().querySelector('#hgpts').textContent = `${st.pts} / ${w.goal}`; body().querySelector('#hgc').textContent = st.coins;
+      HG.clock(res.good ? TIME_BONUS : -TIME_BONUS, true); // last: may end the wave
+      if (st.run && st.pts >= w.goal) HG.stop(); // goal reached: wave cleared straight away
     },
     float(x, y, t, c) { const f = body().querySelector('#hgf'); if (!f) return; const e = document.createElement('span'); e.className = 'hg-float ' + c; e.textContent = t; e.style.left = x + 'px'; e.style.top = y + 'px'; f.appendChild(e); setTimeout(() => e.remove(), 900); },
+    // change the clock; flash = show +3s / -3s on the timer
+    clock(d, flash) {
+      if (!st.run) return;
+      const max = HG.H().waves[st.w].time, before = st.left; // the clock never goes above the wave's starting time
+      st.left = Math.max(0, Math.min(max, st.left + d));
+      const t = body().querySelector('#hgt');
+      if (t) { t.textContent = st.left; if (flash) { t.dataset.d = d > 0 ? (st.left > before ? '+' + (st.left - before) + 's' : 'Max') : '−' + Math.abs(d) + 's'; t.classList.remove('up', 'down'); void t.offsetWidth; t.classList.add(d > 0 ? 'up' : 'down'); } t.classList.toggle('low', st.left <= 5); }
+      if (st.left <= 0) HG.stop();
+    },
     perkUI() { body().querySelectorAll('.hg-perk').forEach(b => { const n = st.perks[b.dataset.v] || 0; b.querySelector('small').textContent = n ? (b.dataset.v === 'nty' ? `${st.nty ? 'On' : 'Off'} · ×${n}` : `×${n}`) : 'Used up'; b.disabled = !n; b.classList.toggle('off', !n); b.classList.toggle('act', b.dataset.v === 'nty' && st.nty); }); },
     perk(k) {
       if (!st.run || !(st.perks[k] > 0)) return;
