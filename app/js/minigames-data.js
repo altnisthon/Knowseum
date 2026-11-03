@@ -205,21 +205,23 @@ window.KN_MINI = {
       battery: ['Battery', 18, 'ewaste'], phone: ['Old phone', 24, 'ewaste'], bank: ['Powerbank', 26, 'ewaste'], toy: ['Soft toy', 36, 'trash'],
       crushed: ['Crushed bottle', 22, 'crushed'], full: ['Half-full bottle', 26, 'full'],
     },
-    // dirty items count as recyclable in wave 1 (rule not taught yet) and as contamination from wave 2
+    // time: seconds on the clock at the start of the wave. Every right item adds 3 s, every wrong one takes 3 s off
+  // (see TIME_BONUS in js/minigames.js).
+  // dirty items count as recyclable in wave 1 (rule not taught yet) and as contamination from wave 2
     waves: [
-      { name: 'Blue bin basics', time: 40, goal: 90, spawn: ['bottle', 'can', 'paper', 'box', 'jar', 'mag', 'tissue', 'peel', 'foam'],
+      { name: 'Blue bin basics', time: 30, goal: 90, spawn: ['bottle', 'can', 'paper', 'box', 'jar', 'mag', 'tissue', 'peel', 'foam'],
         rule: 'Swallow what goes in the blue bin. Food, tissue and styrofoam shrink your hole.',
         learn: 'About 40% of what goes into recycling bins in Singapore can’t be recycled because it’s contaminated.' },
-      { name: 'Rinse it first', time: 40, goal: 130, spawn: ['bottle', 'can', 'paper', 'box', 'carton', 'cup', 'pizza', 'tub', 'dbottle', 'tissue', 'cutlery'],
+      { name: 'Rinse it first', time: 30, goal: 130, spawn: ['bottle', 'can', 'paper', 'box', 'carton', 'cup', 'pizza', 'tub', 'dbottle', 'tissue', 'cutlery'],
         rule: 'New rule: dirty items now cost you. Stained cups, greasy pizza boxes and unrinsed bottles are contamination.',
         learn: 'Food and grease can spoil a whole bin of clean recyclables. Empty it, rinse it, then recycle it.' },
-      { name: 'Not for the blue bin', time: 40, goal: 160, spawn: ['bottle', 'can', 'paper', 'box', 'jar', 'carton', 'battery', 'phone', 'bank', 'toy', 'cup', 'foam'],
+      { name: 'Not for the blue bin', time: 15, goal: 160, spawn: ['bottle', 'can', 'paper', 'box', 'jar', 'carton', 'battery', 'phone', 'bank', 'toy', 'cup', 'foam'],
         rule: 'New rule: batteries, phones and powerbanks are e-waste. They go to e-waste points, never the blue bin.',
         learn: 'E-waste like batteries and powerbanks can catch fire in recycling trucks. Drop them at an e-waste collection point.' },
-      { name: 'Empty and uncrushed', time: 40, goal: 180, spawn: ['bottle', 'can', 'crushed', 'full', 'paper', 'box', 'mag', 'tub', 'dbottle', 'battery', 'peel'],
+      { name: 'Empty and uncrushed', time: 15, goal: 180, spawn: ['bottle', 'can', 'crushed', 'full', 'paper', 'box', 'mag', 'tub', 'dbottle', 'battery', 'peel'],
         rule: 'New rule: half-full bottles are a mess. Crushed bottles still recycle, but they earn no 10¢ deposit.',
         learn: 'Since 1 April 2026, drinks with the deposit mark cost 10¢ more. Return them empty and uncrushed to a reverse vending machine to get it back.' },
-      { name: 'Rush hour', time: 45, goal: 220, fast: true, spawn: ['bottle', 'can', 'crushed', 'full', 'paper', 'box', 'jar', 'carton', 'mag', 'cup', 'pizza', 'tub', 'dbottle', 'battery', 'phone', 'bank', 'toy', 'tissue', 'peel', 'foam', 'cutlery'],
+      { name: 'Rush hour', time: 15, goal: 220, fast: true, spawn: ['bottle', 'can', 'crushed', 'full', 'paper', 'box', 'jar', 'carton', 'mag', 'cup', 'pizza', 'tub', 'dbottle', 'battery', 'phone', 'bank', 'toy', 'tissue', 'peel', 'foam', 'cutlery'],
         rule: 'Everything at once, and it keeps coming. Every rule still counts.',
         learn: 'Not sure about an item? NEA’s recycling guide and its Bloobin chatbot tell you which bin it goes in.' },
     ],

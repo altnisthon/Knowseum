@@ -1550,3 +1550,13 @@ img { max-width: 100%; display: block; }
 .mk .sb-gauge .gread { flex-direction: column; align-items: center; gap: 2px; margin-top: -14px; }
 .mk.t-haze .sb-gauge .sbtn { align-self: center; height: 40px; padding: 0 20px; border-radius: 20px; font: 700 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; }
 .mk.t-tea.full.sm .mk-h { font-size: 37px; }
+/* Hole-some Recycling: time bonus / penalty on the clock */
+.hg-hud .t { position: relative; transition: background .2s; }
+.hg-hud .t::after { content: attr(data-d); position: absolute; left: 50%; top: 100%; transform: translateX(-50%); font: 800 12px var(--mono); white-space: nowrap; opacity: 0; pointer-events: none; }
+.hg-hud .t.up { animation: hgUp .5s var(--spring); } .hg-hud .t.up::after { color: #2e8b57; animation: hgTag .9s ease-out; }
+.hg-hud .t.down { animation: hgDown .45s; } .hg-hud .t.down::after { color: #d6544b; animation: hgTag .9s ease-out; }
+.hg-hud .t.low { background: #d6544b; }
+@keyframes hgDown { 0%, 60% { background: #d6544b; } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } }
+@keyframes hgUp { 40% { transform: scale(1.25); background: #2e8b57; } }
+@keyframes hgTag { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, 14px); } }
+.hg-stats .tb { display: block; font-size: 10.5px; font-weight: 600; opacity: .7; }
