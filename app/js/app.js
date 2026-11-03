@@ -7,7 +7,7 @@ const KN = window.KN;
 const ART = KN.articles;
 const LV = Object.fromEntries(KN.levels.map(l => [l.key, l]));
 const LEVELS = ['easy', 'mid', 'hard'];
-const OPEN = ['singapore', 'politics', 'tech'];
+const OPEN = ['singapore', 'politics', 'tech', 'environment', 'world'];
 const OUTFITS = KNAvatar.OUTFITS, CATS = KNAvatar.CATS;
 const ACCS = [['headphones', 'Headphones'], ['cat', 'Cat buddy'], ['camera', 'Camera'], ['backpack', 'Backpack'], ['bucket', 'Bucket hat'], ['bubbletea', 'Bubble tea']];
 const SECRETS = [
@@ -19,8 +19,10 @@ const SECRETS = [
 const EARNED = [
   { key: 'gradcap', name: 'Grad cap', art: 'politics', bonus: true, how: 'Finish SG Politics' }, { key: 'teamcap', name: 'Team cap', art: 'singapore', bonus: true, how: 'Finish Singapore' },
   { key: 'cyberhoodie', name: 'Cyber hoodie', art: 'tech', bonus: true, how: 'Finish Tech' }, { key: 'glasses', name: 'Round glasses', art: 'politics', item: 'Round glasses', how: '5/5 · SG Politics Not bad leh' },
-  { key: 'gloves', name: 'Racing gloves', art: 'singapore', item: 'Racing gloves', how: '5/5 · Singapore Not bad leh' }, { key: 'pixel', name: 'Pixel shades', art: 'tech', item: 'Pixel shades', how: '5/5 · Tech Not bad leh' }];
-const BONUS_ACC = { 'Grad cap': 'gradcap', 'Team cap': 'teamcap', 'Cyber hoodie': 'cyberhoodie' };
+  { key: 'gloves', name: 'Racing gloves', art: 'singapore', item: 'Racing gloves', how: '5/5 · Singapore Not bad leh' }, { key: 'pixel', name: 'Pixel shades', art: 'tech', item: 'Pixel shades', how: '5/5 · Tech Not bad leh' },
+  { key: 'riderhelmet', name: 'Rider helmet', art: 'environment', bonus: true, how: 'Finish Environment' }, { key: 'presshelmet', name: 'Press helmet', art: 'world', bonus: true, how: 'Finish World' },
+  { key: 'n95', name: 'N95 mask', art: 'environment', item: 'N95 mask', how: '5/5 · Environment Not bad leh' }, { key: 'binoculars', name: 'Binoculars', art: 'world', item: 'Binoculars', how: '5/5 · World Not bad leh' }];
+const BONUS_ACC = { 'Grad cap': 'gradcap', 'Team cap': 'teamcap', 'Cyber hoodie': 'cyberhoodie', 'Rider helmet': 'riderhelmet', 'Press helmet': 'presshelmet' };
 const W_ = window.KN_WORLD;
 const device = document.getElementById('device');
 
@@ -32,7 +34,9 @@ const fresh = () => ({
 });
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)) || fresh(); } catch (e) { S = fresh(); }
-S.topic = S.topic || {}; S.wstory = S.wstory || {}; S.tips = S.tips || {}; S.mini = S.mini || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
+S.topic = S.topic || {}; S.wstory = S.wstory || {};
+OPEN.forEach(k => { if (!S.arts[k]) S.arts[k] = { runs: 0, seenLevel: 0, story: !!S.wstory[k], persp: false, best: { easy: null, mid: null, hard: null }, stamps: {}, items: [], bonus: false }; });
+ S.tips = S.tips || {}; S.mini = S.mini || {}; S.tipHidden = S.tipHidden || {}; S.seenSecrets = S.seenSecrets || [];
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 const today = () => new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const points = () => OPEN.reduce((t, k) => t + LEVELS.reduce((u, l) => u + (S.arts[k].best[l] || 0) * LV[l].mult, 0), 0);
@@ -426,7 +430,7 @@ function walkTo(elId, x, y, w, h, then) {
 // progress that unlocks furniture in a wing: every quiz level finished (or the warm-up quiz) plus every mini game played there, replays included
 const miniPlays = k => Object.values(S.mini[k] || {}).reduce((t, r) => t + (r.plays || 1), 0);
 function wingRuns(k) {
-  const quizzes = ART[k] ? ((S.arts[k] && S.arts[k].runs) || 0) : (S.topic[k] ? 1 : 0) + (S.wstory[k] ? 1 : 0);
+  const quizzes = ART[k] ? ((S.arts[k] && S.arts[k].runs) || 0) + (S.topic[k] ? 1 : 0) : (S.topic[k] ? 1 : 0) + (S.wstory[k] ? 1 : 0);
   return quizzes + miniPlays(k);
 }
 function furnLevel(k) { return Math.min(3, wingRuns(k)); }
@@ -556,11 +560,10 @@ function topicQuiz(k) {
 // --- newsworthy wall
 // wings whose story is on the wall but whose activities aren't built yet (headline + painting only)
 const WALL_ONLY = {
-  environment: { headline: '\u2018Why would I want to harm myself?\u2019: Some delivery riders look to cut hours as haze worsens', painting: 'haze', topic: 'Haze and delivery riders', src: 'The Straits Times', date: '15 Oct 2026', url: 'https://sg.news.yahoo.com/why-want-harm-myself-delivery-092020108.html' },
   culture: { headline: 'Chinamaxxing? Boiling apples won\u2019t make you Chinese', painting: 'chinamaxxing', topic: 'Chinamaxxing', src: 'The Straits Times', date: '1 Mar 2026', url: 'https://www.pressreader.com/singapore/the-straits-times/20260301/281844355118509' },
-  world: { headline: 'Central Ukrainian region hit by vast drone attack, killing three', painting: 'ukraine', topic: 'Drone attack in Ukraine', src: 'Reuters \u00b7 The Straits Times', date: '15 Oct 2026', url: 'https://www.straitstimes.com/world/europe/central-ukrainian-region-hit-by-vast-drone-attack-killing-three' },
 };
-const ARTICLE_URL = { politics: 'https://sg.news.yahoo.com/govts-must-incentivise-private-sector-115433630.html', singapore: 'https://www.redhot.sg/mercedes-kimi-antonelli-within-touching-distance-of-maiden-f1-title-after-finishing-3rd-at-s-pore-gp-726764.html', tech: 'https://sg.news.yahoo.com/anthropic-signs-mou-singapore-evaluate-083000721.html' };
+const ARTICLE_URL = { politics: 'https://sg.news.yahoo.com/govts-must-incentivise-private-sector-115433630.html', singapore: 'https://www.redhot.sg/mercedes-kimi-antonelli-within-touching-distance-of-maiden-f1-title-after-finishing-3rd-at-s-pore-gp-726764.html', tech: 'https://sg.news.yahoo.com/anthropic-signs-mou-singapore-evaluate-083000721.html',
+  environment: 'https://www.asiaone.com/singapore/haze-delivery-rider-health', world: 'https://www.straitstimes.com/world/europe/central-ukrainian-region-hit-by-vast-drone-attack-killing-three' };
 const wallArt = k => ART[k] || (() => { const w = KN.wings.find(x => x.key === k), o = WALL_ONLY[k]; return { ...o, color: w.color, tint: w.tint, wingName: w.name + ' Wing', only: true }; })();
 const WALL_PH = [{ img: 'blur1', t: 'A new story lands on this wall next week' }, { img: 'blur2', t: 'Another headline is on its way' }, { img: null, t: 'More stories from this wing, coming soon' }];
 let wallIdx = 0;
@@ -585,7 +588,7 @@ function wallInfo(k, i) {
     <div class="acts locked">${['Step into the story', 'Perspectives', 'Quiz'].map((n, j) => `<button class="act ph rise" data-act="wall-soon" style="animation-delay:${j * .05}s"><span class="lk">${ic('lock', 18, '#9d988f', 2)}</span><b>${n}</b><small>Soon</small></button>`).join('')}</div>`;
   }
   return `<div class="plaque rise"><div class="label">${a.wingName} · Frame 1 of ${N}</div><h2>${esc(a.headline)}</h2>
-    <div class="row"><span>The Straits Times · ${a.date}</span><button data-act="read-article" data-url="${ARTICLE_URL[k] || ''}">${ic('book', 15)} Read article</button></div></div>
+    <div class="row"><span>${a.press || 'The Straits Times'} · ${a.date}</span><button data-act="read-article" data-url="${ARTICLE_URL[k] || ''}">${ic('book', 15)} Read article</button></div></div>
   <div class="acts-h"><span class="label" style="color:var(--ink)">Pick an activity · any order</span><span class="ascii" style="color:${a.color}">[${'#'.repeat([st.story, st.persp, lvDone === 3].filter(Boolean).length)}${'-'.repeat(3 - [st.story, st.persp, lvDone === 3].filter(Boolean).length)}]</span></div>
   <div class="acts">
     <button class="act story rise" data-act="story" data-v="${k}"><span class="play">${ic('play', 18, '#fff', 2, '#fff')}</span><b>Step into the story</b><small>${KNStory.count(k)} frames</small>${st.story ? `<span class="tick-badge">${tick(16, '#fff', 3)}</span>` : ''}</button>
@@ -882,14 +885,14 @@ SCREENS.passport = () => {
   <button class="strip paper rise" data-act="to-stamps" style="width:calc(100% - 32px)">${show.length ? show.map((s, i) => `<img src="assets/stamps/${s}.webp" alt="" style="transform:rotate(${[-8, 6, -3][i]}deg)">`).join('') : '<span class="empty">Finish any quiz level to get your first stamp.</span>'}</button>
   <div class="sec-h"><h3>Badges<small>${S.badges.length} earned</small></h3><button data-act="to-badges">See all ${ic('chev', 14, '#1c1b19', 2.2)}</button></div>
   ${row(`${S.streak} day streak`, BK('streak'), S.streak, 'flame')}${row(`${S.quizzesDone} quizzes done`, BK('quiz'), S.quizzesDone, 'book')}
-  ${row(`${OPEN.filter(k => S.arts[k].bonus).length} of 3 articles complete`, ALLB.filter(b => b.kind === 'article'), 0, 'spark')}
+  ${row(`${OPEN.filter(k => S.arts[k].bonus).length} of ${OPEN.length} articles complete`, ALLB.filter(b => b.kind === 'article'), 0, 'spark')}
   ${row(`${miniCount()} of ${MINI_TOTAL} mini games played`, BK('mini').filter(isEarned).concat(BK('mini').filter(b => !isEarned(b))), miniCount(), 'map')}`;
 };
 let stampWing = 'singapore', newStamp = null;
 SCREENS.stamps = () => {
   const k = stampWing, a = ART[k], st = S.arts[k];
   return `${topbar('Stamps', `${stampCount()} of 18 collected`, 'to-passport')}
-  <div class="wingchips">${OPEN.map(w => `<button class="${w === k ? 'on' : ''}" data-act="stamp-wing" data-v="${w}">${ART[w].name}<span class="n">${Object.keys(S.arts[w].stamps).length}/3</span></button>`).join('')}<button disabled style="border-style:dashed;color:var(--mute)">+3 soon</button></div>
+  <div class="wingchips">${OPEN.map(w => `<button class="${w === k ? 'on' : ''}" data-act="stamp-wing" data-v="${w}">${ART[w].name}<span class="n">${Object.keys(S.arts[w].stamps).length}/3</span></button>`).join('')}<button disabled style="border-style:dashed;color:var(--mute)">+${KN.wings.length - OPEN.length} soon</button></div>
   <div class="page paper rise"><div class="ph"><span class="label">${a.wingName}</span><b>${esc(a.topic)}</b></div>
     ${LEVELS.map((l, i) => { const d = st.stamps[l], rot = [-6, 7, -3][i];
       return `<div class="slot ${i === 1 ? 'rev' : ''}">${d ? `<button class="st ${newStamp === k + l ? 'new' : ''}" data-act="stamp-detail" data-v="${l}" aria-label="${LV[l].name} stamp"><img src="assets/stamps/stamp-${k}-${l}.webp" alt="" style="transform:rotate(${rot}deg)"></button>

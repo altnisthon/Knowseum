@@ -873,6 +873,583 @@ window.KN = {
     "item": "Cyber hoodie",
     "where": "Make your look"
    }
+  },
+  "environment": {
+   "key": "environment",
+   "name": "Environment",
+   "wingName": "Environment Wing",
+   "color": "#2f5e48",
+   "tint": "#d6e4da",
+   "painting": "haze",
+   "author": "Joyce ZK Lim",
+   "date": "15 Oct 2026",
+   "bonusLook": "Rider helmet",
+   "badgeArt": "article-environment",
+   "titles": [
+    "Cover: Would you ride today?",
+    "Meet the riders",
+    "Shift simulator",
+    "PSI right now",
+    "3 reasons to rethink today's shift",
+    "Myth or fact",
+    "What the apps are doing",
+    "The big picture",
+    "A rider's advice",
+    "Quick quiz",
+    "Story complete",
+    "Thank you, rider"
+   ],
+   "topic": "Riding through the haze",
+   "headline": "‘Why would I want to harm myself?’: Some delivery riders look to cut hours as haze worsens",
+   "source": "The Straits Times · Joyce ZK Lim · 15 Oct 2026",
+   "short": "Haze riders",
+   "parties": [
+    {
+     "key": "amri",
+     "name": "Md Amri",
+     "role": "Part-time food delivery rider, 40",
+     "ini": "MA",
+     "color": "#2f5e48",
+     "short": "Rider, part-time",
+     "time": "8:10 PM"
+    },
+    {
+     "key": "darren",
+     "name": "Darren Tan",
+     "role": "Food delivery rider for about 10 years, 49",
+     "ini": "DT",
+     "color": "#c8501a",
+     "short": "Rider, full-time",
+     "time": "8:14 PM"
+    },
+    {
+     "key": "grab",
+     "name": "Grab",
+     "role": "Delivery platform (spokesperson)",
+     "ini": "GR",
+     "color": "#5b76b0",
+     "short": "Platform",
+     "time": "8:18 PM"
+    }
+   ],
+   "thread": [
+    {
+     "key": "amri",
+     "msgs": [
+      "Sore throat and a cough already, all from the haze.",
+      "I threw away my sweaty mask today, but I'll wear one again tomorrow.",
+      "I do part-time delivery to help pay off my car. A 2.5-hour shift gets me about $50 to $70.",
+      "When it gets really hazardous, I won't go out. Why would I want to harm myself?"
+     ]
+    },
+    {
+     "key": "darren",
+     "msgs": [
+      "I'd rather stay off the roads in this haze, honestly.",
+      "But with fewer riders out and more people ordering in, the ones still riding could earn more.",
+      "I do about 10 hours a day, six days a week. That's around $200 a shift, before petrol and CPF.",
+      "I caught Covid three times delivering during the pandemic. So: wear your mask."
+     ]
+    },
+    {
+     "key": "grab",
+     "msgs": [
+      "Our riders have full autonomy to prioritise their personal safety and comfort.",
+      "We give N95 masks to riders who choose to keep working.",
+      "Our health advisories remind them to hydrate, take breaks and see a doctor if they feel unwell."
+     ]
+    }
+   ],
+   "you": [
+    "So what does this mean for us in Singapore?",
+    "When the 24-hour PSI goes above 200, the air is “very unhealthy”. It hit 212 in the west on 15 Oct.",
+    "The riders bringing your food breathe that air for hours. Some are cutting back to stay well; others keep going because they need the pay.",
+    "If your order is slower on a haze day, there's a person on a bike behind it."
+   ],
+   "threadDay": "Thu, 15 Oct",
+   "threadTime": "8:10 PM",
+   "quiz": {
+    "easy": [
+     {
+      "q": "What did the 24-hour PSI hit in western Singapore on 15 Oct?",
+      "opts": [
+       "112",
+       "162",
+       "212",
+       "312"
+      ],
+      "ans": 2,
+      "why": "212, which is “very unhealthy”. It was a new high for the year."
+     },
+     {
+      "q": "Where were the riders ST spoke to working?",
+      "opts": [
+       "Clementi",
+       "Tampines",
+       "Woodlands",
+       "Orchard Road"
+      ],
+      "ans": 0,
+      "why": "ST spoke to riders around Clementi. One photo shows a rider collecting an order at Clementi Mall."
+     },
+     {
+      "q": "What are some riders doing to protect their health?",
+      "opts": [
+       "Switching to cars",
+       "Cutting back their working hours",
+       "Moving to night shifts only",
+       "Stopping deliveries for a month"
+      ],
+      "ans": 1,
+      "why": "Some riders said they are prepared to cut back on working hours as the haze worsens."
+     },
+     {
+      "q": "Which two delivery platforms are named in the article?",
+      "opts": [
+       "Grab and Foodpanda",
+       "Deliveroo and Uber Eats",
+       "Shopee and Lazada",
+       "Gojek and Lalamove"
+      ],
+      "ans": 0,
+      "why": "Grab and Foodpanda both said how they are helping riders in the haze."
+     },
+     {
+      "q": "How did riders in Clementi say the haze affected them?",
+      "opts": [
+       "Itchy skin",
+       "Irritated eyes and sore throats",
+       "Sore backs",
+       "Blurry phone screens"
+      ],
+      "ans": 1,
+      "why": "Riders said their eyes were irritated and their throats sore after hours on the roads."
+     }
+    ],
+    "mid": [
+     {
+      "q": "The one-hour PM2.5 reading in the west hit 288 on 14 Oct. Why does that stand out?",
+      "opts": [
+       "It was the highest ever recorded",
+       "It was the highest since 2015",
+       "It was the lowest this year",
+       "It was the highest since 1997"
+      ],
+      "ans": 1,
+      "why": "It was the highest level since 2015, so the haze has been worse before."
+     },
+     {
+      "q": "How much does Md Amri earn for a 2.5-hour shift?",
+      "opts": [
+       "About $20 to $30",
+       "About $50 to $70",
+       "About $100 to $120",
+       "About $200"
+      ],
+      "ans": 1,
+      "why": "About $50 to $70. He delivers part-time to help pay off his car."
+     },
+     {
+      "q": "About how much does Darren Tan earn for a 10-hour shift?",
+      "opts": [
+       "$100, after petrol",
+       "$150, after CPF",
+       "$200, before petrol and CPF",
+       "$300, before petrol"
+      ],
+      "ans": 2,
+      "why": "About $200, before costs like petrol and CPF contributions."
+     },
+     {
+      "q": "What does Foodpanda’s app feature let riders do?",
+      "opts": [
+       "Skip orders with no penalty",
+       "Take short breaks without losing applicable incentives",
+       "Choose only short trips",
+       "Get paid double in the haze"
+      ],
+      "ans": 1,
+      "why": "Riders can take short breaks without losing applicable incentives. Foodpanda also gives air-quality advisories and flexible hours."
+     },
+     {
+      "q": "Who can get free N95 masks through the initiative Grab supports?",
+      "opts": [
+       "Every Singapore resident",
+       "Members of the National Delivery Champions Association",
+       "Only riders over 40",
+       "Customers who order twice"
+      ],
+      "ans": 1,
+      "why": "Grab supports an initiative giving free N95 masks to riders who are members of the National Delivery Champions Association."
+     }
+    ],
+    "hard": [
+     {
+      "q": "Why might riders who keep working earn more during the haze?",
+      "opts": [
+       "Pay doubles once the PSI passes 200",
+       "Fewer riders are out while more people order in",
+       "The Government pays a haze bonus",
+       "Petrol gets cheaper in the haze"
+      ],
+      "ans": 1,
+      "why": "With fellow riders staying off the roads and demand rising, those still riding could earn more."
+     },
+     {
+      "q": "Why do some riders skip masks even in the haze?",
+      "opts": [
+       "They aren’t allowed to wear them",
+       "Masks trap sweat and get uncomfortable",
+       "Masks are sold out",
+       "The apps tell them not to"
+      ],
+      "ans": 1,
+      "why": "Some riders said masks trap sweat and become uncomfortable."
+     },
+     {
+      "q": "What is Zareth Tan’s plan?",
+      "opts": [
+       "Ride extra shifts while it’s busy",
+       "Take time off and go back when the air improves",
+       "Switch to a different app",
+       "Stop delivering for good"
+      ],
+      "ans": 1,
+      "why": "He took a day off after his eyes got itchy and will return when the air quality improves."
+     },
+     {
+      "q": "When does Md Amri say he would stop riding?",
+      "opts": [
+       "When his shift target is hit",
+       "When it gets really hazardous",
+       "Only if his app tells him",
+       "Never"
+      ],
+      "ans": 1,
+      "why": "“When it’s really hazardous, then I won’t do,” he said. He already has a sore throat and a cough."
+     },
+     {
+      "q": "What does Grab say about riders working in the haze?",
+      "opts": [
+       "Riders must finish every shift",
+       "Riders have full autonomy to put their safety and comfort first",
+       "Riders who log off lose their bonus",
+       "Riders can only work at night"
+      ],
+      "ans": 1,
+      "why": "A Grab spokesperson said riders have “full autonomy to prioritise their personal safety and comfort”."
+     }
+    ]
+   },
+   "rewards": {
+    "easy": {
+     "stamp": "Paper stamp",
+     "item": "Haze tracker",
+     "where": "room item"
+    },
+    "mid": {
+     "stamp": "Silver stamp",
+     "item": "N95 mask",
+     "where": "Make your look"
+    },
+    "hard": {
+     "stamp": "Gold stamp",
+     "item": "Air purifier",
+     "where": "room item"
+    }
+   },
+   "bonus": {
+    "badge": "Clear Skies",
+    "item": "Rider helmet",
+    "where": "Make your look"
+   },
+   "press": "The Straits Times"
+  },
+  "world": {
+   "key": "world",
+   "name": "World",
+   "wingName": "World Wing",
+   "color": "#5b76b0",
+   "tint": "#d9e0ee",
+   "painting": "ukraine",
+   "author": "Max Hunder (Reuters)",
+   "date": "15 Oct 2026",
+   "bonusLook": "Press helmet",
+   "badgeArt": "article-world",
+   "titles": [
+    "Cover: Step inside the story",
+    "The scale",
+    "Where it happened",
+    "What was hit?",
+    "Strategic context",
+    "The whole night",
+    "Understanding, not a quiz",
+    "The full picture",
+    "What stuck?",
+    "Take your time"
+   ],
+   "topic": "A night of drones in Kirovohrad",
+   "headline": "Central Ukrainian region hit by vast drone attack, killing three",
+   "source": "Reuters via The Straits Times · Max Hunder · 15 Oct 2026",
+   "short": "Kirovohrad",
+   "parties": [
+    {
+     "key": "raikovych",
+     "name": "Andriy Raikovych",
+     "role": "Governor, Kirovohrad region",
+     "ini": "AR",
+     "color": "#5b76b0",
+     "short": "Regional governor",
+     "time": "7:40 AM"
+    },
+    {
+     "key": "airforce",
+     "name": "Ukraine’s Air Force",
+     "role": "National air defence",
+     "ini": "AF",
+     "color": "#3a3834",
+     "short": "Air force",
+     "time": "7:45 AM"
+    },
+    {
+     "key": "ses",
+     "name": "State Emergency Service",
+     "role": "Kirovohrad region",
+     "ini": "SE",
+     "color": "#b5403a",
+     "short": "Emergency service",
+     "time": "7:52 AM"
+    }
+   ],
+   "thread": [
+    {
+     "key": "raikovych",
+     "msgs": [
+      "Last night was the largest Russian attack on our region during the war.",
+      "Over 360 drones. 26 different locations were hit.",
+      "Three people were killed and six were wounded.",
+      "The enemy deliberately hit critical infrastructure, transport enterprises, logistics facilities and homes."
+     ]
+    },
+    {
+     "key": "airforce",
+     "msgs": [
+      "Across the whole country, 580 Russian drones attacked overnight.",
+      "536 of them were shot down."
+     ]
+    },
+    {
+     "key": "ses",
+     "msgs": [
+      "Our firefighters were out in Kropyvnytskyi, the regional capital.",
+      "They worked at the site of a business hit by a drone strike."
+     ]
+    }
+   ],
+   "you": [
+    "So what does this mean for us in Singapore?",
+    "It happened far away, but it’s a reminder to read war news carefully.",
+    "Every number here comes from a named Ukrainian official: the governor for his region, the air force for the country. Reuters reported what they said.",
+    "Ask “who is counting?” whenever you see figures from a war."
+   ],
+   "threadDay": "Thu, 15 Oct",
+   "threadTime": "7:40 AM",
+   "quiz": {
+    "easy": [
+     {
+      "q": "Which Ukrainian region was hit?",
+      "opts": [
+       "Kyiv",
+       "Kirovohrad",
+       "Lviv",
+       "Odesa"
+      ],
+      "ans": 1,
+      "why": "The central region of Kirovohrad was hit overnight."
+     },
+     {
+      "q": "How many people were killed?",
+      "opts": [
+       "One",
+       "Three",
+       "Six",
+       "Ten"
+      ],
+      "ans": 1,
+      "why": "Three people were killed, the local governor said."
+     },
+     {
+      "q": "What was used in the attack?",
+      "opts": [
+       "Drones",
+       "Tanks",
+       "Warships",
+       "Only missiles"
+      ],
+      "ans": 0,
+      "why": "It was a vast drone attack: over 360 drones hit the region."
+     },
+     {
+      "q": "Who gave the region’s figures?",
+      "opts": [
+       "Ukraine’s president",
+       "The region’s governor",
+       "The United Nations",
+       "Russia’s army"
+      ],
+      "ans": 1,
+      "why": "Governor Andriy Raikovych gave the regional figures."
+     },
+     {
+      "q": "Where did the governor post his update?",
+      "opts": [
+       "X",
+       "Telegram",
+       "Instagram",
+       "A TV address"
+      ],
+      "ans": 1,
+      "why": "He wrote on the messaging app Telegram."
+     }
+    ],
+    "mid": [
+     {
+      "q": "About how many drones hit the Kirovohrad region?",
+      "opts": [
+       "Over 36",
+       "Over 160",
+       "Over 360",
+       "Over 3,600"
+      ],
+      "ans": 2,
+      "why": "Over 360 drones, the governor said."
+     },
+     {
+      "q": "How many locations in the region were hit?",
+      "opts": [
+       "6",
+       "16",
+       "26",
+       "60"
+      ],
+      "ans": 2,
+      "why": "26 different locations were hit."
+     },
+     {
+      "q": "How many people were wounded?",
+      "opts": [
+       "3",
+       "6",
+       "9",
+       "26"
+      ],
+      "ans": 1,
+      "why": "Six people were wounded, on top of the three killed."
+     },
+     {
+      "q": "How many Russian drones attacked all of Ukraine overnight, according to the air force?",
+      "opts": [
+       "360",
+       "536",
+       "580",
+       "850"
+      ],
+      "ans": 2,
+      "why": "580 drones attacked the country overnight, Ukraine’s air force said."
+     },
+     {
+      "q": "How many of those drones were shot down?",
+      "opts": [
+       "44",
+       "360",
+       "536",
+       "580"
+      ],
+      "ans": 2,
+      "why": "536 were shot down, the air force said."
+     }
+    ],
+    "hard": [
+     {
+      "q": "What made this attack stand out for Kirovohrad?",
+      "opts": [
+       "It was the largest Russian attack on the region in the war",
+       "It was the first attack anywhere in Ukraine",
+       "It hit only farmland",
+       "It happened at midday"
+      ],
+      "ans": 0,
+      "why": "The governor called it the largest Russian attack on the region’s territory during the war."
+     },
+     {
+      "q": "How often is the Kirovohrad region usually bombarded?",
+      "opts": [
+       "Every night",
+       "Relatively infrequently",
+       "Never before",
+       "Only in winter"
+      ],
+      "ans": 1,
+      "why": "Reuters described it as a relatively infrequent target of bombardment."
+     },
+     {
+      "q": "Using the air force’s figures, how many drones were not shot down?",
+      "opts": [
+       "4",
+       "44",
+       "144",
+       "536"
+      ],
+      "ans": 1,
+      "why": "580 − 536 = 44. That’s our maths from their figures, not a number in the article."
+     },
+     {
+      "q": "Which of these did the governor NOT list as a target?",
+      "opts": [
+       "Critical infrastructure",
+       "Transport enterprises",
+       "Schools",
+       "Residential homes"
+      ],
+      "ans": 2,
+      "why": "He listed critical infrastructure, transport enterprises, logistics facilities and homes. Schools weren’t on his list."
+     },
+     {
+      "q": "Whose figures does the report rely on?",
+      "opts": [
+       "Reuters’ own independent count",
+       "Ukrainian officials: the governor and the air force",
+       "Russia’s defence ministry",
+       "United Nations estimates"
+      ],
+      "ans": 1,
+      "why": "Reuters reported what the governor and the air force said. Knowing who is counting helps you weigh the numbers."
+     }
+    ]
+   },
+   "rewards": {
+    "easy": {
+     "stamp": "Paper stamp",
+     "item": "Pocket atlas",
+     "where": "room item"
+    },
+    "mid": {
+     "stamp": "Silver stamp",
+     "item": "Binoculars",
+     "where": "Make your look"
+    },
+    "hard": {
+     "stamp": "Gold stamp",
+     "item": "Wall map",
+     "where": "room item"
+    }
+   },
+   "bonus": {
+    "badge": "Source Check",
+    "item": "Press helmet",
+    "where": "Make your look"
+   },
+   "press": "Reuters · The Straits Times"
   }
  },
  "levels": [
@@ -948,16 +1525,16 @@ window.KN = {
    "name": "Environment",
    "color": "#2f5e48",
    "tint": "#d6e4da",
-   "open": false,
-   "teaser": "Haze"
+   "open": true,
+   "teaser": ""
   },
   {
    "key": "world",
    "name": "World",
    "color": "#5b76b0",
    "tint": "#d9e0ee",
-   "open": false,
-   "teaser": "Ukraine war"
+   "open": true,
+   "teaser": ""
   },
   {
    "key": "culture",
