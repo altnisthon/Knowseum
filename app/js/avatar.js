@@ -13,10 +13,10 @@ const OUTFITS = [['hoodie', 'Hoodie'], ['uniform', 'School uniform'], ['fusion',
 
 // slot decides what an item replaces. Every head-worn item shares one slot, so only one is worn at a time.
 const ACC = {
-  headphones: { slot: 'head' }, cat: { slot: 'head' }, bucket: { slot: 'head' }, fedora: { slot: 'head' }, gradcap: { slot: 'head' }, teamcap: { slot: 'head' },
-  shades: { slot: 'face' }, glasses: { slot: 'face' }, pixel: { slot: 'face' },
+  headphones: { slot: 'head' }, cat: { slot: 'head' }, bucket: { slot: 'head' }, fedora: { slot: 'head' }, gradcap: { slot: 'head' }, teamcap: { slot: 'head' }, riderhelmet: { slot: 'head' }, presshelmet: { slot: 'head' },
+  shades: { slot: 'face' }, glasses: { slot: 'face' }, pixel: { slot: 'face' }, n95: { slot: 'face' },
   presspass: { slot: 'neck' }, vip: { slot: 'neck' },
-  camera: { slot: 'hand' }, bubbletea: { slot: 'hand' }, mic: { slot: 'hand' }, goldmic: { slot: 'hand' }, notebook: { slot: 'hand' }, bottle: { slot: 'hand' }, gloves: { slot: 'hand' },
+  camera: { slot: 'hand' }, bubbletea: { slot: 'hand' }, mic: { slot: 'hand' }, goldmic: { slot: 'hand' }, notebook: { slot: 'hand' }, bottle: { slot: 'hand' }, gloves: { slot: 'hand' }, binoculars: { slot: 'hand' },
   cape: { slot: 'back' }, backpack: { slot: 'back' }, cyberhoodie: { slot: 'body' },
 };
 // 3D items made for the cats (assets/acc). The rest are the museum's doodle items, kept as they were.
@@ -30,6 +30,10 @@ const EXTRA = {
   glasses: `<g fill="none" ${st}><circle cx="30" cy="50" r="16"/><circle cx="70" cy="50" r="16"/><path d="M46 49 L54 49"/></g>`,
   pixel: `<g fill="${INK}"><rect x="8" y="40" width="38" height="18"/><rect x="54" y="40" width="38" height="18"/><rect x="46" y="42" width="8" height="5"/><rect x="14" y="44" width="9" height="6" fill="#d8ff3d"/><rect x="60" y="44" width="9" height="6" fill="#d8ff3d"/></g>`,
   gloves: `<path d="M30 92 L30 58 Q30 50 36 50 L36 36 Q36 30 42 30 Q48 30 48 36 L48 48 L48 30 Q48 24 54 24 Q60 24 60 30 L60 50 L66 46 Q72 42 74 50 L62 92 Z" fill="#b5403a" ${st}/>`,
+  riderhelmet: `<path d="M8 70 C6 26 94 26 92 70 Z" fill="#2f5e48" ${st}/><path d="M22 60 C30 44 70 44 78 60 L78 70 L22 70 Z" fill="#1c1b19" ${st}/><path d="M26 58 C36 50 64 50 74 58" stroke="#ff7a1a" stroke-width="4" fill="none"/><path d="M50 22 L50 34" stroke="#ff7a1a" stroke-width="5" stroke-linecap="round"/>`,
+  presshelmet: `<path d="M10 70 C8 26 92 26 90 70 Z" fill="#5b76b0" ${st}/><path d="M4 70 H96" ${st}/><rect x="28" y="44" width="44" height="15" rx="3" fill="#fff" ${st}/><text x="50" y="55.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="11" fill="#1c1b19">PRESS</text>`,
+  n95: `<path d="M18 40 C30 30 70 30 82 40 L80 62 C70 76 30 76 20 62 Z" fill="#f4f1ea" ${st}/><path d="M20 48 C40 44 60 44 80 48 M22 58 C40 54 60 54 78 58" stroke="#b8b2a6" stroke-width="2" fill="none"/><path d="M18 42 L4 36 M82 42 L96 36" ${st}/><circle cx="66" cy="62" r="4" fill="#5b76b0" ${st}/>`,
+  binoculars: `<g ${st}><rect x="14" y="34" width="28" height="44" rx="9" fill="#3a3834"/><rect x="58" y="34" width="28" height="44" rx="9" fill="#3a3834"/><rect x="40" y="44" width="20" height="16" fill="#5b76b0"/><circle cx="28" cy="72" r="9" fill="#8fb0d9"/><circle cx="72" cy="72" r="9" fill="#8fb0d9"/></g>`,
   cyberhoodie: `<path d="M8 30 H92 M18 52 H82" stroke="#d8ff3d" stroke-width="9" stroke-linecap="round"/><path d="M8 30 H92 M18 52 H82" stroke="#6a47ff" stroke-width="2.5" stroke-linecap="round"/>`,
 };
 const LANYARD = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 58"><g fill="none" stroke-linecap="round"><path d="M5 2 C9 28 30 48 46 56 M95 2 C91 28 70 48 54 56" stroke="#9d968a" stroke-width="9"/><path d="M5 2 C9 28 30 48 46 56 M95 2 C91 28 70 48 54 56" stroke="#ece6dc" stroke-width="6.5"/><path d="M6 6 C11 28 30 46 45 53 M94 6 C89 28 70 46 55 53" stroke="#fff" stroke-opacity=".6" stroke-width="1.6"/></g></svg>`);
@@ -60,11 +64,13 @@ function place(k, pose, m) {
     case 'fedora': return at(m.hx, c - HW * .6, HW * 1.0);
     case 'gradcap': return at(m.hx, c - HW * .5, HW * 1.0);
     case 'teamcap': return at(m.hx, c - HW * .42, HW * .98);
+    case 'riderhelmet': case 'presshelmet': return at(m.hx, c - HW * .46, HW * 1.04);
     case 'shades': case 'glasses': case 'pixel':
       return side ? null : at(m.hx, c + HW * .44 - HW * .82 / 2, HW * .82);
+    case 'n95': return side ? null : at(m.hx, c + HW * .27, HW * .62);
     case 'presspass': return null; // lanyard + card, drawn in figure()
     case 'vip': return side ? null : at(m.hx, c + HW * .6, HW * .5);
-    case 'camera': case 'bubbletea': case 'mic': case 'goldmic': case 'notebook': case 'bottle': {
+    case 'camera': case 'bubbletea': case 'mic': case 'goldmic': case 'notebook': case 'bottle': case 'binoculars': {
       if (side || jump) return null;
       const wd = k === 'camera' ? w * .36 : k === 'bubbletea' ? w * .24 : w * .34;
       return [m.bx + w * .38, H * .88 - wd * ar, wd, wd * ar, false];
